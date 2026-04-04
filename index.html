@@ -6,138 +6,175 @@
 <title>Budget Survival</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
-    color: white;
-    text-align: center;
-    padding: 20px;
-  }
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
 
-  h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
-  }
+.nav {
+  display: flex;
+  justify-content: space-around;
+  background: #1a1a1a;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
 
-  .card {
-    background: #1e1e1e;
-    padding: 20px;
-    border-radius: 16px;
-    margin: 15px 0;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-  }
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
 
-  input {
-    width: 90%;
-    padding: 14px;
-    margin: 10px 0;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    background: #2a2a2a;
-    color: white;
-  }
+.nav a:hover {
+  color: #00e676;
+}
 
-  button {
-    width: 95%;
-    padding: 14px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 12px;
-    font-size: 18px;
-    background: #00c853;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-  }
+.card {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 16px;
+  margin: 15px auto;
+  max-width: 420px;
+}
 
-  button:hover {
-    background: #00e676;
-  }
+input {
+  width: 90%;
+  padding: 14px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  background: #2a2a2a;
+  color: white;
+}
 
-  .big {
-    font-size: 42px;
-    font-weight: bold;
-    margin: 10px 0;
-  }
+button {
+  width: 95%;
+  padding: 14px;
+  border-radius: 12px;
+  background: #00c853;
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-  .label {
-    opacity: 0.7;
-    font-size: 14px;
-  }
+.big {
+  font-size: 40px;
+  margin: 10px 0;
+}
 
-  .warning {
-    color: #ff5252;
-    font-weight: bold;
-    margin-top: 10px;
-  }
+.progress {
+  height: 10px;
+  background: #333;
+  border-radius: 10px;
+  margin-top: 10px;
+}
 
-  .okay {
-    color: #ffd740;
-    font-weight: bold;
-    margin-top: 10px;
-  }
+.progress-bar {
+  height: 10px;
+  background: #00e676;
+  border-radius: 10px;
+  width: 0%;
+}
 
-  .good {
-    color: #00e676;
-    font-weight: bold;
-    margin-top: 10px;
-  }
+.warning { color: red; }
+.okay { color: orange; }
+.good { color: #00e676; }
 
 </style>
 </head>
 
 <body>
 
+<div class="nav">
+  <a href="index.html">Home</a>
+  <a href="tips.html">Tips</a>
+  <a href="about.html">About</a>
+</div>
+
 <h1>💰 Budget Survival</h1>
-<p>Will your money last?</p>
 
 <div class="card">
-  <input type="number" id="income" placeholder="Total Income ($)">
-  <input type="number" id="expenses" placeholder="Total Expenses ($)">
-  <input type="number" id="days" placeholder="Days Until Payday">
-
+  <input type="number" id="income" placeholder="Income ($)">
+  <input type="number" id="expenses" placeholder="Expenses ($)">
+  <input type="number" id="days" placeholder="Days until payday">
   <button onclick="calculate()">Calculate</button>
 </div>
 
 <div class="card" id="results" style="display:none;">
-  
-  <div class="label">Money Left</div>
-  <div class="big" id="moneyLeft">$0</div>
+  <div>Money Left</div>
+  <div class="big" id="moneyLeft"></div>
 
-  <div class="label">Daily Budget</div>
-  <div class="big" id="daily">$0</div>
+  <div>Daily Budget</div>
+  <div class="big" id="daily"></div>
+
+  <div id="daysWarning"></div>
+
+  <div class="progress">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
 
   <div id="status"></div>
-
 </div>
 
 <script>
 function calculate() {
-  const income = parseFloat(document.getElementById("income").value) || 0;
-  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
-  const days = parseFloat(document.getElementById("days").value) || 1;
+  const income = parseFloat(incomeInput.value) || 0;
+  const expenses = parseFloat(expensesInput.value) || 0;
+  const days = parseFloat(daysInput.value) || 1;
 
   const moneyLeft = income - expenses;
   const daily = moneyLeft / days;
 
-  document.getElementById("results").style.display = "block";
-  document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
-  document.getElementById("daily").innerText = "$" + daily.toFixed(2);
+  localStorage.setItem("income", income);
+  localStorage.setItem("expenses", expenses);
+  localStorage.setItem("days", days);
 
-  let status = "";
+  results.style.display = "block";
 
-  if (daily < 10) {
-    status = "<div class='warning'>⚠️ You may run out of money early</div>";
-  } else if (daily <= 30) {
-    status = "<div class='okay'>⚠️ Be careful with spending</div>";
-  } else {
-    status = "<div class='good'>✅ You're in a good position</div>";
-  }
+  moneyLeftDisplay.innerText = "$" + moneyLeft.toFixed(2);
+  dailyDisplay.innerText = "$" + daily.toFixed(2);
 
-  document.getElementById("status").innerHTML = status;
+  let statusText = "";
+  if (daily < 10) statusText = "<div class='warning'>⚠️ Risk of running out</div>";
+  else if (daily <= 30) statusText = "<div class='okay'>⚠️ Be careful</div>";
+  else statusText = "<div class='good'>✅ You're good</div>";
+
+  status.innerHTML = statusText;
+
+  let percent = Math.min((expenses / income) * 100, 100);
+  progressBar.style.width = percent + "%";
+
+  daysWarning.innerHTML = `<p>You have <b>${days}</b> days left</p>`;
 }
+
+const incomeInput = document.getElementById("income");
+const expensesInput = document.getElementById("expenses");
+const daysInput = document.getElementById("days");
+
+const moneyLeftDisplay = document.getElementById("moneyLeft");
+const dailyDisplay = document.getElementById("daily");
+const status = document.getElementById("status");
+const results = document.getElementById("results");
+const progressBar = document.getElementById("progressBar");
+const daysWarning = document.getElementById("daysWarning");
+
+window.onload = () => {
+  const income = localStorage.getItem("income");
+  const expenses = localStorage.getItem("expenses");
+  const days = localStorage.getItem("days");
+
+  if (income) incomeInput.value = income;
+  if (expenses) expensesInput.value = expenses;
+  if (days) daysInput.value = days;
+
+  if (income && expenses && days) calculate();
+};
 </script>
 
 </body>
