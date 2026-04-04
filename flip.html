@@ -1,31 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Flip It</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flip It Scanner</title>
+
+<link rel="manifest" href="manifest.json">
 
 <style>
 body {
-  font-family: 'Segoe UI';
-  background: #111;
+  margin: 0;
+  font-family: system-ui;
+  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
   color: white;
-  text-align: center;
-  padding: 20px;
 }
 
 .nav {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 20px;
+  background: #1a1a1a;
+  padding: 12px;
 }
 
-.nav a { color: white; text-decoration: none; }
+.nav a {
+  color: white;
+  text-decoration: none;
+}
+
+.container {
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
 
 .card {
   background: #1e1e1e;
   padding: 20px;
-  border-radius: 15px;
-  max-width: 400px;
-  margin: auto;
+  border-radius: 16px;
+  margin-bottom: 15px;
+}
+
+input, button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+}
+
+input {
+  background: #2a2a2a;
+  color: white;
+}
+
+button {
+  background: #00c853;
+  color: white;
+}
+
+.big { font-size: 28px; }
+
+.tip {
+  background: #2a2a2a;
+  padding: 10px;
+  margin-top: 8px;
+  border-radius: 8px;
+}
+
+.link-btn {
+  background: #2196f3;
 }
 </style>
 </head>
@@ -38,11 +81,162 @@ body {
   <a href="about.html">About</a>
 </div>
 
+<div class="container">
+
+<!-- 📷 SCANNER -->
 <div class="card">
-  <h1>💸 Make Money Now</h1>
-  <p>Flip items around you for profit.</p>
-  <p>Buy low. Sell high. Start with what you have.</p>
+  <h3>📷 AI Item Scanner</h3>
+
+  <input type="file" accept="image/*" onchange="previewImage(event)">
+  
+  <img id="preview" style="width:100%; margin-top:10px; border-radius:10px; display:none;" />
+
+  <button onclick="analyzeImage()">Scan Item</button>
+
+  <div id="scanStatus"></div>
+  <div id="scanResult"></div>
 </div>
+
+<!-- 🧠 TEXT SCANNER -->
+<div class="card">
+  <h3>🧠 Smart Scanner</h3>
+
+  <input type="text" id="item" placeholder="Enter item (couch, phone, shoes)">
+  <button onclick="scan()">Scan Item</button>
+
+  <div id="scanTextResult"></div>
+</div>
+
+<!-- 💰 PROFIT -->
+<div class="card">
+  <h3>💰 Profit Calculator</h3>
+
+  <input type="number" id="buy" placeholder="Buy Price">
+  <input type="number" id="sell" placeholder="Sell Price">
+
+  <button onclick="calc()">Check Profit</button>
+
+  <div class="big" id="profit">$0</div>
+  <div id="rating"></div>
+</div>
+
+<!-- 🔗 MARKET -->
+<div class="card">
+  <h3>🔗 Sell Fast</h3>
+
+  <button class="link-btn" onclick="goMarket('fb')">Facebook Marketplace</button>
+  <button class="link-btn" onclick="goMarket('ebay')">eBay</button>
+  <button class="link-btn" onclick="goMarket('offerup')">OfferUp</button>
+</div>
+
+<!-- 📊 TRENDING -->
+<div class="card">
+  <h3>📊 Trending Flips</h3>
+
+  <div class="tip">📱 iPhones</div>
+  <div class="tip">🪑 Furniture</div>
+  <div class="tip">👟 Sneakers</div>
+  <div class="tip">🎮 Game consoles</div>
+</div>
+
+<!-- 🔘 ACTIONS -->
+<div class="card">
+  <button onclick="window.location.href='index.html'">💰 Back to Budget</button>
+  <button onclick="installApp()">⬇️ Install</button>
+  <button onclick="shareApp()">📤 Share</button>
+</div>
+
+</div>
+
+<script>
+// IMAGE PREVIEW
+function previewImage(event) {
+  const img = document.getElementById("preview");
+  img.src = URL.createObjectURL(event.target.files[0]);
+  img.style.display = "block";
+}
+
+// FAKE AI SCAN
+function analyzeImage() {
+  const status = document.getElementById("scanStatus");
+  const result = document.getElementById("scanResult");
+
+  status.innerText = "🔍 Analyzing...";
+  result.innerText = "";
+
+  setTimeout(() => {
+    const outcomes = [
+      "📱 Phone detected. High resale value.",
+      "🪑 Furniture detected. Clean & flip.",
+      "👟 Shoes detected. Resell for profit.",
+      "📦 General item. Check demand."
+    ];
+
+    const random = outcomes[Math.floor(Math.random() * outcomes.length)];
+
+    status.innerText = "✅ Done";
+    result.innerText = random;
+  }, 2000);
+}
+
+// TEXT SCAN
+function scan() {
+  let item = document.getElementById("item").value.toLowerCase();
+  let result = "";
+
+  if (item.includes("couch")) result = "Furniture flip $50–$200 profit";
+  else if (item.includes("phone")) result = "Phones flip fast";
+  else if (item.includes("shoes")) result = "Clean and resell 2x";
+  else result = "Look for cheap + high demand";
+
+  document.getElementById("scanTextResult").innerText = result;
+}
+
+// PROFIT
+function calc() {
+  let buy = parseFloat(document.getElementById("buy").value) || 0;
+  let sell = parseFloat(document.getElementById("sell").value) || 0;
+  let profit = sell - buy;
+
+  document.getElementById("profit").innerText = "$" + profit;
+  document.getElementById("rating").innerText =
+    profit <= 0 ? "Bad deal"
+    : profit < 20 ? "Low profit"
+    : "Great flip";
+}
+
+// LINKS
+function goMarket(type) {
+  if (type === "fb") window.open("https://facebook.com/marketplace");
+  if (type === "ebay") window.open("https://ebay.com");
+  if (type === "offerup") window.open("https://offerup.com");
+}
+
+// INSTALL
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+function installApp() {
+  if (deferredPrompt) deferredPrompt.prompt();
+  else alert("Add to Home Screen");
+}
+
+// SHARE
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({
+      title: "Flip It",
+      text: "Make money flipping items",
+      url: window.location.href
+    });
+  } else {
+    alert("Copy link: " + window.location.href);
+  }
+}
+</script>
 
 </body>
 </html>
