@@ -7,27 +7,44 @@
 
 <style>
 body {
-  font-family: 'Segoe UI';
-  background: #111;
+  margin: 0;
+  font-family: system-ui;
+  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
   color: white;
-  text-align: center;
-  padding: 20px;
 }
 
 .nav {
   display: flex;
   justify-content: space-around;
-  margin-bottom: 20px;
+  background: #1a1a1a;
+  padding: 12px;
 }
 
-.nav a { color: white; text-decoration: none; }
+.nav a {
+  color: white;
+  text-decoration: none;
+}
+
+.container {
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
 
 .card {
   background: #1e1e1e;
   padding: 20px;
-  border-radius: 15px;
-  max-width: 400px;
-  margin: auto;
+  border-radius: 16px;
+  margin-bottom: 15px;
+}
+
+h1, h3 {
+  text-align: center;
+}
+
+.highlight {
+  color: #00e676;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -40,10 +57,63 @@ body {
   <a href="about.html">About</a>
 </div>
 
+<div class="container">
+
 <div class="card">
-  <h1>📘 About</h1>
-  <p>This app helps you survive between paychecks.</p>
-  <p>Track money. Avoid going broke. Stay in control.</p>
+  <h1>📘 About Budget Survival Toolkit</h1>
+
+  <p>
+    Budget Survival Toolkit is designed to help people manage their money between paychecks and avoid running out before their next income.
+  </p>
+
+  <p>
+    The app calculates how much money you have left and how much you can safely spend each day, helping you stay in control of your finances.
+  </p>
+</div>
+
+<div class="card">
+  <h3 class="highlight">💡 What To Do When Money Is Low</h3>
+
+  <p>
+    If your daily budget is low, the solution is not just to spend less — it's to increase your income.
+  </p>
+
+  <p>
+    Tap the <b>"💸 Make Money Now"</b> button on the home screen to open Flip It.
+  </p>
+
+  <p>
+    Flip It helps you:
+  </p>
+
+  <ul style="text-align:left;">
+    <li>Find items to flip for profit</li>
+    <li>Scan items and get smart advice</li>
+    <li>Estimate profit before buying</li>
+    <li>Sell items quickly using marketplace links</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3 class="highlight">🚀 How This System Works</h3>
+
+  <p>
+    This is more than a budgeting app — it’s a survival system.
+  </p>
+
+  <p>
+    Step 1: Track your money  
+    <br>
+    Step 2: Control your spending  
+    <br>
+    Step 3: Use Flip It to make more money  
+  </p>
+
+  <p>
+    <b>Manage money + Make money = Stay in control</b>
+  </p>
+</div>
+
 </div>
 
 </body>
