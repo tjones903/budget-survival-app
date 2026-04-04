@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget Survival</title>
+<title>Budget Survival FINAL</title>
 
 <style>
 body {
@@ -134,9 +134,9 @@ button {
 
 <script>
 function calculate() {
-  const income = parseFloat(incomeInput.value) || 0;
-  const expenses = parseFloat(expensesInput.value) || 0;
-  const days = parseFloat(daysInput.value) || 1;
+  const income = parseFloat(document.getElementById("income").value) || 0;
+  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
+  const days = parseFloat(document.getElementById("days").value) || 1;
 
   const moneyLeft = income - expenses;
   const daily = moneyLeft / days;
@@ -145,30 +145,28 @@ function calculate() {
   localStorage.setItem("expenses", expenses);
   localStorage.setItem("days", days);
 
-  results.style.display = "block";
+  document.getElementById("results").style.display = "block";
 
-  moneyLeftDisplay.innerText = "$" + moneyLeft.toFixed(2);
-  dailyDisplay.innerText = "$" + daily.toFixed(2);
+  document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
+  document.getElementById("daily").innerText = "$" + daily.toFixed(2);
 
-  daysWarning.innerHTML = `You have ${days} days left`;
+  document.getElementById("daysWarning").innerText = "You have " + days + " days left";
 
   let percent = income > 0 ? (expenses / income) * 100 : 0;
-  progressBar.style.width = percent + "%";
+  document.getElementById("progressBar").style.width = percent + "%";
 
-  status.innerHTML = daily < 10 
-    ? "⚠️ Risk of running out"
-    : daily < 30 
-    ? "⚠️ Be careful"
-    : "✅ You're good";
+  document.getElementById("status").innerText =
+    daily < 10 ? "⚠️ Risk of running out" :
+    daily < 30 ? "⚠️ Be careful" :
+    "✅ You're good";
 }
 
 function goFlip() {
   window.location.href = "flip.html";
 }
 
-// INSTALL APP
+// INSTALL BUTTON
 let deferredPrompt;
-
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
@@ -177,20 +175,17 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function installApp() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => {
-      deferredPrompt = null;
-    });
   } else {
-    alert("To install: tap Share → Add to Home Screen");
+    alert("Tap Share → Add to Home Screen");
   }
 }
 
-// SHARE APP
+// SHARE BUTTON
 function shareApp() {
   if (navigator.share) {
     navigator.share({
       title: "Budget Survival",
-      text: "Check out this budgeting app!",
+      text: "Check out this app!",
       url: window.location.href
     });
   } else {
@@ -198,25 +193,15 @@ function shareApp() {
   }
 }
 
-const incomeInput = document.getElementById("income");
-const expensesInput = document.getElementById("expenses");
-const daysInput = document.getElementById("days");
-
-const moneyLeftDisplay = document.getElementById("moneyLeft");
-const dailyDisplay = document.getElementById("daily");
-const status = document.getElementById("status");
-const results = document.getElementById("results");
-const progressBar = document.getElementById("progressBar");
-const daysWarning = document.getElementById("daysWarning");
-
+// LOAD SAVED DATA
 window.onload = () => {
   const income = localStorage.getItem("income");
   const expenses = localStorage.getItem("expenses");
   const days = localStorage.getItem("days");
 
-  if (income) incomeInput.value = income;
-  if (expenses) expensesInput.value = expenses;
-  if (days) daysInput.value = days;
+  if (income) document.getElementById("income").value = income;
+  if (expenses) document.getElementById("expenses").value = expenses;
+  if (days) document.getElementById("days").value = days;
 
   if (income && expenses && days) calculate();
 };
