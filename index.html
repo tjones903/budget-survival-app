@@ -94,6 +94,11 @@ button {
 .share-btn {
   background: #2196f3;
 }
+
+.guide {
+  margin-top: 10px;
+  font-size: 14px;
+}
 </style>
 </head>
 
@@ -109,6 +114,7 @@ button {
 
 <div class="container">
 
+<!-- INPUT -->
 <div class="card">
   <input type="number" id="income" placeholder="Income ($)">
   <input type="number" id="expenses" placeholder="Expenses ($)">
@@ -117,6 +123,7 @@ button {
   <button onclick="calculate()">Calculate</button>
 </div>
 
+<!-- RESULTS -->
 <div class="card">
 
   <div>Money Left</div>
@@ -133,9 +140,13 @@ button {
 
   <div id="status"></div>
 
-  <!-- 🔥 THIS OPENS FLIP IT -->
+  <!-- 🔥 NEW GUIDANCE -->
+  <div id="actionGuide" class="guide"></div>
+
+  <!-- FLIP BUTTON -->
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
 
+  <!-- INSTALL + SHARE -->
   <button onclick="installApp()">⬇️ Install App</button>
   <button class="share-btn" onclick="shareApp()">📤 Share App</button>
 
@@ -165,13 +176,28 @@ function calculate() {
   let percent = income > 0 ? (expenses / income) * 100 : 0;
   document.getElementById("progressBar").style.width = percent + "%";
 
-  document.getElementById("status").innerText =
-    daily < 10 ? "⚠️ Risk of running out"
-    : daily < 30 ? "⚠️ Be careful"
-    : "✅ You're in control";
+  // STATUS
+  let statusText = "";
+  if (daily < 10) statusText = "⚠️ Risk of running out";
+  else if (daily < 30) statusText = "⚠️ Be careful";
+  else statusText = "✅ You're in control";
+
+  document.getElementById("status").innerText = statusText;
+
+  // 🔥 ACTION GUIDE (NEW)
+  let guide = "";
+  if (daily < 10) {
+    guide = "💡 You need more income. Tap 'Make Money Now' to flip items.";
+  } else if (daily < 30) {
+    guide = "⚠️ Stay careful. Reduce spending or earn extra income.";
+  } else {
+    guide = "✅ You're doing well. Keep managing your money.";
+  }
+
+  document.getElementById("actionGuide").innerText = guide;
 }
 
-// 🔥 THIS CONNECTS TO FLIP IT
+// CONNECT TO FLIP IT
 function goFlip() {
   window.location.href = "flip.html";
 }
@@ -196,7 +222,7 @@ function shareApp() {
   if (navigator.share) {
     navigator.share({
       title: "Budget Survival Toolkit",
-      text: "Manage your money and stay on track",
+      text: "Manage your money and stay in control",
       url: window.location.href
     });
   } else {
@@ -204,7 +230,7 @@ function shareApp() {
   }
 }
 
-// LOAD SAVED DATA
+// LOAD DATA
 window.onload = () => {
   const income = localStorage.getItem("income");
   const expenses = localStorage.getItem("expenses");
