@@ -99,6 +99,11 @@ button {
   margin-top: 10px;
   font-size: 14px;
 }
+
+/* 🔥 COLOR WARNINGS */
+.status-good { color: #00e676; }
+.status-warning { color: orange; }
+.status-danger { color: red; }
 </style>
 </head>
 
@@ -114,7 +119,6 @@ button {
 
 <div class="container">
 
-<!-- INPUT -->
 <div class="card">
   <input type="number" id="income" placeholder="Income ($)">
   <input type="number" id="expenses" placeholder="Expenses ($)">
@@ -123,7 +127,6 @@ button {
   <button onclick="calculate()">Calculate</button>
 </div>
 
-<!-- RESULTS -->
 <div class="card">
 
   <div>Money Left</div>
@@ -139,14 +142,10 @@ button {
   </div>
 
   <div id="status"></div>
-
-  <!-- 🔥 NEW GUIDANCE -->
   <div id="actionGuide" class="guide"></div>
 
-  <!-- FLIP BUTTON -->
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
 
-  <!-- INSTALL + SHARE -->
   <button onclick="installApp()">⬇️ Install App</button>
   <button class="share-btn" onclick="shareApp()">📤 Share App</button>
 
@@ -176,15 +175,26 @@ function calculate() {
   let percent = income > 0 ? (expenses / income) * 100 : 0;
   document.getElementById("progressBar").style.width = percent + "%";
 
-  // STATUS
+  // 🔥 STATUS WITH COLORS
   let statusText = "";
-  if (daily < 10) statusText = "⚠️ Risk of running out";
-  else if (daily < 30) statusText = "⚠️ Be careful";
-  else statusText = "✅ You're in control";
+  let statusClass = "";
 
-  document.getElementById("status").innerText = statusText;
+  if (daily < 10) {
+    statusText = "🔴 Risk of running out";
+    statusClass = "status-danger";
+  } else if (daily < 30) {
+    statusText = "🟡 Be careful";
+    statusClass = "status-warning";
+  } else {
+    statusText = "🟢 You're in control";
+    statusClass = "status-good";
+  }
 
-  // 🔥 ACTION GUIDE (NEW)
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = statusText;
+  statusEl.className = statusClass;
+
+  // 🔥 ACTION GUIDE
   let guide = "";
   if (daily < 10) {
     guide = "💡 You need more income. Tap 'Make Money Now' to flip items.";
@@ -194,10 +204,15 @@ function calculate() {
     guide = "✅ You're doing well. Keep managing your money.";
   }
 
-  document.getElementById("actionGuide").innerText = guide;
+  const guideEl = document.getElementById("actionGuide");
+  guideEl.innerText = guide;
+
+  if (daily < 10) guideEl.style.color = "red";
+  else if (daily < 30) guideEl.style.color = "orange";
+  else guideEl.style.color = "#00e676";
 }
 
-// CONNECT TO FLIP IT
+// CONNECT TO FLIP
 function goFlip() {
   window.location.href = "flip.html";
 }
