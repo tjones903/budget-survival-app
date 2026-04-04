@@ -63,6 +63,7 @@ button {
   color: white;
   border: none;
   margin-top: 10px;
+  font-size: 16px;
 }
 
 .big {
@@ -102,8 +103,8 @@ button {
 <div class="container">
 
 <div class="card">
-  <input type="number" id="income" placeholder="Income">
-  <input type="number" id="expenses" placeholder="Expenses">
+  <input type="number" id="income" placeholder="Income ($)">
+  <input type="number" id="expenses" placeholder="Expenses ($)">
   <input type="number" id="days" placeholder="Days until payday">
   <button onclick="calculate()">Calculate</button>
 </div>
@@ -124,6 +125,9 @@ button {
   <div id="status"></div>
 
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
+
+  <button onclick="installApp()">⬇️ Install App</button>
+  <button onclick="shareApp()">📤 Share App</button>
 </div>
 
 </div>
@@ -160,6 +164,38 @@ function calculate() {
 
 function goFlip() {
   window.location.href = "flip.html";
+}
+
+// INSTALL APP
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+    });
+  } else {
+    alert("To install: tap Share → Add to Home Screen");
+  }
+}
+
+// SHARE APP
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({
+      title: "Budget Survival",
+      text: "Check out this budgeting app!",
+      url: window.location.href
+    });
+  } else {
+    alert("Copy this link: " + window.location.href);
+  }
 }
 
 const incomeInput = document.getElementById("income");
