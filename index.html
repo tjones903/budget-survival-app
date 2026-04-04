@@ -1,101 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Budget Survival</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Survival</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #f5f7fb;
-      text-align: center;
-      padding: 20px;
-    }
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
 
-    .box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      max-width: 400px;
-      margin: auto;
-    }
+  h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+  }
 
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-    }
+  .card {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 16px;
+    margin: 15px 0;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+  }
 
-    button {
-      padding: 10px;
-      width: 95%;
-      background: black;
-      color: white;
-      border: none;
-      margin-top: 10px;
-    }
+  input {
+    width: 90%;
+    padding: 14px;
+    margin: 10px 0;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    background: #2a2a2a;
+    color: white;
+  }
 
-    .links a {
-      display: block;
-      margin-top: 10px;
-    }
+  button {
+    width: 95%;
+    padding: 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    background: #00c853;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
 
-    .good { color: green; }
-    .bad { color: red; }
-  </style>
+  button:hover {
+    background: #00e676;
+  }
+
+  .big {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+
+  .label {
+    opacity: 0.7;
+    font-size: 14px;
+  }
+
+  .warning {
+    color: #ff5252;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .okay {
+    color: #ffd740;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+  .good {
+    color: #00e676;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+
+</style>
 </head>
 
 <body>
 
-<div class="box">
-  <h1>💰 Budget Survival</h1>
+<h1>💰 Budget Survival</h1>
+<p>Will your money last?</p>
 
-  <input id="income" type="number" placeholder="Income">
-  <input id="expenses" type="number" placeholder="Expenses">
-  <input id="days" type="number" placeholder="Days until paycheck">
+<div class="card">
+  <input type="number" id="income" placeholder="Total Income ($)">
+  <input type="number" id="expenses" placeholder="Total Expenses ($)">
+  <input type="number" id="days" placeholder="Days Until Payday">
 
-  <button onclick="calc()">Calculate</button>
+  <button onclick="calculate()">Calculate</button>
+</div>
 
-  <p>Money Left: <b id="left">$0</b></p>
-  <p>Daily Budget: <b id="daily">$0</b></p>
-  <p id="status"></p>
-  <p id="tips"></p>
+<div class="card" id="results" style="display:none;">
+  
+  <div class="label">Money Left</div>
+  <div class="big" id="moneyLeft">$0</div>
 
-  <div class="links">
-    <a href="tips.html">💡 Tips</a>
-    <a href="about.html">📘 About</a>
-  </div>
+  <div class="label">Daily Budget</div>
+  <div class="big" id="daily">$0</div>
+
+  <div id="status"></div>
+
 </div>
 
 <script>
-function calc() {
-  let i = +income.value || 0;
-  let e = +expenses.value || 0;
-  let d = +days.value || 1;
+function calculate() {
+  const income = parseFloat(document.getElementById("income").value) || 0;
+  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
+  const days = parseFloat(document.getElementById("days").value) || 1;
 
-  let left = i - e;
-  let daily = left / d;
+  const moneyLeft = income - expenses;
+  const daily = moneyLeft / days;
 
-  document.getElementById("left").innerText = "$" + left.toFixed(2);
+  document.getElementById("results").style.display = "block";
+  document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
   document.getElementById("daily").innerText = "$" + daily.toFixed(2);
 
-  let s = document.getElementById("status");
-  let t = document.getElementById("tips");
+  let status = "";
 
-  if (left < 0) {
-    s.innerText = "🚨 Over budget!";
-    s.className = "bad";
-    t.innerText = "Cut spending immediately.";
-  } else if (daily < 10) {
-    s.innerText = "⚠️ Risk of running out";
-    s.className = "bad";
-    t.innerText = "Limit food & trips.";
+  if (daily < 10) {
+    status = "<div class='warning'>⚠️ You may run out of money early</div>";
+  } else if (daily <= 30) {
+    status = "<div class='okay'>⚠️ Be careful with spending</div>";
   } else {
-    s.innerText = "✅ You're good";
-    s.className = "good";
-    t.innerText = "Try saving money.";
+    status = "<div class='good'>✅ You're in a good position</div>";
   }
+
+  document.getElementById("status").innerHTML = status;
 }
 </script>
 
