@@ -3,93 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>About - Budget Survival</title>
+<title>About</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
-    color: white;
-    text-align: center;
-    padding: 20px;
-  }
+body {
+  font-family: 'Segoe UI';
+  background: #111;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
 
-  h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
-  }
+.nav {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
 
-  .card {
-    background: #1e1e1e;
-    padding: 25px;
-    border-radius: 16px;
-    margin: 20px auto;
-    max-width: 420px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-  }
+.nav a { color: white; text-decoration: none; }
 
-  p {
-    opacity: 0.85;
-    line-height: 1.5;
-    font-size: 16px;
-  }
-
-  .highlight {
-    color: #00e676;
-    font-weight: bold;
-  }
-
-  a {
-    display: block;
-    margin-top: 15px;
-    padding: 12px;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .btn {
-    background: #2a2a2a;
-    color: white;
-  }
-
-  .btn:hover {
-    background: #3a3a3a;
-  }
-
+.card {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 15px;
+  max-width: 400px;
+  margin: auto;
+}
 </style>
 </head>
 
 <body>
 
-<h1>📘 About Budget Survival</h1>
+<div class="nav">
+  <a href="index.html">Home</a>
+  <a href="tips.html">Tips</a>
+  <a href="about.html">About</a>
+</div>
 
 <div class="card">
-
-  <p>
-    <span class="highlight">Budget Survival</span> is designed for people living paycheck to paycheck.
-  </p>
-
-  <p>
-    Instead of complicated budgeting tools, it focuses on one simple question:
-  </p>
-
-  <p class="highlight">
-    “Will my money last until my next paycheck?”
-  </p>
-
-  <p>
-    The app calculates your daily spending limit and warns you if you're at risk of running out early.
-  </p>
-
-  <p>
-    Built to help you stay in control, avoid stress, and make smarter financial decisions every day.
-  </p>
-
-  <a href="index.html" class="btn">⬅ Back to Home</a>
-  <a href="tips.html" class="btn">💡 Money Tips</a>
-
+  <h1>📘 About</h1>
+  <p>This app helps you survive between paychecks.</p>
+  <p>Track money. Avoid going broke. Stay in control.</p>
 </div>
 
 </body>
