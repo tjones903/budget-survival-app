@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget Survival</title>
+<title>Budget Survival Toolkit</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00c853">
 
 <style>
 body {
   margin: 0;
   font-family: system-ui;
-  background: #111;
+  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
   color: white;
 }
 
@@ -24,7 +27,7 @@ body {
   display: flex;
   justify-content: space-around;
   background: #1a1a1a;
-  padding: 10px;
+  padding: 12px;
 }
 
 .nav a {
@@ -41,13 +44,14 @@ body {
 .card {
   background: #1e1e1e;
   padding: 20px;
-  border-radius: 15px;
+  border-radius: 16px;
   margin-bottom: 15px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
 }
 
 input {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   margin: 8px 0;
   border-radius: 10px;
   border: none;
@@ -57,8 +61,8 @@ input {
 
 button {
   width: 100%;
-  padding: 12px;
-  border-radius: 10px;
+  padding: 14px;
+  border-radius: 12px;
   background: #00c853;
   color: white;
   border: none;
@@ -88,12 +92,16 @@ button {
 .money-btn {
   background: orange;
 }
+
+.share-btn {
+  background: #2196f3;
+}
 </style>
 </head>
 
 <body>
 
-<div class="header">💰 Budget Survival</div>
+<div class="header">💰 Budget Survival Toolkit</div>
 
 <div class="nav">
   <a href="index.html">Home</a>
@@ -107,11 +115,11 @@ button {
   <input type="number" id="income" placeholder="Income ($)">
   <input type="number" id="expenses" placeholder="Expenses ($)">
   <input type="number" id="days" placeholder="Days until payday">
+
   <button onclick="calculate()">Calculate</button>
 </div>
 
-<!-- RESULTS ALWAYS VISIBLE NOW -->
-<div class="card" id="results">
+<div class="card">
 
   <div>Money Left</div>
   <div class="big" id="moneyLeft">$0.00</div>
@@ -130,7 +138,7 @@ button {
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
 
   <button onclick="installApp()">⬇️ Install App</button>
-  <button onclick="shareApp()">📤 Share App</button>
+  <button class="share-btn" onclick="shareApp()">📤 Share App</button>
 
 </div>
 
@@ -161,14 +169,14 @@ function calculate() {
   document.getElementById("status").innerText =
     daily < 10 ? "⚠️ Risk of running out" :
     daily < 30 ? "⚠️ Be careful" :
-    "✅ You're good";
+    "✅ You're in control";
 }
 
 function goFlip() {
   window.location.href = "flip.html";
 }
 
-// INSTALL BUTTON
+// INSTALL
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
@@ -183,16 +191,16 @@ function installApp() {
   }
 }
 
-// SHARE BUTTON
+// SHARE
 function shareApp() {
   if (navigator.share) {
     navigator.share({
-      title: "Budget Survival",
-      text: "Check out this app!",
+      title: "Budget Survival Toolkit",
+      text: "Manage your money and stay on track",
       url: window.location.href
     });
   } else {
-    alert("Copy this link: " + window.location.href);
+    alert("Copy link: " + window.location.href);
   }
 }
 
