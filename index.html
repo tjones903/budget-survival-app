@@ -8,89 +8,67 @@
 <style>
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Arial, sans-serif;
-  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+  font-family: system-ui;
+  background: #111;
   color: white;
 }
 
-/* HEADER */
 .header {
-  padding: 15px;
   text-align: center;
+  padding: 15px;
   font-size: 22px;
   font-weight: bold;
 }
 
-/* NAV */
 .nav {
   display: flex;
   justify-content: space-around;
   background: #1a1a1a;
-  padding: 12px;
+  padding: 10px;
 }
 
 .nav a {
   color: white;
   text-decoration: none;
-  font-size: 14px;
 }
 
-/* MAIN CONTAINER */
 .container {
   padding: 20px;
   max-width: 500px;
   margin: auto;
 }
 
-/* CARD */
 .card {
   background: #1e1e1e;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 15px;
   margin-bottom: 15px;
 }
 
-/* INPUTS */
 input {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   margin: 8px 0;
   border-radius: 10px;
   border: none;
   background: #2a2a2a;
   color: white;
-  font-size: 16px;
 }
 
-/* BUTTON */
 button {
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 10px;
   background: #00c853;
   color: white;
   border: none;
-  font-size: 18px;
   margin-top: 10px;
 }
 
-/* RESULTS */
 .big {
-  font-size: 36px;
-  margin: 8px 0;
+  font-size: 32px;
 }
 
-.label {
-  font-size: 14px;
-  opacity: 0.7;
-}
-
-/* STATUS COLORS */
-.warning { color: #ff5252; }
-.okay { color: #ffb300; }
-.good { color: #00e676; }
-
-/* PROGRESS BAR */
 .progress {
   height: 8px;
   background: #333;
@@ -105,9 +83,8 @@ button {
   width: 0%;
 }
 
-/* MONEY BUTTON */
 .money-btn {
-  background: #ff9800;
+  background: orange;
 }
 </style>
 </head>
@@ -125,18 +102,17 @@ button {
 <div class="container">
 
 <div class="card">
-  <input type="number" id="income" placeholder="Income ($)">
-  <input type="number" id="expenses" placeholder="Expenses ($)">
+  <input type="number" id="income" placeholder="Income">
+  <input type="number" id="expenses" placeholder="Expenses">
   <input type="number" id="days" placeholder="Days until payday">
   <button onclick="calculate()">Calculate</button>
 </div>
 
 <div class="card" id="results" style="display:none;">
-
-  <div class="label">Money Left</div>
+  <div>Money Left</div>
   <div class="big" id="moneyLeft"></div>
 
-  <div class="label">Daily Budget</div>
+  <div>Daily Budget</div>
   <div class="big" id="daily"></div>
 
   <div id="daysWarning"></div>
@@ -148,7 +124,6 @@ button {
   <div id="status"></div>
 
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
-
 </div>
 
 </div>
@@ -171,18 +146,16 @@ function calculate() {
   moneyLeftDisplay.innerText = "$" + moneyLeft.toFixed(2);
   dailyDisplay.innerText = "$" + daily.toFixed(2);
 
-  let daysToBroke = daily > 0 ? Math.floor(moneyLeft / daily) : 0;
-  daysWarning.innerHTML = `<p>You have <b>${daysToBroke}</b> days before running out</p>`;
+  daysWarning.innerHTML = `You have ${days} days left`;
 
-  let statusText = "";
-  if (daily < 10) statusText = "<div class='warning'>⚠️ Risk of running out</div>";
-  else if (daily <= 30) statusText = "<div class='okay'>⚠️ Tight budget</div>";
-  else statusText = "<div class='good'>✅ You're in control</div>";
-
-  status.innerHTML = statusText;
-
-  let percent = income > 0 ? Math.min((expenses / income) * 100, 100) : 0;
+  let percent = income > 0 ? (expenses / income) * 100 : 0;
   progressBar.style.width = percent + "%";
+
+  status.innerHTML = daily < 10 
+    ? "⚠️ Risk of running out"
+    : daily < 30 
+    ? "⚠️ Be careful"
+    : "✅ You're good";
 }
 
 function goFlip() {
