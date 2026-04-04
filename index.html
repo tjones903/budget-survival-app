@@ -61,6 +61,7 @@ button {
   border: none;
   font-size: 18px;
   font-weight: bold;
+  margin-top: 10px;
 }
 
 .big {
@@ -86,6 +87,9 @@ button {
 .okay { color: orange; }
 .good { color: #00e676; }
 
+.money-btn {
+  background: #ff9800;
+}
 </style>
 </head>
 
@@ -120,6 +124,8 @@ button {
   </div>
 
   <div id="status"></div>
+
+  <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
 </div>
 
 <script>
@@ -140,17 +146,23 @@ function calculate() {
   moneyLeftDisplay.innerText = "$" + moneyLeft.toFixed(2);
   dailyDisplay.innerText = "$" + daily.toFixed(2);
 
+  // Days until broke
+  let daysToBroke = daily > 0 ? Math.floor(moneyLeft / daily) : 0;
+  daysWarning.innerHTML = `<p>You have <b>${daysToBroke}</b> days before running out</p>`;
+
   let statusText = "";
-  if (daily < 10) statusText = "<div class='warning'>⚠️ Risk of running out</div>";
-  else if (daily <= 30) statusText = "<div class='okay'>⚠️ Be careful</div>";
-  else statusText = "<div class='good'>✅ You're good</div>";
+  if (daily < 10) statusText = "<div class='warning'>⚠️ You're overspending. Act now.</div>";
+  else if (daily <= 30) statusText = "<div class='okay'>⚠️ Tight budget. Be careful.</div>";
+  else statusText = "<div class='good'>✅ You're in control.</div>";
 
   status.innerHTML = statusText;
 
   let percent = Math.min((expenses / income) * 100, 100);
   progressBar.style.width = percent + "%";
+}
 
-  daysWarning.innerHTML = `<p>You have <b>${days}</b> days left</p>`;
+function goFlip() {
+  window.location.href = "flip.html"; // future second app
 }
 
 const incomeInput = document.getElementById("income");
