@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget Survival FINAL</title>
+<title>Budget Survival</title>
 
 <style>
 body {
@@ -68,6 +68,7 @@ button {
 
 .big {
   font-size: 32px;
+  margin: 5px 0;
 }
 
 .progress {
@@ -109,14 +110,16 @@ button {
   <button onclick="calculate()">Calculate</button>
 </div>
 
-<div class="card" id="results" style="display:none;">
+<!-- RESULTS ALWAYS VISIBLE NOW -->
+<div class="card" id="results">
+
   <div>Money Left</div>
-  <div class="big" id="moneyLeft"></div>
+  <div class="big" id="moneyLeft">$0.00</div>
 
   <div>Daily Budget</div>
-  <div class="big" id="daily"></div>
+  <div class="big" id="daily">$0.00</div>
 
-  <div id="daysWarning"></div>
+  <div id="daysWarning">Enter values to begin</div>
 
   <div class="progress">
     <div class="progress-bar" id="progressBar"></div>
@@ -128,6 +131,7 @@ button {
 
   <button onclick="installApp()">⬇️ Install App</button>
   <button onclick="shareApp()">📤 Share App</button>
+
 </div>
 
 </div>
@@ -145,12 +149,11 @@ function calculate() {
   localStorage.setItem("expenses", expenses);
   localStorage.setItem("days", days);
 
-  document.getElementById("results").style.display = "block";
-
   document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
   document.getElementById("daily").innerText = "$" + daily.toFixed(2);
 
-  document.getElementById("daysWarning").innerText = "You have " + days + " days left";
+  document.getElementById("daysWarning").innerText =
+    "You have " + days + " days left";
 
   let percent = income > 0 ? (expenses / income) * 100 : 0;
   document.getElementById("progressBar").style.width = percent + "%";
