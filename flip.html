@@ -92,7 +92,7 @@ button {
 
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
-  <input type="text" id="item" placeholder="Enter item (couch, phone, shoes)">
+  <input type="text" id="item" placeholder="Enter item (couch, phone, shoes)" oninput="scan()">
   <button onclick="scan()">Scan Item</button>
   <div id="scanTextResult"></div>
 </div>
@@ -136,22 +136,6 @@ mobilenet.load().then(m => {
   model = m;
 });
 
-// CLEAN NAME (SMART DETECTION FIX)
-function cleanName(rawName) {
-  rawName = rawName.toLowerCase();
-
-  if (rawName.includes("phone") || rawName.includes("cellular")) return "📱 iPhone";
-  if (rawName.includes("shoe") || rawName.includes("sneaker")) return "👟 Sneakers";
-  if (rawName.includes("laptop") || rawName.includes("computer")) return "💻 Laptop";
-  if (rawName.includes("tv") || rawName.includes("screen")) return "📺 TV";
-  if (rawName.includes("chair")) return "🪑 Chair";
-  if (rawName.includes("couch") || rawName.includes("sofa")) return "🛋️ Couch";
-  if (rawName.includes("bottle")) return "🍾 Bottle";
-  if (rawName.includes("bag")) return "👜 Bag";
-
-  return "📦 Item";
-}
-
 function previewImage(event) {
   const img = document.getElementById("preview");
   img.src = URL.createObjectURL(event.target.files[0]);
@@ -160,20 +144,18 @@ function previewImage(event) {
 
 function handleCamera(event) {
   const img = document.getElementById("preview");
-
-  img.src = "";
-  img.style.display = "none";
-
   const file = event.target.files[0];
+  if (!file) return;
+
   img.src = URL.createObjectURL(file);
   img.style.display = "block";
 
   document.getElementById("scanResult").innerHTML = "";
   document.getElementById("scanStatus").innerText = "";
 
-  setTimeout(() => {
+  img.onload = () => {
     runAI();
-  }, 500);
+  };
 }
 
 function analyzeImage() {
@@ -187,64 +169,41 @@ async function runAI() {
   const result = document.getElementById("scanResult");
   const img = document.getElementById("preview");
 
-  if (!model) {
-    status.innerText = "⏳ Loading AI...";
-    return;
-  }
-
   status.innerText = "🔍 Analyzing...";
-  result.innerHTML = "";
 
   const predictions = await model.classify(img);
+  const itemName = predictions[0].className;
 
-  const rawName = predictions[0].className;
-  const itemName = cleanName(rawName);
-
-  // 💰 DYNAMIC PRICING
-  let marketFactor = 0.8 + Math.random() * 0.7;
-
-  let priceDB = {
-    "📱 iPhone": [200, 800],
-    "💻 Laptop": [150, 700],
-    "📺 TV": [80, 400],
-    "🪑 Chair": [25, 150],
-    "🛋️ Couch": [50, 300],
-    "👟 Sneakers": [40, 250],
-    "🍾 Bottle": [5, 30],
-    "👜 Bag": [50, 400],
-    "📦 Item": [20, 120]
-  };
-
-  let valueRange = priceDB[itemName] || priceDB["📦 Item"];
-
-  let value = Math.floor(
-    valueRange[0] + Math.random() * (valueRange[1] - valueRange[0])
-  );
-
-  value = Math.floor(value * marketFactor);
-  let sell = Math.floor(value * (1.3 + Math.random() * 0.7));
+  let value = 50 + Math.floor(Math.random() * 150);
+  let sell = Math.floor(value * 1.6);
 
   status.innerText = "✅ Scan Complete";
 
   result.innerHTML = `
     <div class="tip">Detected Item: <b>${itemName}</b></div>
-    <div class="tip">Estimated Value: <b>$${value}</b></div>
-    <div class="tip">Suggested Sell Price: <b>$${sell}</b></div>
-    <div class="tip">Potential Profit: <b>$${sell - value}</b></div>
+    <div class="tip">Value: <b>$${value}</b></div>
+    <div class="tip">Sell: <b>$${sell}</b></div>
+    <div class="tip">Profit: <b>$${sell - value}</b></div>
   `;
 }
 
-// REST SAME
 function scan() {
   let item = document.getElementById("item").value.toLowerCase();
-  let result = "";
 
-  if (item.includes("couch")) result = "Furniture flip $50–$200 profit";
-  else if (item.includes("phone")) result = "Phones flip fast";
-  else if (item.includes("shoes")) result = "Clean and resell 2x";
-  else result = "Look for cheap + high demand";
+  let value = 100;
 
-  document.getElementById("scanTextResult").innerText = result;
+  if (item.includes("iphone")) {
+    value = 250;
+    if (item.includes("12")) value = 300;
+    if (item.includes("13")) value = 400;
+    if (item.includes("128")) value += 50;
+    if (item.includes("256")) value += 100;
+  }
+
+  let sell = Math.floor(value * 1.6);
+
+  document.getElementById("scanTextResult").innerText =
+    `Value: $${value} | Sell: $${sell} | Profit: $${sell - value}`;
 }
 
 function calc() {
