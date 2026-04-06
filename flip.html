@@ -136,6 +136,22 @@ mobilenet.load().then(m => {
   model = m;
 });
 
+// CLEAN NAME (SMART DETECTION FIX)
+function cleanName(rawName) {
+  rawName = rawName.toLowerCase();
+
+  if (rawName.includes("phone") || rawName.includes("cellular")) return "📱 iPhone";
+  if (rawName.includes("shoe") || rawName.includes("sneaker")) return "👟 Sneakers";
+  if (rawName.includes("laptop") || rawName.includes("computer")) return "💻 Laptop";
+  if (rawName.includes("tv") || rawName.includes("screen")) return "📺 TV";
+  if (rawName.includes("chair")) return "🪑 Chair";
+  if (rawName.includes("couch") || rawName.includes("sofa")) return "🛋️ Couch";
+  if (rawName.includes("bottle")) return "🍾 Bottle";
+  if (rawName.includes("bag")) return "👜 Bag";
+
+  return "📦 Item";
+}
+
 function previewImage(event) {
   const img = document.getElementById("preview");
   img.src = URL.createObjectURL(event.target.files[0]);
@@ -145,7 +161,6 @@ function previewImage(event) {
 function handleCamera(event) {
   const img = document.getElementById("preview");
 
-  // clear old image
   img.src = "";
   img.style.display = "none";
 
@@ -153,7 +168,6 @@ function handleCamera(event) {
   img.src = URL.createObjectURL(file);
   img.style.display = "block";
 
-  // clear old results
   document.getElementById("scanResult").innerHTML = "";
   document.getElementById("scanStatus").innerText = "";
 
@@ -162,16 +176,12 @@ function handleCamera(event) {
   }, 500);
 }
 
-// split logic so camera always works
-async function analyzeImage() {
+function analyzeImage() {
   const camera = document.getElementById("cameraInput");
-
-  // force new camera every time
   camera.value = "";
   camera.click();
 }
 
-// actual AI runs here
 async function runAI() {
   const status = document.getElementById("scanStatus");
   const result = document.getElementById("scanResult");
@@ -186,33 +196,26 @@ async function runAI() {
   result.innerHTML = "";
 
   const predictions = await model.classify(img);
-  const itemName = predictions[0].className.toLowerCase();
 
-  // 💰 REALISTIC MARKET PRICING
+  const rawName = predictions[0].className;
+  const itemName = cleanName(rawName);
+
+  // 💰 DYNAMIC PRICING
   let marketFactor = 0.8 + Math.random() * 0.7;
 
   let priceDB = {
-    phone: [150, 600],
-    iphone: [200, 800],
-    laptop: [150, 700],
-    tv: [80, 400],
-    chair: [25, 150],
-    couch: [50, 300],
-    sneaker: [40, 250],
-    shoe: [30, 200],
-    bottle: [5, 30],
-    bag: [50, 400],
-    default: [20, 120]
+    "📱 iPhone": [200, 800],
+    "💻 Laptop": [150, 700],
+    "📺 TV": [80, 400],
+    "🪑 Chair": [25, 150],
+    "🛋️ Couch": [50, 300],
+    "👟 Sneakers": [40, 250],
+    "🍾 Bottle": [5, 30],
+    "👜 Bag": [50, 400],
+    "📦 Item": [20, 120]
   };
 
-  let valueRange = priceDB.default;
-
-  for (let key in priceDB) {
-    if (itemName.includes(key)) {
-      valueRange = priceDB[key];
-      break;
-    }
-  }
+  let valueRange = priceDB[itemName] || priceDB["📦 Item"];
 
   let value = Math.floor(
     valueRange[0] + Math.random() * (valueRange[1] - valueRange[0])
@@ -231,6 +234,7 @@ async function runAI() {
   `;
 }
 
+// REST SAME
 function scan() {
   let item = document.getElementById("item").value.toLowerCase();
   let result = "";
