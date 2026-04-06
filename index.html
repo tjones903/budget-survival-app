@@ -144,6 +144,15 @@ button {
   <div id="status"></div>
   <div id="actionGuide" class="guide"></div>
 
+  <!-- 🔥 ADDED VALUE SECTION -->
+  <div class="card">
+    <div>💰 Quick Flip Value</div>
+    <div class="big" id="flipWorth">$0</div>
+
+    <div>🏷 Potential Sell Value</div>
+    <div class="big" id="flipSell">$0</div>
+  </div>
+
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
 
   <button onclick="installApp()">⬇️ Install App</button>
@@ -175,7 +184,6 @@ function calculate() {
   let percent = income > 0 ? (expenses / income) * 100 : 0;
   document.getElementById("progressBar").style.width = percent + "%";
 
-  // 🔥 STATUS WITH COLORS
   let statusText = "";
   let statusClass = "";
 
@@ -194,14 +202,19 @@ function calculate() {
   statusEl.innerText = statusText;
   statusEl.className = statusClass;
 
-  // 🔥 ACTION GUIDE
+  // 🔥 SMART ACTION + VALUE SYSTEM (ADDED ONLY)
   let guide = "";
+  let flipWorth = 0;
+
   if (daily < 10) {
-    guide = "💡 You need more income. Tap 'Make Money Now' to flip items.";
+    guide = "🚨 You are about to run out of money. Tap 'Make Money Now' ASAP.";
+    flipWorth = 50;
   } else if (daily < 30) {
-    guide = "⚠️ Stay careful. Reduce spending or earn extra income.";
+    guide = "⚠️ You need extra income. Tap 'Make Money Now' and flip something today.";
+    flipWorth = 100;
   } else {
-    guide = "✅ You're doing well. Keep managing your money.";
+    guide = "✅ You're doing well. Flipping can still grow your money.";
+    flipWorth = 150;
   }
 
   const guideEl = document.getElementById("actionGuide");
@@ -210,6 +223,15 @@ function calculate() {
   if (daily < 10) guideEl.style.color = "red";
   else if (daily < 30) guideEl.style.color = "orange";
   else guideEl.style.color = "#00e676";
+
+  const sellLow = flipWorth * 1.3;
+  const sellHigh = flipWorth * 1.5;
+
+  document.getElementById("flipWorth").innerText =
+    "$" + flipWorth;
+
+  document.getElementById("flipSell").innerText =
+    "$" + sellLow.toFixed(0) + " - $" + sellHigh.toFixed(0);
 }
 
 // CONNECT TO FLIP
