@@ -7,7 +7,7 @@
 
 <link rel="manifest" href="manifest.json">
 
-<!-- ✅ REAL AI (FREE) -->
+<!-- ✅ FREE REAL AI -->
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
 
@@ -93,6 +93,9 @@ button {
 
   <input type="file" accept="image/*" onchange="previewImage(event)">
   
+  <!-- ✅ CAMERA INPUT (ADDED) -->
+  <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none;" onchange="handleCamera(event)">
+  
   <img id="preview" style="width:100%; margin-top:10px; border-radius:10px; display:none;" />
 
   <button onclick="analyzeImage()">Scan Item</button>
@@ -167,11 +170,29 @@ function previewImage(event) {
   img.style.display = "block";
 }
 
-// REAL AI SCAN
+// ✅ CAMERA HANDLER (ADDED)
+function handleCamera(event) {
+  const img = document.getElementById("preview");
+  img.src = URL.createObjectURL(event.target.files[0]);
+  img.style.display = "block";
+
+  setTimeout(() => {
+    analyzeImage();
+  }, 500);
+}
+
+// ✅ REAL AI SCAN + CAMERA TRIGGER
 async function analyzeImage() {
   const status = document.getElementById("scanStatus");
   const result = document.getElementById("scanResult");
   const img = document.getElementById("preview");
+  const camera = document.getElementById("cameraInput");
+
+  // OPEN CAMERA FIRST
+  if (!img.src) {
+    camera.click();
+    return;
+  }
 
   if (!model) {
     status.innerText = "⏳ Loading AI...";
@@ -182,9 +203,9 @@ async function analyzeImage() {
   result.innerText = "";
 
   const predictions = await model.classify(img);
-  const itemName = predictions[0].className;
+  const itemName = predictions[0].className.toLowerCase();
 
-  // SIMPLE PRICING LOGIC
+  // 💰 SMART PRICING
   let value = 50;
   let sell = 120;
 
@@ -193,6 +214,7 @@ async function analyzeImage() {
   else if (itemName.includes("laptop")) { value = 150; sell = 350; }
   else if (itemName.includes("chair")) { value = 30; sell = 100; }
   else if (itemName.includes("tv")) { value = 80; sell = 200; }
+  else if (itemName.includes("bottle")) { value = 10; sell = 30; }
 
   status.innerText = "✅ Scan Complete";
 
