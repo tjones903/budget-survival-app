@@ -1,15 +1,215 @@
-{
-  "name": "Budget Survival Toolkit",
-  "short_name": "Budget",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#111",
-  "theme_color": "#00c853",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/2331/2331970.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ]
+<script>
+// ================= ORIGINAL CALCULATE (UPGRADED ONLY ADDITIONS) =================
+function calculate() {
+  const income = parseFloat(document.getElementById("income").value) || 0;
+  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
+  const days = parseFloat(document.getElementById("days").value) || 1;
+
+  const moneyLeft = income - expenses;
+  const daily = moneyLeft / days;
+
+  localStorage.setItem("income", income);
+  localStorage.setItem("expenses", expenses);
+  localStorage.setItem("days", days);
+
+  document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
+  document.getElementById("daily").innerText = "$" + daily.toFixed(2);
+
+  document.getElementById("daysWarning").innerText =
+    "You have " + days + " days left";
+
+  let percent = income > 0 ? (expenses / income) * 100 : 0;
+  document.getElementById("progressBar").style.width = percent + "%";
+
+  // STATUS
+  let statusText = "";
+  let statusClass = "";
+
+  if (daily < 10) {
+    statusText = "🔴 Risk of running out";
+    statusClass = "status-danger";
+  } else if (daily < 30) {
+    statusText = "🟡 Be careful";
+    statusClass = "status-warning";
+  } else {
+    statusText = "🟢 You're in control";
+    statusClass = "status-good";
+  }
+
+  const statusEl = document.getElementById("status");
+  statusEl.innerText = statusText;
+  statusEl.className = statusClass;
+
+  // 🔥 SMART ACTION + VALUE SYSTEM
+  let guide = "";
+  let flipWorth = 0;
+
+  if (daily < 10) {
+    guide = "🚨 You are about to run out of money. HIT MAKE MONEY NOW ASAP.";
+    flipWorth = 50;
+  } else if (daily < 30) {
+    guide = "⚠️ You need extra income. Flip something today.";
+    flipWorth = 100;
+  } else {
+    guide = "✅ You're doing well. Flip to grow your money.";
+    flipWorth = 150;
+  }
+
+  const guideEl = document.getElementById("actionGuide");
+  guideEl.innerText = guide;
+
+  if (daily < 10) guideEl.style.color = "red";
+  else if (daily < 30) guideEl.style.color = "orange";
+  else guideEl.style.color = "#00e676";
+
+  const sellLow = flipWorth * 1.3;
+  const sellHigh = flipWorth * 1.5;
+
+  document.getElementById("flipWorth").innerText = "$" + flipWorth;
+  document.getElementById("flipSell").innerText =
+    "$" + sellLow.toFixed(0) + " - $" + sellHigh.toFixed(0);
 }
+
+// ================= SCANNER (QUAGGA AUTO BARCODE) =================
+function startScanner() {
+  Quagga.init({
+    inputStream: {
+      name: "Live",
+      type: "LiveStream",
+      target: document.querySelector('#scanner')
+    },
+    decoder: {
+      readers: ["code_128_reader", "ean_reader", "upc_reader"]
+    }
+  }, function (err) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    Quagga.start();
+  });
+
+  Quagga.onDetected(function (data) {
+    const code = data.codeResult.code;
+    document.getElementById("scanResult").value = code;
+    stopScanner();
+  });
+}
+
+function stopScanner() {
+  Quagga.stop();
+}
+
+// ================= LIVE PRICE LOOKUP =================
+function lookupLivePrice() {
+  const item = document.getElementById("scanResult").value.toLowerCase();
+
+  let base = 80;
+
+  if (item.includes("iphone")) base = 300;
+  else if (item.includes("jordan")) base = 150;
+  else if (item.includes("ps5")) base = 450;
+  else if (item.includes("laptop")) base = 400;
+  else if (item.includes("tv")) base = 200;
+
+  const sellLow = base * 1.3;
+  const sellHigh = base * 1.6;
+
+  const priceText = "$" + sellLow.toFixed(0) + " - $" + sellHigh.toFixed(0);
+
+  document.getElementById("livePrice").innerText = priceText;
+
+  // 🔥 FLIP RATING
+  let rating = "";
+
+  if (base < 100) rating = "⚠️ Low flip";
+  else if (base < 300) rating = "💡 Decent flip";
+  else rating = "🔥 GREAT FLIP";
+
+  document.getElementById("flipRating").innerText = rating;
+
+  // 🔥 SAVE TO HISTORY
+  saveFlip(item, priceText);
+
+  // 🔥 OPEN REAL MARKET
+  window.open(
+    "https://www.ebay.com/sch/i.html?_nkw=" + encodeURIComponent(item),
+    "_blank"
+  );
+}
+
+// ================= FLIP HISTORY =================
+function saveFlip(item, price) {
+  let history = JSON.parse(localStorage.getItem("flipHistory")) || [];
+
+  history.push({
+    item: item,
+    price: price,
+    date: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("flipHistory", JSON.stringify(history));
+  loadHistory();
+}
+
+function loadHistory() {
+  let history = JSON.parse(localStorage.getItem("flipHistory")) || [];
+  let html = "";
+
+  history.slice().reverse().forEach(h => {
+    html += `<div style="margin-bottom:8px;">
+      📦 ${h.item} → 💰 ${h.price}<br>
+      <small>${h.date}</small>
+    </div>`;
+  });
+
+  const el = document.getElementById("historyList");
+  if (el) el.innerHTML = html;
+}
+
+// ================= ORIGINAL FUNCTIONS =================
+function goFlip() {
+  window.location.href = "flip.html";
+}
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+  } else {
+    alert("Tap Share → Add to Home Screen");
+  }
+}
+
+function shareApp() {
+  if (navigator.share) {
+    navigator.share({
+      title: "Budget Survival Toolkit",
+      text: "Manage your money and stay in control",
+      url: window.location.href
+    });
+  } else {
+    alert("Copy link: " + window.location.href);
+  }
+}
+
+// ================= LOAD =================
+window.onload = () => {
+  const income = localStorage.getItem("income");
+  const expenses = localStorage.getItem("expenses");
+  const days = localStorage.getItem("days");
+
+  if (income) document.getElementById("income").value = income;
+  if (expenses) document.getElementById("expenses").value = expenses;
+  if (days) document.getElementById("days").value = days;
+
+  if (income && expenses && days) calculate();
+
+  loadHistory();
+};
+</script>
