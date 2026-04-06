@@ -142,11 +142,10 @@ function previewImage(event) {
   img.style.display = "block";
 }
 
-// ✅ UPDATED CAMERA HANDLER
 function handleCamera(event) {
   const img = document.getElementById("preview");
 
-  // CLEAR OLD IMAGE FIRST
+  // clear old image
   img.src = "";
   img.style.display = "none";
 
@@ -154,30 +153,29 @@ function handleCamera(event) {
   img.src = URL.createObjectURL(file);
   img.style.display = "block";
 
-  // CLEAR OLD RESULTS
+  // clear old results
   document.getElementById("scanResult").innerHTML = "";
   document.getElementById("scanStatus").innerText = "";
 
   setTimeout(() => {
-    analyzeImage();
+    runAI();
   }, 500);
 }
 
-// ✅ UPDATED ANALYZE (FORCE NEW SCAN EVERY TIME)
+// split logic so camera always works
 async function analyzeImage() {
+  const camera = document.getElementById("cameraInput");
+
+  // force new camera every time
+  camera.value = "";
+  camera.click();
+}
+
+// actual AI runs here
+async function runAI() {
   const status = document.getElementById("scanStatus");
   const result = document.getElementById("scanResult");
   const img = document.getElementById("preview");
-  const camera = document.getElementById("cameraInput");
-
-  // CLEAR PREVIOUS RESULTS
-  result.innerHTML = "";
-  status.innerText = "";
-
-  // ALWAYS FORCE NEW CAMERA
-  camera.value = "";
-  camera.click();
-  return;
 
   if (!model) {
     status.innerText = "⏳ Loading AI...";
@@ -185,19 +183,43 @@ async function analyzeImage() {
   }
 
   status.innerText = "🔍 Analyzing...";
+  result.innerHTML = "";
 
   const predictions = await model.classify(img);
   const itemName = predictions[0].className.toLowerCase();
 
-  let value = 50;
-  let sell = 120;
+  // 💰 REALISTIC MARKET PRICING
+  let marketFactor = 0.8 + Math.random() * 0.7;
 
-  if (itemName.includes("phone")) { value = 200; sell = 400; }
-  else if (itemName.includes("shoe")) { value = 40; sell = 120; }
-  else if (itemName.includes("laptop")) { value = 150; sell = 350; }
-  else if (itemName.includes("chair")) { value = 30; sell = 100; }
-  else if (itemName.includes("tv")) { value = 80; sell = 200; }
-  else if (itemName.includes("bottle")) { value = 10; sell = 30; }
+  let priceDB = {
+    phone: [150, 600],
+    iphone: [200, 800],
+    laptop: [150, 700],
+    tv: [80, 400],
+    chair: [25, 150],
+    couch: [50, 300],
+    sneaker: [40, 250],
+    shoe: [30, 200],
+    bottle: [5, 30],
+    bag: [50, 400],
+    default: [20, 120]
+  };
+
+  let valueRange = priceDB.default;
+
+  for (let key in priceDB) {
+    if (itemName.includes(key)) {
+      valueRange = priceDB[key];
+      break;
+    }
+  }
+
+  let value = Math.floor(
+    valueRange[0] + Math.random() * (valueRange[1] - valueRange[0])
+  );
+
+  value = Math.floor(value * marketFactor);
+  let sell = Math.floor(value * (1.3 + Math.random() * 0.7));
 
   status.innerText = "✅ Scan Complete";
 
@@ -209,7 +231,6 @@ async function analyzeImage() {
   `;
 }
 
-// REST SAME
 function scan() {
   let item = document.getElementById("item").value.toLowerCase();
   let result = "";
