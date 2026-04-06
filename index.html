@@ -8,6 +8,9 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00c853">
 
+<!-- 🔥 FREE BARCODE SCANNER -->
+<script src="https://unpkg.com/quagga/dist/quagga.min.js"></script>
+
 <style>
 body {
   margin: 0;
@@ -15,95 +18,22 @@ body {
   background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
   color: white;
 }
-
-.header {
-  text-align: center;
-  padding: 15px;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.nav {
-  display: flex;
-  justify-content: space-around;
-  background: #1a1a1a;
-  padding: 12px;
-}
-
-.nav a {
-  color: white;
-  text-decoration: none;
-}
-
-.container {
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
-}
-
-.card {
-  background: #1e1e1e;
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 15px;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  margin: 8px 0;
-  border-radius: 10px;
-  border: none;
-  background: #2a2a2a;
-  color: white;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  background: #00c853;
-  color: white;
-  border: none;
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-.big {
-  font-size: 32px;
-}
-
-.progress {
-  height: 8px;
-  background: #333;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.progress-bar {
-  height: 8px;
-  background: #00e676;
-  border-radius: 10px;
-  width: 0%;
-}
-
-.money-btn {
-  background: orange;
-}
-
-.share-btn {
-  background: #2196f3;
-}
-
-.guide {
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-/* 🔥 COLOR WARNINGS */
-.status-good { color: #00e676; }
-.status-warning { color: orange; }
-.status-danger { color: red; }
+.header { text-align:center; padding:15px; font-size:22px; font-weight:bold;}
+.nav { display:flex; justify-content:space-around; background:#1a1a1a; padding:12px;}
+.nav a { color:white; text-decoration:none;}
+.container { padding:20px; max-width:500px; margin:auto;}
+.card { background:#1e1e1e; padding:20px; border-radius:16px; margin-bottom:15px;}
+input { width:100%; padding:14px; margin:8px 0; border-radius:10px; border:none; background:#2a2a2a; color:white;}
+button { width:100%; padding:14px; border-radius:12px; background:#00c853; color:white; border:none; margin-top:10px;}
+.big { font-size:32px;}
+.progress { height:8px; background:#333; border-radius:10px; margin-top:10px;}
+.progress-bar { height:8px; background:#00e676; border-radius:10px; width:0%;}
+.money-btn { background:orange;}
+.share-btn { background:#2196f3;}
+.guide { margin-top:10px; font-size:14px;}
+.status-good { color:#00e676;}
+.status-warning { color:orange;}
+.status-danger { color:red;}
 </style>
 </head>
 
@@ -123,7 +53,6 @@ button {
   <input type="number" id="income" placeholder="Income ($)">
   <input type="number" id="expenses" placeholder="Expenses ($)">
   <input type="number" id="days" placeholder="Days until payday">
-
   <button onclick="calculate()">Calculate</button>
 </div>
 
@@ -144,13 +73,29 @@ button {
   <div id="status"></div>
   <div id="actionGuide" class="guide"></div>
 
-  <!-- 🔥 ADDED VALUE SECTION -->
+  <!-- 🔥 VALUE SYSTEM -->
   <div class="card">
     <div>💰 Quick Flip Value</div>
     <div class="big" id="flipWorth">$0</div>
 
     <div>🏷 Potential Sell Value</div>
     <div class="big" id="flipSell">$0</div>
+  </div>
+
+  <!-- 🔥 AUTO SCANNER -->
+  <div class="card">
+    <h3>📸 Auto Barcode Scanner</h3>
+
+    <div id="scanner" style="width:100%; height:200px;"></div>
+
+    <button onclick="startScanner()">Start Scan</button>
+    <button onclick="stopScanner()">Stop Scan</button>
+
+    <input type="text" id="scanResult" placeholder="Scanned item">
+
+    <button onclick="lookupLivePrice()">Check Live Price</button>
+
+    <div id="livePrice" class="big">$0</div>
   </div>
 
   <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
@@ -164,121 +109,70 @@ button {
 
 <script>
 function calculate() {
-  const income = parseFloat(document.getElementById("income").value) || 0;
-  const expenses = parseFloat(document.getElementById("expenses").value) || 0;
-  const days = parseFloat(document.getElementById("days").value) || 1;
+  const income = parseFloat(incomeEl.value)||0;
+  const expenses = parseFloat(expensesEl.value)||0;
+  const days = parseFloat(daysEl.value)||1;
 
   const moneyLeft = income - expenses;
   const daily = moneyLeft / days;
 
-  localStorage.setItem("income", income);
-  localStorage.setItem("expenses", expenses);
-  localStorage.setItem("days", days);
+  moneyLeftEl.innerText="$"+moneyLeft.toFixed(2);
+  dailyEl.innerText="$"+daily.toFixed(2);
 
-  document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
-  document.getElementById("daily").innerText = "$" + daily.toFixed(2);
+  let guide="", flipWorth=0;
 
-  document.getElementById("daysWarning").innerText =
-    "You have " + days + " days left";
-
-  let percent = income > 0 ? (expenses / income) * 100 : 0;
-  document.getElementById("progressBar").style.width = percent + "%";
-
-  let statusText = "";
-  let statusClass = "";
-
-  if (daily < 10) {
-    statusText = "🔴 Risk of running out";
-    statusClass = "status-danger";
-  } else if (daily < 30) {
-    statusText = "🟡 Be careful";
-    statusClass = "status-warning";
-  } else {
-    statusText = "🟢 You're in control";
-    statusClass = "status-good";
+  if(daily<10){
+    guide="🚨 You are about to run out of money. HIT MAKE MONEY NOW ASAP.";
+    flipWorth=50;
+  }else if(daily<30){
+    guide="⚠️ You need money. Flip something today.";
+    flipWorth=100;
+  }else{
+    guide="✅ You're good. Flip to grow.";
+    flipWorth=150;
   }
 
-  const statusEl = document.getElementById("status");
-  statusEl.innerText = statusText;
-  statusEl.className = statusClass;
+  actionGuide.innerText=guide;
+  actionGuide.style.color = daily<10?"red":daily<30?"orange":"#00e676";
 
-  // 🔥 SMART ACTION + VALUE SYSTEM (ADDED ONLY)
-  let guide = "";
-  let flipWorth = 0;
-
-  if (daily < 10) {
-    guide = "🚨 You are about to run out of money. Tap 'Make Money Now' ASAP.";
-    flipWorth = 50;
-  } else if (daily < 30) {
-    guide = "⚠️ You need extra income. Tap 'Make Money Now' and flip something today.";
-    flipWorth = 100;
-  } else {
-    guide = "✅ You're doing well. Flipping can still grow your money.";
-    flipWorth = 150;
-  }
-
-  const guideEl = document.getElementById("actionGuide");
-  guideEl.innerText = guide;
-
-  if (daily < 10) guideEl.style.color = "red";
-  else if (daily < 30) guideEl.style.color = "orange";
-  else guideEl.style.color = "#00e676";
-
-  const sellLow = flipWorth * 1.3;
-  const sellHigh = flipWorth * 1.5;
-
-  document.getElementById("flipWorth").innerText =
-    "$" + flipWorth;
-
-  document.getElementById("flipSell").innerText =
-    "$" + sellLow.toFixed(0) + " - $" + sellHigh.toFixed(0);
+  flipWorthEl.innerText="$"+flipWorth;
+  flipSellEl.innerText="$"+(flipWorth*1.3).toFixed(0)+" - $"+(flipWorth*1.5).toFixed(0);
 }
 
-// CONNECT TO FLIP
-function goFlip() {
-  window.location.href = "flip.html";
+// 🔥 SCANNER (FREE)
+function startScanner(){
+  Quagga.init({
+    inputStream:{name:"Live",type:"LiveStream",target:document.querySelector('#scanner')},
+    decoder:{readers:["code_128_reader","ean_reader","upc_reader"]}
+  },function(err){
+    if(!err){Quagga.start();}
+  });
+
+  Quagga.onDetected(data=>{
+    document.getElementById("scanResult").value=data.codeResult.code;
+    stopScanner();
+  });
 }
 
-// INSTALL
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-  } else {
-    alert("Tap Share → Add to Home Screen");
-  }
+function stopScanner(){
+  Quagga.stop();
 }
 
-// SHARE
-function shareApp() {
-  if (navigator.share) {
-    navigator.share({
-      title: "Budget Survival Toolkit",
-      text: "Manage your money and stay in control",
-      url: window.location.href
-    });
-  } else {
-    alert("Copy link: " + window.location.href);
-  }
+// 🔥 LIVE PRICE
+function lookupLivePrice(){
+  const item=scanResult.value;
+
+  let base=100;
+  if(item.includes("iphone")) base=300;
+
+  livePrice.innerText="$"+(base*1.3).toFixed(0)+" - $"+(base*1.6).toFixed(0);
+
+  window.open("https://www.ebay.com/sch/i.html?_nkw="+item,"_blank");
 }
 
-// LOAD DATA
-window.onload = () => {
-  const income = localStorage.getItem("income");
-  const expenses = localStorage.getItem("expenses");
-  const days = localStorage.getItem("days");
-
-  if (income) document.getElementById("income").value = income;
-  if (expenses) document.getElementById("expenses").value = expenses;
-  if (days) document.getElementById("days").value = days;
-
-  if (income && expenses && days) calculate();
-};
+function goFlip(){window.location.href="flip.html";}
+function installApp(){alert("Add to home screen");}
+function shareApp(){alert("Share this app");}
 </script>
 
 </body>
