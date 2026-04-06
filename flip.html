@@ -7,6 +7,10 @@
 
 <link rel="manifest" href="manifest.json">
 
+<!-- ✅ REAL AI (FREE) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+
 <style>
 body {
   margin: 0;
@@ -149,6 +153,13 @@ button {
 </div>
 
 <script>
+let model;
+
+// LOAD AI MODEL
+mobilenet.load().then(m => {
+  model = m;
+});
+
 // IMAGE PREVIEW
 function previewImage(event) {
   const img = document.getElementById("preview");
@@ -156,27 +167,41 @@ function previewImage(event) {
   img.style.display = "block";
 }
 
-// FAKE AI SCAN
-function analyzeImage() {
+// REAL AI SCAN
+async function analyzeImage() {
   const status = document.getElementById("scanStatus");
   const result = document.getElementById("scanResult");
+  const img = document.getElementById("preview");
+
+  if (!model) {
+    status.innerText = "⏳ Loading AI...";
+    return;
+  }
 
   status.innerText = "🔍 Analyzing...";
   result.innerText = "";
 
-  setTimeout(() => {
-    const outcomes = [
-      "📱 Phone detected. High resale value.",
-      "🪑 Furniture detected. Clean & flip.",
-      "👟 Shoes detected. Resell for profit.",
-      "📦 General item. Check demand."
-    ];
+  const predictions = await model.classify(img);
+  const itemName = predictions[0].className;
 
-    const random = outcomes[Math.floor(Math.random() * outcomes.length)];
+  // SIMPLE PRICING LOGIC
+  let value = 50;
+  let sell = 120;
 
-    status.innerText = "✅ Done";
-    result.innerText = random;
-  }, 2000);
+  if (itemName.includes("phone")) { value = 200; sell = 400; }
+  else if (itemName.includes("shoe")) { value = 40; sell = 120; }
+  else if (itemName.includes("laptop")) { value = 150; sell = 350; }
+  else if (itemName.includes("chair")) { value = 30; sell = 100; }
+  else if (itemName.includes("tv")) { value = 80; sell = 200; }
+
+  status.innerText = "✅ Scan Complete";
+
+  result.innerHTML = `
+    <div class="tip">Detected Item: <b>${itemName}</b></div>
+    <div class="tip">Estimated Value: <b>$${value}</b></div>
+    <div class="tip">Suggested Sell Price: <b>$${sell}</b></div>
+    <div class="tip">Potential Profit: <b>$${sell - value}</b></div>
+  `;
 }
 
 // TEXT SCAN
