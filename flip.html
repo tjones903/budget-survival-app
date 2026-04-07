@@ -63,6 +63,12 @@ button {
 .link-btn {
   background: #2196f3;
 }
+
+/* ✅ ADDED BUTTON STYLE */
+.condition-btn {
+  background: #333;
+  margin-top: 8px;
+}
 </style>
 </head>
 
@@ -92,7 +98,17 @@ button {
 
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
+
+  <!-- ✅ NOTE ADDED -->
+  <div class="tip">Type product manually</div>
+
   <input type="text" id="item" placeholder="Enter item (couch, phone, shoes)" oninput="scan()">
+
+  <!-- ✅ CONDITION BUTTONS -->
+  <button class="condition-btn" onclick="setCondition('new')">New</button>
+  <button class="condition-btn" onclick="setCondition('used')">Used</button>
+  <button class="condition-btn" onclick="setCondition('cracked')">Cracked</button>
+
   <div id="scanTextResult"></div>
 </div>
 
@@ -130,10 +146,17 @@ button {
 
 <script>
 let model;
+let condition = "used"; // default
 
 mobilenet.load().then(m => {
   model = m;
 });
+
+// ✅ SET CONDITION
+function setCondition(type) {
+  condition = type;
+  scan(); // update instantly
+}
 
 function previewImage(event) {
   const img = document.getElementById("preview");
@@ -186,23 +209,34 @@ async function runAI() {
   `;
 }
 
+// ✅ UPDATED SMART SCANNER
 function scan() {
   let item = document.getElementById("item").value.toLowerCase();
 
-  let value = 100;
+  let value = 80 + Math.floor(Math.random() * 40);
 
   if (item.includes("iphone")) {
-    value = 250;
-    if (item.includes("12")) value = 300;
-    if (item.includes("13")) value = 400;
-    if (item.includes("128")) value += 50;
-    if (item.includes("256")) value += 100;
+    value = 200 + Math.floor(Math.random() * 100);
+
+    if (item.includes("11")) value = 180 + Math.floor(Math.random() * 50);
+    if (item.includes("12")) value = 250 + Math.floor(Math.random() * 80);
+    if (item.includes("13")) value = 350 + Math.floor(Math.random() * 100);
+
+    if (item.includes("128")) value += 40 + Math.floor(Math.random() * 20);
+    if (item.includes("256")) value += 80 + Math.floor(Math.random() * 30);
   }
 
-  let sell = Math.floor(value * 1.6);
+  // ✅ CONDITION IMPACT
+  if (condition === "new") value *= 1.3;
+  if (condition === "used") value *= 1;
+  if (condition === "cracked") value *= 0.5;
+
+  value = Math.floor(value);
+
+  let sell = Math.floor(value * (1.4 + Math.random() * 0.4));
 
   document.getElementById("scanTextResult").innerText =
-    `Value: $${value} | Sell: $${sell} | Profit: $${sell - value}`;
+    `Condition: ${condition.toUpperCase()} | Value: $${value} | Sell: $${sell} | Profit: $${sell - value}`;
 }
 
 function calc() {
