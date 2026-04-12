@@ -193,14 +193,39 @@ function autoScan(){
 
       let item = data.responses[0].labelAnnotations[0].description.toLowerCase();
 
+      // 🔥 BRAND BOOST
+      let brand = "";
+      if(item.includes("nike")) brand = "Nike";
+      if(item.includes("apple") || item.includes("iphone")) brand = "Apple";
+      if(item.includes("samsung")) brand = "Samsung";
+
+      if(brand){
+        item = brand + " " + item;
+      }
+
       document.getElementById("scanDesc").innerText = item;
 
+      // 🔥 REAL-ISH PRICING
       let worth = 0;
 
-      if(item.includes("shoe")) worth = 40 + Math.floor(Math.random()*30);
-      else if(item.includes("phone")) worth = 200 + Math.floor(Math.random()*300);
-      else if(item.includes("laptop")) worth = 300 + Math.floor(Math.random()*400);
-      else worth = 20 + Math.floor(Math.random()*50);
+      try {
+        const res2 = await fetch(`https://dummyjson.com/products/search?q=${item}`);
+        const data2 = await res2.json();
+
+        if(data2.products && data2.products.length){
+          let prices = data2.products.map(p => p.price);
+          let avg = prices.reduce((a,b)=>a+b,0)/prices.length;
+          worth = Math.floor(avg);
+        } else {
+          throw "no data";
+        }
+
+      } catch(e){
+        if(item.includes("shoe")) worth = 40 + Math.floor(Math.random()*30);
+        else if(item.includes("phone")) worth = 200 + Math.floor(Math.random()*300);
+        else if(item.includes("laptop")) worth = 300 + Math.floor(Math.random()*400);
+        else worth = 20 + Math.floor(Math.random()*50);
+      }
 
       let sellLow = Math.floor(worth*1.3);
       let sellHigh = Math.floor(worth*1.5);
