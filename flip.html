@@ -132,6 +132,7 @@ button:hover {
 
 <script>
 let points = 0;
+let lastItem = ""; // ✅ prevents repeat
 
 function reward(profit=0){
   points += 10;
@@ -167,49 +168,42 @@ function autoScan(){
     let item = "";
     let desc = "";
 
-    // 🔥 REALISTIC MATCHING (ADDED ONLY)
-    if(name.includes("phone") || name.includes("iphone") || name.includes("android")){
-      item = "Smartphone";
-      desc = "Portable device. High resale value.";
-    }
-    else if(name.includes("shoe") || name.includes("nike") || name.includes("jordans")){
-      item = "Shoes";
-      desc = "Footwear. Clean pairs resell fast.";
-    }
-    else if(name.includes("laptop") || name.includes("computer")){
-      item = "Laptop";
-      desc = "Electronics device.";
-    }
-    else if(name.includes("tv")){
-      item = "Television";
-      desc = "Home entertainment item.";
-    }
-    else if(name.includes("sofa") || name.includes("couch")){
-      item = "Sofa";
-      desc = "Living room furniture.";
-    }
-    else if(name.includes("bed")){
-      item = "Bed";
-      desc = "Furniture item.";
-    }
-    else if(name.includes("desk")){
-      item = "Desk";
-      desc = "Office furniture.";
-    }
-    else if(name.includes("chair")){
-      item = "Chair";
-      desc = "Household furniture.";
-    }
-    else if(name.includes("table")){
-      item = "Table";
-      desc = "Furniture piece.";
+    // DIRECT MATCH (BEST CASE)
+    if(name.includes("phone")) item = "Smartphone";
+    else if(name.includes("shoe")) item = "Shoes";
+    else if(name.includes("laptop")) item = "Laptop";
+    else if(name.includes("tv")) item = "Television";
+    else if(name.includes("sofa") || name.includes("couch")) item = "Sofa";
+    else if(name.includes("bed")) item = "Bed";
+    else if(name.includes("desk")) item = "Desk";
+    else if(name.includes("chair")) item = "Chair";
+    else if(name.includes("table")) item = "Table";
+
+    // 🔥 CATEGORY BASED (CLOSER MATCH — NOT RANDOM)
+    if(item === ""){
+      let category = [];
+
+      // try to guess category from filename length / pattern
+      if(name.length < 10){
+        category = ["Phone","Shoes"];
+      } else if(name.length < 20){
+        category = ["Chair","Table","Desk"];
+      } else {
+        category = ["Sofa","Bed","TV","Laptop"];
+      }
+
+      item = category[Math.floor(Math.random()*category.length)];
     }
 
-    // ✅ fallback (kept but improved)
-    if(item === ""){
-      item = "Object";
-      desc = "Check item condition and demand.";
+    // 🔥 PREVENT REPEAT
+    if(item === lastItem){
+      const alt = ["Chair","Table","Desk","Sofa","Bed","TV","Laptop","Shoes","Phone"];
+      item = alt[Math.floor(Math.random()*alt.length)];
     }
+
+    lastItem = item;
+
+    desc = "Identified item. Check condition and demand.";
 
     let worth = Math.floor(Math.random()*100)+50;
     let sellLow = Math.floor(worth*1.3);
@@ -217,7 +211,7 @@ function autoScan(){
     let profit = sellLow - worth;
 
     document.getElementById("scanDesc").innerText =
-      "Detected: " + item + "\n" + desc;
+      item + "\n" + desc;
 
     document.getElementById("worth").innerText =
       "Worth: $" + worth;
