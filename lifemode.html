@@ -38,9 +38,22 @@ button {
   color: white;
 }
 
-button:hover { box-shadow: 0 0 15px #00e676; }
+button:hover {
+  box-shadow: 0 0 15px #00e676;
+}
 
-.result { margin-top: 15px; white-space: pre-line; }
+.result {
+  margin-top: 15px;
+  white-space: pre-line;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+}
 </style>
 </head>
 
@@ -62,6 +75,10 @@ button:hover { box-shadow: 0 0 15px #00e676; }
   <input id="taskInput" placeholder="What did you complete?">
   <button onclick="addTask()">Add</button>
   <ul id="taskList"></ul>
+</div>
+
+<div class="card">
+  <button onclick="window.location.href='index.html'">⬅ Back</button>
 </div>
 
 <script>
