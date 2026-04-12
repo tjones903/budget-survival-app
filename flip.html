@@ -191,7 +191,6 @@ function autoScan(){
 
       const data = await res.json();
 
-      // ✅ SAFE FIX (prevents crash)
       let item = "unknown";
 
       if(
@@ -201,6 +200,11 @@ function autoScan(){
         data.responses[0].labelAnnotations.length > 0
       ){
         item = data.responses[0].labelAnnotations[0].description.toLowerCase();
+      }
+
+      // 🔥 FIX MISLABELS (slides, rubber, etc.)
+      if(item.includes("rubber") || item.includes("synthetic")){
+        item = "shoe";
       }
 
       // 🔥 BRAND BOOST
@@ -215,7 +219,6 @@ function autoScan(){
 
       document.getElementById("scanDesc").innerText = item;
 
-      // 🔥 REAL-ISH PRICING
       let worth = 0;
 
       try {
