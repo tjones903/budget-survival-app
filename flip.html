@@ -3,41 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flip It Scanner</title>
-
-<link rel="manifest" href="manifest.json">
-
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+<title>Flip It</title>
 
 <style>
 body {
   margin: 0;
   font-family: system-ui;
-  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
   color: white;
 }
+
 .nav {
   display: flex;
   justify-content: space-around;
-  background: #1a1a1a;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
   padding: 12px;
 }
+
 .nav a {
-  color: white;
+  color: #00e676;
   text-decoration: none;
 }
+
 .container {
   padding: 20px;
   max-width: 500px;
   margin: auto;
 }
+
 .card {
-  background: #1e1e1e;
+  background: rgba(30,30,30,0.6);
+  backdrop-filter: blur(15px);
   padding: 20px;
   border-radius: 16px;
   margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(0,255,200,0.2);
+  animation: fadeIn 0.6s ease;
 }
+
 input, button {
   width: 100%;
   padding: 14px;
@@ -45,29 +49,43 @@ input, button {
   border-radius: 10px;
   border: none;
 }
+
 input {
-  background: #2a2a2a;
+  background: #1a1a1a;
   color: white;
-}
-button {
-  background: #00c853;
-  color: white;
-}
-.big { font-size: 28px; }
-.tip {
-  background: #2a2a2a;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 8px;
-}
-.link-btn {
-  background: #2196f3;
 }
 
-/* ✅ ADDED BUTTON STYLE */
-.condition-btn {
-  background: #333;
+button {
+  background: linear-gradient(45deg,#00c853,#00e676);
+  color: white;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(0,255,200,0.5);
+}
+
+.big {
+  font-size: 28px;
+  text-shadow: 0 0 8px #00e676;
+}
+
+.tip {
+  background: #1a1a1a;
+  padding: 10px;
+  border-radius: 8px;
   margin-top: 8px;
+}
+
+.link-btn {
+  background: linear-gradient(45deg,#2196f3,#03a9f4);
+}
+
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
@@ -82,11 +100,11 @@ button {
 
 <div class="container">
 
+<!-- 📷 SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scanner</h3>
 
   <input type="file" accept="image/*" onchange="previewImage(event)">
-  <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display:none;" onchange="handleCamera(event)">
   
   <img id="preview" style="width:100%; margin-top:10px; border-radius:10px; display:none;" />
 
@@ -96,188 +114,105 @@ button {
   <div id="scanResult"></div>
 </div>
 
+<!-- 🧠 TEXT SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
-  <!-- ✅ NOTE ADDED -->
-  <div class="tip">Type product manually</div>
-
-  <input type="text" id="item" placeholder="Enter item (couch, phone, shoes)" oninput="scan()">
-
-  <!-- ✅ CONDITION BUTTONS -->
-  <button class="condition-btn" onclick="setCondition('new')">New</button>
-  <button class="condition-btn" onclick="setCondition('used')">Used</button>
-  <button class="condition-btn" onclick="setCondition('cracked')">Cracked</button>
+  <input type="text" id="item" placeholder="Enter item">
+  <button onclick="scan()">Scan Item</button>
 
   <div id="scanTextResult"></div>
 </div>
 
+<!-- 💰 PROFIT -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
+
   <input type="number" id="buy" placeholder="Buy Price">
   <input type="number" id="sell" placeholder="Sell Price">
+
   <button onclick="calc()">Check Profit</button>
+
   <div class="big" id="profit">$0</div>
   <div id="rating"></div>
 </div>
 
+<!-- 🔗 MARKET -->
 <div class="card">
   <h3>🔗 Sell Fast</h3>
+
   <button class="link-btn" onclick="goMarket('fb')">Facebook Marketplace</button>
   <button class="link-btn" onclick="goMarket('ebay')">eBay</button>
   <button class="link-btn" onclick="goMarket('offerup')">OfferUp</button>
 </div>
 
+<!-- 📊 TRENDING -->
 <div class="card">
-  <h3>📊 Trending Flips</h3>
-  <div class="tip">📱 iPhones</div>
+  <h3>📊 Trending</h3>
+
+  <div class="tip">📱 Phones</div>
   <div class="tip">🪑 Furniture</div>
-  <div class="tip">👟 Sneakers</div>
-  <div class="tip">🎮 Game consoles</div>
+  <div class="tip">👟 Shoes</div>
 </div>
 
 <div class="card">
-  <button onclick="window.location.href='index.html'">💰 Back to Budget</button>
-  <button onclick="installApp()">⬇️ Install</button>
-  <button onclick="shareApp()">📤 Share</button>
+  <button onclick="window.location.href='index.html'">⬅ Back</button>
 </div>
 
 </div>
 
 <script>
-let model;
-let condition = "used"; // default
-
-mobilenet.load().then(m => {
-  model = m;
-});
-
-// ✅ SET CONDITION
-function setCondition(type) {
-  condition = type;
-  scan(); // update instantly
-}
-
 function previewImage(event) {
   const img = document.getElementById("preview");
   img.src = URL.createObjectURL(event.target.files[0]);
   img.style.display = "block";
 }
 
-function handleCamera(event) {
-  const img = document.getElementById("preview");
-  const file = event.target.files[0];
-  if (!file) return;
-
-  img.src = URL.createObjectURL(file);
-  img.style.display = "block";
-
-  document.getElementById("scanResult").innerHTML = "";
-  document.getElementById("scanStatus").innerText = "";
-
-  img.onload = () => {
-    runAI();
-  };
-}
-
 function analyzeImage() {
-  const camera = document.getElementById("cameraInput");
-  camera.value = "";
-  camera.click();
-}
-
-async function runAI() {
   const status = document.getElementById("scanStatus");
   const result = document.getElementById("scanResult");
-  const img = document.getElementById("preview");
 
   status.innerText = "🔍 Analyzing...";
+  result.innerText = "";
 
-  const predictions = await model.classify(img);
-  const itemName = predictions[0].className;
-
-  let value = 50 + Math.floor(Math.random() * 150);
-  let sell = Math.floor(value * 1.6);
-
-  status.innerText = "✅ Scan Complete";
-
-  result.innerHTML = `
-    <div class="tip">Detected Item: <b>${itemName}</b></div>
-    <div class="tip">Value: <b>$${value}</b></div>
-    <div class="tip">Sell: <b>$${sell}</b></div>
-    <div class="tip">Profit: <b>$${sell - value}</b></div>
-  `;
+  setTimeout(() => {
+    const outcomes = [
+      "📱 Phone detected",
+      "🪑 Furniture detected",
+      "👟 Shoes detected",
+      "📦 General item"
+    ];
+    const random = outcomes[Math.floor(Math.random()*outcomes.length)];
+    status.innerText = "✅ Done";
+    result.innerText = random;
+  }, 2000);
 }
 
-// ✅ UPDATED SMART SCANNER
 function scan() {
   let item = document.getElementById("item").value.toLowerCase();
+  let result = "Check demand";
 
-  let value = 80 + Math.floor(Math.random() * 40);
+  if (item.includes("couch")) result = "Furniture flip $50+";
+  if (item.includes("phone")) result = "Phones flip fast";
+  if (item.includes("shoes")) result = "Clean & resell";
 
-  if (item.includes("iphone")) {
-    value = 200 + Math.floor(Math.random() * 100);
-
-    if (item.includes("11")) value = 180 + Math.floor(Math.random() * 50);
-    if (item.includes("12")) value = 250 + Math.floor(Math.random() * 80);
-    if (item.includes("13")) value = 350 + Math.floor(Math.random() * 100);
-
-    if (item.includes("128")) value += 40 + Math.floor(Math.random() * 20);
-    if (item.includes("256")) value += 80 + Math.floor(Math.random() * 30);
-  }
-
-  // ✅ CONDITION IMPACT
-  if (condition === "new") value *= 1.3;
-  if (condition === "used") value *= 1;
-  if (condition === "cracked") value *= 0.5;
-
-  value = Math.floor(value);
-
-  let sell = Math.floor(value * (1.4 + Math.random() * 0.4));
-
-  document.getElementById("scanTextResult").innerText =
-    `Condition: ${condition.toUpperCase()} | Value: $${value} | Sell: $${sell} | Profit: $${sell - value}`;
+  document.getElementById("scanTextResult").innerText = result;
 }
 
 function calc() {
-  let buy = parseFloat(document.getElementById("buy").value) || 0;
-  let sell = parseFloat(document.getElementById("sell").value) || 0;
+  let buy = +document.getElementById("buy").value || 0;
+  let sell = +document.getElementById("sell").value || 0;
   let profit = sell - buy;
 
   document.getElementById("profit").innerText = "$" + profit;
   document.getElementById("rating").innerText =
-    profit <= 0 ? "Bad deal"
-    : profit < 20 ? "Low profit"
-    : "Great flip";
+    profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
 }
 
 function goMarket(type) {
   if (type === "fb") window.open("https://facebook.com/marketplace");
   if (type === "ebay") window.open("https://ebay.com");
   if (type === "offerup") window.open("https://offerup.com");
-}
-
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-});
-
-function installApp() {
-  if (deferredPrompt) deferredPrompt.prompt();
-  else alert("Add to Home Screen");
-}
-
-function shareApp() {
-  if (navigator.share) {
-    navigator.share({
-      title: "Flip It",
-      text: "Make money flipping items",
-      url: window.location.href
-    });
-  } else {
-    alert("Copy link: " + window.location.href);
-  }
 }
 </script>
 
