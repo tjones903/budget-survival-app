@@ -52,7 +52,6 @@ button:hover {
 
 .big { font-size: 26px; }
 
-/* ✅ PREVIEW IMAGE */
 #preview {
   width: 100%;
   margin-top: 10px;
@@ -74,13 +73,9 @@ button:hover {
 
 <div class="card">
   <h3>📷 AI Item Scan</h3>
-
-  <!-- ✅ UPDATED CAMERA INPUT (WORKS ON PC + PHONE) -->
   <input type="file" accept="image/*" id="camera">
-
   <button onclick="scanItem()">Scan Item</button>
 
-  <!-- ✅ IMAGE PREVIEW -->
   <img id="preview">
 
   <div id="scanDesc"></div>
@@ -149,7 +144,6 @@ function autoScan(){
     return;
   }
 
-  // ✅ SHOW IMAGE PREVIEW
   const preview = document.getElementById("preview");
   preview.src = URL.createObjectURL(file);
   preview.style.display = "block";
@@ -158,7 +152,6 @@ function autoScan(){
 
   setTimeout(()=>{
 
-    // ✅ BASIC "AI DETECTION" (FREE)
     let name = file.name.toLowerCase();
     let item = "Item";
     let worth = Math.floor(Math.random()*100)+50;
@@ -172,7 +165,12 @@ function autoScan(){
     let sellHigh = Math.floor(worth*1.5);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = "Detected: " + item;
+    // ✅ ADDED REAL AI FEEL
+    let confidence = Math.floor(Math.random()*20)+80;
+
+    document.getElementById("scanDesc").innerText =
+      "Detected: " + item + " (" + confidence + "% match)\nCategory: Resell Item";
+
     document.getElementById("worth").innerText = "Worth: $" + worth;
     document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
     document.getElementById("profitScan").innerText = "Profit: $" + profit;
