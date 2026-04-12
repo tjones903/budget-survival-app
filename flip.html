@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flip It</title>
+<title>Life Mode</title>
 
 <style>
 body {
@@ -11,6 +11,14 @@ body {
   font-family: system-ui;
   background: radial-gradient(circle at top, #0f2027, #0f0f0f);
   color: white;
+}
+
+.header {
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 0 10px #00ffcc;
 }
 
 .nav {
@@ -42,23 +50,14 @@ body {
   animation: fadeIn 0.6s ease;
 }
 
-input, button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-}
-
-input {
-  background: #1a1a1a;
-  color: white;
-}
-
 button {
-  background: linear-gradient(45deg,#00c853,#00e676);
-  color: white;
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
   font-size: 16px;
+  color: white;
   transition: 0.3s;
 }
 
@@ -67,22 +66,20 @@ button:hover {
   box-shadow: 0 0 15px rgba(0,255,200,0.5);
 }
 
-.big {
-  font-size: 28px;
-  text-shadow: 0 0 8px #00e676;
+/* MODE COLORS */
+.broke { background: linear-gradient(45deg, red, #ff5252); }
+.hustle { background: linear-gradient(45deg, orange, #ff9800); }
+.stable { background: linear-gradient(45deg, #00c853, #00e676); }
+.emergency { background: linear-gradient(45deg, purple, #9c27b0); }
+
+.result {
+  margin-top: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: pre-line;
 }
 
-.tip {
-  background: #1a1a1a;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 8px;
-}
-
-.link-btn {
-  background: linear-gradient(45deg,#2196f3,#03a9f4);
-}
-
+/* ANIMATION */
 @keyframes fadeIn {
   from {opacity:0; transform:translateY(10px);}
   to {opacity:1; transform:translateY(0);}
@@ -92,127 +89,101 @@ button:hover {
 
 <body>
 
+<div class="header">🧠 Life Mode</div>
+
 <div class="nav">
   <a href="index.html">Home</a>
-  <a href="tips.html">Tips</a>
+  <a href="flip.html">Flip</a>
   <a href="about.html">About</a>
 </div>
 
 <div class="container">
 
-<!-- 📷 SCANNER -->
 <div class="card">
-  <h3>📷 AI Item Scanner</h3>
+  <h3>Select Your Mode</h3>
 
-  <input type="file" accept="image/*" onchange="previewImage(event)">
-  
-  <img id="preview" style="width:100%; margin-top:10px; border-radius:10px; display:none;" />
+  <button class="broke" onclick="setMode('broke')">💸 Broke Mode</button>
+  <button class="hustle" onclick="setMode('hustle')">🔥 Hustle Mode</button>
+  <button class="stable" onclick="setMode('stable')">🧘 Stability Mode</button>
+  <button class="emergency" onclick="setMode('emergency')">🚨 Emergency Mode</button>
 
-  <button onclick="analyzeImage()">Scan Item</button>
-
-  <div id="scanStatus"></div>
-  <div id="scanResult"></div>
-</div>
-
-<!-- 🧠 TEXT SCANNER -->
-<div class="card">
-  <h3>🧠 Smart Scanner</h3>
-
-  <input type="text" id="item" placeholder="Enter item">
-  <button onclick="scan()">Scan Item</button>
-
-  <div id="scanTextResult"></div>
-</div>
-
-<!-- 💰 PROFIT -->
-<div class="card">
-  <h3>💰 Profit Calculator</h3>
-
-  <input type="number" id="buy" placeholder="Buy Price">
-  <input type="number" id="sell" placeholder="Sell Price">
-
-  <button onclick="calc()">Check Profit</button>
-
-  <div class="big" id="profit">$0</div>
-  <div id="rating"></div>
-</div>
-
-<!-- 🔗 MARKET -->
-<div class="card">
-  <h3>🔗 Sell Fast</h3>
-
-  <button class="link-btn" onclick="goMarket('fb')">Facebook Marketplace</button>
-  <button class="link-btn" onclick="goMarket('ebay')">eBay</button>
-  <button class="link-btn" onclick="goMarket('offerup')">OfferUp</button>
-</div>
-
-<!-- 📊 TRENDING -->
-<div class="card">
-  <h3>📊 Trending</h3>
-
-  <div class="tip">📱 Phones</div>
-  <div class="tip">🪑 Furniture</div>
-  <div class="tip">👟 Shoes</div>
+  <div id="output" class="result"></div>
 </div>
 
 <div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back</button>
+  <button onclick="goBack()">⬅ Back to Budget</button>
 </div>
 
 </div>
 
 <script>
-function previewImage(event) {
-  const img = document.getElementById("preview");
-  img.src = URL.createObjectURL(event.target.files[0]);
-  img.style.display = "block";
+function setMode(mode) {
+  let message = "";
+
+  if (mode === "broke") {
+    message = `
+💸 BROKE MODE
+
+Spend: Under $15 today
+
+Action:
+• Flip 1 item
+• Sell something you own
+
+Warning:
+You are at risk of running out
+    `;
+  }
+
+  if (mode === "hustle") {
+    message = `
+🔥 HUSTLE MODE
+
+Goal: Make $100 today
+
+Action:
+• Flip item
+• Offer a service
+• Sell something fast
+
+Stay active and move fast
+    `;
+  }
+
+  if (mode === "stable") {
+    message = `
+🧘 STABILITY MODE
+
+Spend normally
+
+Action:
+• Save money
+• Avoid waste
+
+You are in a good position
+    `;
+  }
+
+  if (mode === "emergency") {
+    message = `
+🚨 EMERGENCY MODE
+
+Stop spending now
+
+Action:
+• Sell 1–2 items
+• Cut expenses
+• Find quick cash
+
+Priority: survival
+    `;
+  }
+
+  document.getElementById("output").innerText = message;
 }
 
-function analyzeImage() {
-  const status = document.getElementById("scanStatus");
-  const result = document.getElementById("scanResult");
-
-  status.innerText = "🔍 Analyzing...";
-  result.innerText = "";
-
-  setTimeout(() => {
-    const outcomes = [
-      "📱 Phone detected",
-      "🪑 Furniture detected",
-      "👟 Shoes detected",
-      "📦 General item"
-    ];
-    const random = outcomes[Math.floor(Math.random()*outcomes.length)];
-    status.innerText = "✅ Done";
-    result.innerText = random;
-  }, 2000);
-}
-
-function scan() {
-  let item = document.getElementById("item").value.toLowerCase();
-  let result = "Check demand";
-
-  if (item.includes("couch")) result = "Furniture flip $50+";
-  if (item.includes("phone")) result = "Phones flip fast";
-  if (item.includes("shoes")) result = "Clean & resell";
-
-  document.getElementById("scanTextResult").innerText = result;
-}
-
-function calc() {
-  let buy = +document.getElementById("buy").value || 0;
-  let sell = +document.getElementById("sell").value || 0;
-  let profit = sell - buy;
-
-  document.getElementById("profit").innerText = "$" + profit;
-  document.getElementById("rating").innerText =
-    profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
-}
-
-function goMarket(type) {
-  if (type === "fb") window.open("https://facebook.com/marketplace");
-  if (type === "ebay") window.open("https://ebay.com");
-  if (type === "offerup") window.open("https://offerup.com");
+function goBack() {
+  window.location.href = "index.html";
 }
 </script>
 
