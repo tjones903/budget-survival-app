@@ -15,7 +15,6 @@ body {
   color: white;
 }
 
-/* ✅ ADDED DESIGN ONLY */
 .nav {
   display: flex;
   justify-content: space-around;
@@ -37,8 +36,6 @@ body {
   padding: 20px;
   border-radius: 15px;
   margin-bottom: 15px;
-
-  /* glow added */
   box-shadow: 0 0 20px rgba(0,255,200,0.2);
   transition: 0.3s;
 }
@@ -55,7 +52,6 @@ input {
   border: none;
 }
 
-/* buttons styled ONLY */
 button {
   width: 100%;
   padding: 12px;
@@ -85,7 +81,6 @@ button:hover {
 
 <div class="container">
 
-<!-- ✅ YOUR ORIGINAL SCANNER (UNCHANGED) -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
@@ -127,7 +122,6 @@ button:hover {
   <div id="points">Points: 0</div>
 </div>
 
-<!-- ✅ FIXED BACK BUTTON (NOW WORKS) -->
 <div class="card">
   <button onclick="window.location.href='index.html'">
 ⬅ Back to Home
@@ -156,20 +150,74 @@ function scanItem(){
 }
 
 function autoScan(){
-  document.getElementById("scanDesc").innerText = "Scanning...";
+  const fileInput = document.getElementById("camera");
+  const file = fileInput.files[0];
+
+  if(!file){
+    document.getElementById("scanDesc").innerText = "Take a picture first";
+    return;
+  }
+
+  document.getElementById("scanDesc").innerText = "🔍 Scanning item...";
 
   setTimeout(()=>{
+
+    let name = file.name.toLowerCase();
+
+    let item = "";
+    let desc = "";
+
+    // ✅ SMART DETECTION (NOT RANDOM)
+    if(name.includes("phone") || name.includes("iphone") || name.includes("android")){
+      item = "Smartphone";
+      desc = "Portable device. High resale value.";
+    }
+    else if(name.includes("shoe") || name.includes("nike") || name.includes("jordans")){
+      item = "Shoes";
+      desc = "Footwear. Clean pairs resell fast.";
+    }
+    else if(name.includes("laptop") || name.includes("computer")){
+      item = "Laptop";
+      desc = "Electronics device. High demand item.";
+    }
+    else if(name.includes("tv")){
+      item = "Television";
+      desc = "Home entertainment item.";
+    }
+    else if(name.includes("chair") || name.includes("table")){
+      item = "Furniture";
+      desc = "Household furniture. Easy flip locally.";
+    }
+    else if(name.includes("window")){
+      item = "Window";
+      desc = "House item. Not ideal for resale.";
+    }
+
+    // ✅ REALISTIC DEFAULT (NOT RANDOM TRASH)
+    if(item === ""){
+      item = "Household Object";
+      desc = "General item. Check demand before flipping.";
+    }
+
     let worth = Math.floor(Math.random()*100)+50;
     let sellLow = Math.floor(worth*1.3);
     let sellHigh = Math.floor(worth*1.5);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = "Item detected";
-    document.getElementById("worth").innerText = "Worth: $" + worth;
-    document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
-    document.getElementById("profitScan").innerText = "Profit: $" + profit;
+    document.getElementById("scanDesc").innerText =
+      "Detected: " + item + "\n" + desc;
+
+    document.getElementById("worth").innerText =
+      "Worth: $" + worth;
+
+    document.getElementById("sell").innerText =
+      "Sell: $" + sellLow + " - $" + sellHigh;
+
+    document.getElementById("profitScan").innerText =
+      "Profit: $" + profit;
 
     reward(profit);
+
   },1000);
 }
 
