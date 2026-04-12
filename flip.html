@@ -191,7 +191,17 @@ function autoScan(){
 
       const data = await res.json();
 
-      let item = data.responses[0].labelAnnotations[0].description.toLowerCase();
+      // ✅ SAFE FIX (prevents crash)
+      let item = "unknown";
+
+      if(
+        data.responses &&
+        data.responses[0] &&
+        data.responses[0].labelAnnotations &&
+        data.responses[0].labelAnnotations.length > 0
+      ){
+        item = data.responses[0].labelAnnotations[0].description.toLowerCase();
+      }
 
       // 🔥 BRAND BOOST
       let brand = "";
