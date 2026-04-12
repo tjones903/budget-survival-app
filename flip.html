@@ -86,12 +86,9 @@ button:hover {
 
 <div class="container">
 
-<!-- 📷 AI SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
-
   <input type="file" accept="image/*" capture="environment" id="camera">
-
   <button onclick="scanItem()">Scan Item</button>
 
   <div id="scanDesc"></div>
@@ -100,129 +97,89 @@ button:hover {
   <div class="big" id="profitScan">$0</div>
 </div>
 
-<!-- 🧠 SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
-
   <input type="text" id="item" placeholder="Type item">
-
   <button onclick="scan('new')">New</button>
   <button onclick="scan('used')">Used</button>
   <button onclick="scan('cracked')">Cracked</button>
-
   <div id="scanTextResult"></div>
 </div>
 
-<!-- 💰 PROFIT -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
-
   <input type="number" id="buy" placeholder="Buy Price">
   <input type="number" id="sellInput" placeholder="Sell Price">
-
   <button onclick="calc()">Check Profit</button>
-
   <div class="big" id="profit">$0</div>
   <div id="rating"></div>
 </div>
 
-<!-- 🏆 PROGRESS -->
 <div class="card">
-  <h3>🏆 Your Progress</h3>
+  <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
-  <div id="streak">Streak: 0</div>
-</div>
-
-<div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back</button>
 </div>
 
 </div>
 
 <script>
 let points = 0;
-let streak = 0;
 
-function reward(profit = 0) {
+function reward(profit=0){
   points += 10;
-  streak += 1;
-
   document.getElementById("points").innerText = "Points: " + points;
-  document.getElementById("streak").innerText = "Streak: " + streak;
 
-  // 💰 SAVE MONEY
   let total = parseInt(localStorage.getItem("money")) || 0;
   total += profit;
   localStorage.setItem("money", total);
 }
 
-// 📷 AUTO SCAN AFTER PHOTO
 document.getElementById("camera").addEventListener("change", autoScan);
 
-function scanItem() {
-  const input = document.getElementById("camera");
-  if (!input.files.length) input.click();
+function scanItem(){
+  let cam = document.getElementById("camera");
+  if(!cam.files.length) cam.click();
 }
 
-function autoScan() {
-  document.getElementById("scanDesc").innerText = "🔍 Scanning...";
+function autoScan(){
+  document.getElementById("scanDesc").innerText = "Scanning...";
 
-  setTimeout(() => {
-
-    const fileName = document.getElementById("camera").files[0].name.toLowerCase();
-
-    let item = "Item";
-    let base = Math.floor(Math.random()*100)+40;
-
-    if(fileName.includes("phone")) { item="Phone"; base+=80; }
-    else if(fileName.includes("shoe")) { item="Shoes"; base+=40; }
-    else if(fileName.includes("tv") || fileName.includes("laptop")) { item="Electronics"; base+=90; }
-
-    let worth = base;
+  setTimeout(()=>{
+    let worth = Math.floor(Math.random()*100)+50;
     let sellLow = Math.floor(worth*1.3);
     let sellHigh = Math.floor(worth*1.5);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = "Detected: " + item;
+    document.getElementById("scanDesc").innerText = "Item detected";
     document.getElementById("worth").innerText = "Worth: $" + worth;
-    document.getElementById("sell").innerText = "Sell: $" + sellLow + " - $" + sellHigh;
+    document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
     document.getElementById("profitScan").innerText = "Profit: $" + profit;
 
     reward(profit);
-
   },1000);
 }
 
-// 🧠 SMART SCAN
-function scan(type) {
+function scan(type){
   let worth = Math.floor(Math.random()*80)+30;
-
   if(type==="new") worth+=50;
   if(type==="used") worth+=10;
   if(type==="cracked") worth-=15;
 
   let sellLow = Math.floor(worth*1.3);
-  let sellHigh = Math.floor(worth*1.5);
   let profit = sellLow - worth;
 
   document.getElementById("scanTextResult").innerText =
-    "Worth: $" + worth +
-    "\nSell: $" + sellLow + " - $" + sellHigh +
-    "\nProfit: $" + profit;
+  "Worth: $" + worth + "\nSell: $" + sellLow + "\nProfit: $" + profit;
 
   reward(profit);
 }
 
-// 💰 PROFIT CALC
-function calc() {
+function calc(){
   let buy = +document.getElementById("buy").value || 0;
   let sell = +document.getElementById("sellInput").value || 0;
   let profit = sell - buy;
 
   document.getElementById("profit").innerText = "$" + profit;
-  document.getElementById("rating").innerText =
-    profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
-
   reward(profit);
 }
 </script>
