@@ -38,7 +38,6 @@ body {
   margin-bottom: 15px;
 }
 
-/* INPUT */
 input {
   width: 100%;
   padding: 12px;
@@ -49,7 +48,6 @@ input {
   color: white;
 }
 
-/* BUTTON */
 button {
   width: 100%;
   padding: 12px;
@@ -60,15 +58,12 @@ button {
   color: white;
 }
 
-/* COLORS */
 .green { background: #00c853; }
 .orange { background: orange; }
 .red { background: red; }
 .blue { background: #2196f3; }
 
-.big {
-  font-size: 28px;
-}
+.big { font-size: 26px; }
 </style>
 </head>
 
@@ -82,22 +77,27 @@ button {
 
 <div class="container">
 
-<!-- 📷 CAMERA SCAN -->
+<!-- 📷 AI ITEM SCAN -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
+  <!-- CAMERA OPENS -->
   <input type="file" accept="image/*" capture="environment" id="camera">
 
-  <button class="green" onclick="scanImage()">Scan Item</button>
+  <button class="green" onclick="scanItem()">Scan Item</button>
 
-  <div id="scanResult"></div>
+  <div id="scanDesc"></div>
+
+  <div class="big" id="worth">$0</div>
+  <div class="big" id="sell">$0</div>
+  <div class="big" id="profitScan">$0</div>
 </div>
 
 <!-- 🧠 SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
-  <input type="text" id="item" placeholder="Type item (phone, shoes, couch)">
+  <input type="text" id="item" placeholder="Type item">
 
   <button class="green" onclick="scan('new')">New</button>
   <button class="orange" onclick="scan('used')">Used</button>
@@ -106,12 +106,12 @@ button {
   <div id="scanTextResult"></div>
 </div>
 
-<!-- 💰 PROFIT -->
+<!-- 💰 PROFIT CALCULATOR -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
 
   <input type="number" id="buy" placeholder="Buy Price">
-  <input type="number" id="sell" placeholder="Sell Price">
+  <input type="number" id="sellInput" placeholder="Sell Price">
 
   <button class="green" onclick="calc()">Check Profit</button>
 
@@ -135,19 +135,41 @@ button {
 </div>
 
 <script>
-function scanImage() {
-  const input = document.getElementById("camera");
-  const result = document.getElementById("scanResult");
+function scanItem() {
+  const file = document.getElementById("camera");
 
-  if (!input.files.length) {
-    result.innerText = "Take a picture first";
+  if (!file.files.length) {
+    document.getElementById("scanDesc").innerText = "Take a picture first";
     return;
   }
 
-  result.innerText = "🔍 Scanning...";
+  document.getElementById("scanDesc").innerText = "🔍 Scanning item...";
 
   setTimeout(() => {
-    result.innerText = "📦 Item detected. Check resale value.";
+
+    // RANDOM ITEM TYPE
+    const items = ["Phone", "Shoes", "Furniture", "Electronics"];
+    const item = items[Math.floor(Math.random()*items.length)];
+
+    // VALUE SYSTEM
+    let worth = Math.floor(Math.random() * 100) + 50;
+    let sellLow = Math.floor(worth * 1.3);
+    let sellHigh = Math.floor(worth * 1.5);
+    let profit = sellLow - worth;
+
+    // DISPLAY
+    document.getElementById("scanDesc").innerText =
+      "Detected: " + item;
+
+    document.getElementById("worth").innerText =
+      "Worth: $" + worth;
+
+    document.getElementById("sell").innerText =
+      "Sell: $" + sellLow + " - $" + sellHigh;
+
+    document.getElementById("profitScan").innerText =
+      "Profit: $" + profit;
+
   }, 1500);
 }
 
@@ -158,24 +180,10 @@ function scan(type) {
   if (!item) {
     result = "Enter item first";
   } else {
-    if (item.includes("phone")) {
-      if (type === "new") result = "📱 New phone: $200+";
-      if (type === "used") result = "📱 Used phone: $80–150";
-      if (type === "cracked") result = "📱 Cracked: Fix & flip";
-    } 
-    else if (item.includes("shoes")) {
-      if (type === "new") result = "👟 New: $60–120";
-      if (type === "used") result = "👟 Used: $30–80";
-      if (type === "cracked") result = "👟 Low value";
-    } 
-    else if (item.includes("couch")) {
-      if (type === "new") result = "🪑 New: $150+";
-      if (type === "used") result = "🪑 Used: $50–120";
-      if (type === "cracked") result = "🪑 Avoid";
-    } 
-    else {
-      result = "Check local demand";
-    }
+    if (item.includes("phone")) result = "📱 Phones flip fast";
+    else if (item.includes("shoes")) result = "👟 Clean & resell";
+    else if (item.includes("couch")) result = "🪑 Furniture flip $50+";
+    else result = "Check demand locally";
   }
 
   document.getElementById("scanTextResult").innerText = result;
@@ -183,7 +191,7 @@ function scan(type) {
 
 function calc() {
   let buy = +document.getElementById("buy").value || 0;
-  let sell = +document.getElementById("sell").value || 0;
+  let sell = +document.getElementById("sellInput").value || 0;
   let profit = sell - buy;
 
   document.getElementById("profit").innerText = "$" + profit;
