@@ -17,7 +17,6 @@ body {
   display: flex;
   justify-content: space-around;
   background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(10px);
   padding: 12px;
 }
 
@@ -31,7 +30,6 @@ body {
 
 .card {
   background: rgba(30,30,30,0.6);
-  backdrop-filter: blur(15px);
   padding: 20px;
   border-radius: 15px;
   margin-bottom: 15px;
@@ -40,7 +38,7 @@ body {
 }
 
 .card:hover {
-  box-shadow: 0 0 25px rgba(0,255,200,0.5);
+  box-shadow: 0 0 25px rgba(0,255,200,0.4);
 }
 
 input {
@@ -53,22 +51,17 @@ input {
   color: white;
 }
 
-input:focus { box-shadow: 0 0 10px #00e676; }
-
 button {
   width: 100%;
   padding: 12px;
   border-radius: 10px;
   border: none;
   margin-top: 10px;
-  font-size: 16px;
-  color: white;
   background: #444;
-  transition: 0.3s;
+  color: white;
 }
 
 button:hover {
-  transform: scale(1.05);
   box-shadow: 0 0 15px #00e676;
 }
 
@@ -99,25 +92,32 @@ button:hover {
 
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
-  <input type="text" id="item" placeholder="Type item">
+  <input id="item" placeholder="Type item">
+
   <button onclick="scan('new')">New</button>
   <button onclick="scan('used')">Used</button>
   <button onclick="scan('cracked')">Cracked</button>
+
   <div id="scanTextResult"></div>
 </div>
 
 <div class="card">
   <h3>💰 Profit Calculator</h3>
-  <input type="number" id="buy" placeholder="Buy Price">
-  <input type="number" id="sellInput" placeholder="Sell Price">
+  <input id="buy" type="number" placeholder="Buy Price">
+  <input id="sellInput" type="number" placeholder="Sell Price">
+
   <button onclick="calc()">Check Profit</button>
+
   <div class="big" id="profit">$0</div>
-  <div id="rating"></div>
 </div>
 
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
+</div>
+
+<div class="card">
+  <button onclick="window.location.href='index.html'">⬅ Back</button>
 </div>
 
 </div>
@@ -169,7 +169,7 @@ function scan(type){
   let profit = sellLow - worth;
 
   document.getElementById("scanTextResult").innerText =
-  "Worth: $" + worth + "\nSell: $" + sellLow + "\nProfit: $" + profit;
+    "Worth: $" + worth + "\nSell: $" + sellLow + "\nProfit: $" + profit;
 
   reward(profit);
 }
