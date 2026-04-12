@@ -51,6 +51,14 @@ button:hover {
 }
 
 .big { font-size: 26px; }
+
+/* ✅ PREVIEW IMAGE */
+#preview {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+  display: none;
+}
 </style>
 </head>
 
@@ -66,8 +74,14 @@ button:hover {
 
 <div class="card">
   <h3>📷 AI Item Scan</h3>
-  <input type="file" accept="image/*" capture="environment" id="camera">
+
+  <!-- ✅ UPDATED CAMERA INPUT (WORKS ON PC + PHONE) -->
+  <input type="file" accept="image/*" id="camera">
+
   <button onclick="scanItem()">Scan Item</button>
+
+  <!-- ✅ IMAGE PREVIEW -->
+  <img id="preview">
 
   <div id="scanDesc"></div>
   <div class="big" id="worth">$0</div>
@@ -101,7 +115,6 @@ button:hover {
   <div id="points">Points: 0</div>
 </div>
 
-<!-- ✅ BACK BUTTON CARD (THIS WAS MISSING) -->
 <div class="card">
   <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
 </div>
@@ -128,21 +141,45 @@ function scanItem(){
 }
 
 function autoScan(){
-  document.getElementById("scanDesc").innerText = "Scanning...";
+  const fileInput = document.getElementById("camera");
+  const file = fileInput.files[0];
+
+  if(!file){
+    document.getElementById("scanDesc").innerText = "Take or upload a picture first";
+    return;
+  }
+
+  // ✅ SHOW IMAGE PREVIEW
+  const preview = document.getElementById("preview");
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+
+  document.getElementById("scanDesc").innerText = "🔍 Scanning item...";
 
   setTimeout(()=>{
+
+    // ✅ BASIC "AI DETECTION" (FREE)
+    let name = file.name.toLowerCase();
+    let item = "Item";
     let worth = Math.floor(Math.random()*100)+50;
+
+    if(name.includes("phone")) { item="Phone"; worth+=80; }
+    else if(name.includes("shoe")) { item="Shoes"; worth+=40; }
+    else if(name.includes("tv") || name.includes("laptop")) { item="Electronics"; worth+=90; }
+    else if(name.includes("chair") || name.includes("table")) { item="Furniture"; worth+=60; }
+
     let sellLow = Math.floor(worth*1.3);
     let sellHigh = Math.floor(worth*1.5);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = "Item detected";
+    document.getElementById("scanDesc").innerText = "Detected: " + item;
     document.getElementById("worth").innerText = "Worth: $" + worth;
     document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
     document.getElementById("profitScan").innerText = "Profit: $" + profit;
 
     reward(profit);
-  },1000);
+
+  },1200);
 }
 
 function scan(type){
