@@ -8,7 +8,7 @@
 <style>
 body {
   font-family: 'Segoe UI';
-  background: #111;
+  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
   color: white;
   text-align: center;
   padding: 20px;
@@ -18,23 +18,46 @@ body {
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  background: rgba(0,0,0,0.5);
+  padding: 10px;
+  border-radius: 10px;
 }
 
-.nav a { color: white; text-decoration: none; }
+.nav a {
+  color: white;
+  text-decoration: none;
+}
 
 .card {
-  background: #1e1e1e;
+  background: rgba(30,30,30,0.6);
   padding: 20px;
   border-radius: 15px;
-  max-width: 400px;
+  max-width: 420px;
   margin: auto;
+  box-shadow: 0 0 12px rgba(0,255,200,0.15);
+  transition: 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 0 20px rgba(0,255,200,0.3);
 }
 
 .tip {
-  background: #2a2a2a;
-  padding: 10px;
+  background: rgba(255,255,255,0.05);
+  padding: 12px;
   border-radius: 10px;
-  margin: 8px 0;
+  margin: 10px 0;
+  text-align: left;
+  border-left: 3px solid #00e676;
+  transition: 0.3s;
+}
+
+.tip:hover {
+  box-shadow: 0 0 10px #00e676;
+}
+
+strong {
+  color: #00e676;
 }
 </style>
 </head>
@@ -48,11 +71,22 @@ body {
 </div>
 
 <div class="card">
-  <h1>💡 Tips</h1>
-  <div class="tip">Cook at home</div>
-  <div class="tip">Track spending</div>
-  <div class="tip">Cancel subscriptions</div>
-  <div class="tip">Use cash</div>
+  <h1>💡 Real Money Tips</h1>
+
+  <div class="tip"><strong>Cook at home:</strong> Eating out daily drains your money fast.</div>
+
+  <div class="tip"><strong>Track spending:</strong> If you don’t track it, you will lose it.</div>
+
+  <div class="tip"><strong>Cancel subscriptions:</strong> Small monthly charges add up quickly.</div>
+
+  <div class="tip"><strong>Use cash mindset:</strong> Spend like it’s your last dollars.</div>
+
+  <div class="tip"><strong>Flip items:</strong> Sell things you don’t need for quick cash.</div>
+
+  <div class="tip"><strong>Act early:</strong> Don’t wait until you’re broke to make money.</div>
+
+  <div class="tip"><strong>Follow the app:</strong> If it says you're at risk, take action immediately.</div>
+
 </div>
 
 </body>
