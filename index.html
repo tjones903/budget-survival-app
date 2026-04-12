@@ -101,7 +101,6 @@ button:hover {
 .status-warning { color:orange; }
 .status-danger { color:red; }
 
-/* SHARE BUTTON SPECIAL */
 .share-btn {
   background: linear-gradient(45deg, #00e676, #00c853);
 }
@@ -137,12 +136,17 @@ button:hover {
   <button onclick="goFlip()">💸 Make Money</button>
   <button onclick="goLife()">🧠 Life Mode</button>
 
-  <!-- ✅ ADDED SHARE BUTTON -->
   <button class="share-btn" onclick="shareApp()">📤 Share App</button>
 </div>
 
 <div class="card">
   <h3>📊 Budget History</h3>
+
+  <!-- ✅ ADDED EXPLANATION -->
+  <div style="font-size:12px; opacity:0.7; margin-bottom:10px;">
+    Shows your last calculations so you can track spending patterns and improve decisions.
+  </div>
+
   <ul id="history"></ul>
 </div>
 
@@ -181,26 +185,37 @@ function calculate() {
   let moneyLeft = income - expenses;
   let daily = moneyLeft / days;
 
-  document.getElementById("moneyLeft").innerText = "$" + moneyLeft;
-  document.getElementById("daily").innerText = "$" + daily.toFixed(2);
+  document.getElementById("moneyLeft").innerText = "Money Left: $" + moneyLeft;
+  document.getElementById("daily").innerText = "Daily Budget: $" + daily.toFixed(2);
 
-  let status = "", message = "";
+  let status = "", message = "", colorClass = "";
 
   if (daily < 10) {
     status = "🔴 Risk";
-    message = "Make money ASAP";
-  } else if (daily < 30) {
+    message = "You are at risk.\nMoney Left: $" + moneyLeft + "\nDaily: $" + daily.toFixed(2) + "\nDays Left: " + days + "\nMake money ASAP";
+    colorClass = "status-danger";
+  } 
+  else if (daily < 30) {
     status = "🟡 Careful";
-    message = "Earn extra";
-  } else {
+    message = "Be careful.\nMoney Left: $" + moneyLeft + "\nDaily: $" + daily.toFixed(2) + "\nDays Left: " + days + "\nEarn extra income";
+    colorClass = "status-warning";
+  } 
+  else {
     status = "🟢 Good";
-    message = "In control";
+    message = "You are in control.\nMoney Left: $" + moneyLeft + "\nDaily: $" + daily.toFixed(2) + "\nDays Left: " + days;
+    colorClass = "status-good";
   }
 
   document.getElementById("status").innerText = status;
   document.getElementById("message").innerText = message;
 
-  saveHistory("Left: $" + moneyLeft + " Daily: $" + daily.toFixed(2));
+  // ✅ APPLY COLORS TO EVERYTHING
+  document.getElementById("moneyLeft").className = colorClass;
+  document.getElementById("daily").className = colorClass;
+  document.getElementById("status").className = colorClass;
+  document.getElementById("message").className = colorClass;
+
+  saveHistory("Left: $" + moneyLeft + " Daily: $" + daily.toFixed(2) + " Days: " + days);
 }
 
 function shareApp(){
