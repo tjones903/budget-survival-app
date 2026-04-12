@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Life Mode</title>
 
+<link rel="icon" href="icon.png">
+
 <style>
 body {
   margin: 0;
@@ -25,7 +27,7 @@ body {
   padding: 20px;
   border-radius: 15px;
   margin: 15px;
-  box-shadow: 0 0 20px rgba(0,255,200,0.25);
+  box-shadow: 0 0 20px rgba(0,255,200,0.2);
   transition: 0.3s;
 }
 
@@ -39,33 +41,29 @@ button {
   margin-top: 10px;
   border-radius: 10px;
   border: none;
-  color: white;
-  transition: 0.3s;
+  font-weight: bold;
+  color: black;
 }
 
-/* COLORS */
 .broke { background: linear-gradient(45deg, red, #ff5252); }
 .hustle { background: linear-gradient(45deg, orange, #ff9800); }
 .stable { background: linear-gradient(45deg, #00c853, #00e676); }
 .emergency { background: linear-gradient(45deg, purple, #9c27b0); }
 
 button:hover {
-  box-shadow: 0 0 20px #00e676;
   transform: scale(1.05);
+  box-shadow: 0 0 20px #00e676;
 }
 
 .result {
   margin-top: 15px;
   white-space: pre-line;
-  line-height: 1.6;
 }
 
 input {
   width: 100%;
   padding: 10px;
   margin-top: 10px;
-  border-radius: 8px;
-  border: none;
 }
 </style>
 </head>
@@ -75,112 +73,25 @@ input {
 <div class="header">🧠 Life Mode</div>
 
 <div class="card">
-  <button class="broke" onclick="setMode('broke')">💸 Broke</button>
-  <button class="hustle" onclick="setMode('hustle')">🔥 Hustle</button>
-  <button class="stable" onclick="setMode('stable')">🧘 Stable</button>
-  <button class="emergency" onclick="setMode('emergency')">🚨 Emergency</button>
+  <button class="broke">💸 Broke</button>
+  <button class="hustle">🔥 Hustle</button>
+  <button class="stable">🧘 Stable</button>
+  <button class="emergency">🚨 Emergency</button>
 
   <div id="output" class="result"></div>
 </div>
 
 <div class="card">
   <h3>✅ Track Wins</h3>
-  <input id="taskInput" placeholder="What did you complete?">
-  <button onclick="addTask()">Add</button>
-  <ul id="taskList"></ul>
+  <input placeholder="What did you complete?">
+  <button style="background:linear-gradient(45deg,#2196f3,#00e5ff);">Add</button>
 </div>
 
 <div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
+  <button style="background:linear-gradient(45deg,#00e676,#00c853);">
+⬅ Back to Home
+</button>
 </div>
-
-<script>
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
-function render(){
-  let list = document.getElementById("taskList");
-  list.innerHTML="";
-  tasks.forEach((t,i)=>{
-    let li=document.createElement("li");
-    li.innerHTML = `<input type="checkbox" ${t.done?"checked":""} onclick="toggle(${i})"> ${t.text}`;
-    list.appendChild(li);
-  });
-}
-
-function addTask(){
-  let val=document.getElementById("taskInput").value;
-  if(!val) return;
-  tasks.push({text:val,done:false});
-  save();
-}
-
-function toggle(i){
-  tasks[i].done=!tasks[i].done;
-  save();
-}
-
-function save(){
-  localStorage.setItem("tasks",JSON.stringify(tasks));
-  render();
-}
-
-/* ✅ ONLY WORDING UPGRADED */
-function setMode(mode){
-  let msg="";
-
-  if(mode==="broke") msg=
-`💸 BROKE MODE
-
-Spend: Under $15 today
-
-Action:
-• Flip 1 item immediately
-• Sell something you already own
-• Check Facebook Marketplace for cheap items
-
-Goal: Make at least $20 today`;
-
-  if(mode==="hustle") msg=
-`🔥 HUSTLE MODE
-
-Goal: Make $100 today
-
-Action:
-• Flip 1–2 items
-• Offer a quick service (cleaning, yard work)
-• Post items on Facebook & OfferUp
-
-Move fast and stay active`;
-
-  if(mode==="stable") msg=
-`🧘 STABLE MODE
-
-You are in control
-
-Action:
-• Save extra money
-• Look for 1 flip opportunity
-• Avoid unnecessary spending
-
-Build momentum`;
-
-  if(mode==="emergency") msg=
-`🚨 EMERGENCY MODE
-
-STOP spending immediately
-
-Action:
-• Sell 1–2 items NOW
-• Use Flip It tool
-• Find fast cash opportunities
-
-Priority: Survival`;
-
-  document.getElementById("output").innerText = msg;
-}
-
-render();
-</script>
 
 </body>
 </html>
