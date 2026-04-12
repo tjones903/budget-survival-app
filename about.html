@@ -9,14 +9,21 @@
 body {
   margin: 0;
   font-family: system-ui;
-  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
   color: white;
+}
+
+.header {
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+  text-shadow: 0 0 8px #00e676;
 }
 
 .nav {
   display: flex;
   justify-content: space-around;
-  background: #1a1a1a;
+  background: rgba(0,0,0,0.5);
   padding: 12px;
 }
 
@@ -27,90 +34,95 @@ body {
 
 .container {
   padding: 20px;
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
 }
 
 .card {
-  background: #1e1e1e;
+  background: rgba(30,30,30,0.6);
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 15px;
   margin-bottom: 15px;
+  box-shadow: 0 0 12px rgba(0,255,200,0.15);
+  transition: 0.3s;
 }
 
-h1, h3 {
-  text-align: center;
+.card:hover {
+  box-shadow: 0 0 20px rgba(0,255,200,0.3);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+p {
+  line-height: 1.6;
+  opacity: 0.9;
 }
 
 .highlight {
   color: #00e676;
-  font-weight: bold;
 }
 </style>
 </head>
 
 <body>
 
+<div class="header">📘 About This App</div>
+
 <div class="nav">
   <a href="index.html">Home</a>
-  <a href="tips.html">Tips</a>
-  <a href="about.html">About</a>
+  <a href="flip.html">Flip</a>
+  <a href="lifemode.html">Life Mode</a>
 </div>
 
 <div class="container">
 
 <div class="card">
-  <h1>📘 About Budget Survival Toolkit</h1>
-
+  <h2>💰 Budget Survival Toolkit</h2>
   <p>
-    Budget Survival Toolkit is designed to help people manage their money between paychecks and avoid running out before their next income.
-  </p>
-
-  <p>
-    The app calculates how much money you have left and how much you can safely spend each day, helping you stay in control of your finances.
+    This app is designed to help you stay in control of your money and avoid running out before your next paycheck.
+    It combines budgeting, income tracking, and real-time decision tools to guide you every day.
   </p>
 </div>
 
 <div class="card">
-  <h3 class="highlight">💡 What To Do When Money Is Low</h3>
-
+  <h2>📊 Smart Budgeting</h2>
   <p>
-    If your daily budget is low, the solution is not just to spend less — it's to increase your income.
+    Enter your <span class="highlight">monthly income</span>, <span class="highlight">expenses</span>, and 
+    <span class="highlight">days left</span> to instantly see how much you can spend per day.
+    The app will warn you if you are at risk and guide you on what to do next.
   </p>
-
-  <p>
-    Tap the <b>"💸 Make Money Now"</b> button on the home screen to open Flip It.
-  </p>
-
-  <p>
-    Flip It helps you:
-  </p>
-
-  <ul style="text-align:left;">
-    <li>Find items to flip for profit</li>
-    <li>Scan items and get smart advice</li>
-    <li>Estimate profit before buying</li>
-    <li>Sell items quickly using marketplace links</li>
-  </ul>
 </div>
 
 <div class="card">
-  <h3 class="highlight">🚀 How This System Works</h3>
-
+  <h2>📷 Flip It (Make Money Fast)</h2>
   <p>
-    This is more than a budgeting app — it’s a survival system.
+    Use the AI scanner to analyze items around you and get an estimate of their value, selling price, and profit.
+    The smart scanner also helps you quickly decide what is worth flipping.
   </p>
+</div>
 
+<div class="card">
+  <h2>🧠 Life Mode</h2>
   <p>
-    Step 1: Track your money  
-    <br>
-    Step 2: Control your spending  
-    <br>
-    Step 3: Use Flip It to make more money  
+    Choose your situation and get real guidance. Whether you are broke, hustling, stable, or in an emergency,
+    the app gives you clear steps to move forward.
   </p>
+</div>
 
+<div class="card">
+  <h2>🎯 Track Progress</h2>
   <p>
-    <b>Manage money + Make money = Stay in control</b>
+    Track your wins, completed goals, and money made. Your progress is saved so you can see how far you’ve come.
+  </p>
+</div>
+
+<div class="card">
+  <h2>🔊 Voice + Easy Use</h2>
+  <p>
+    Speak your numbers or type them in. The app is built to be fast, simple, and usable on any device including
+    phones, tablets, and computers.
   </p>
 </div>
 
