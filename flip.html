@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flip It</title>
+<title>Life Mode</title>
 
 <style>
 body {
@@ -13,50 +13,27 @@ body {
   color: white;
 }
 
-.nav {
-  display: flex;
-  justify-content: space-around;
-  background: rgba(0,0,0,0.5);
-  padding: 12px;
-}
-
-.nav a { color: white; text-decoration: none; }
-
-.container {
+.header {
+  text-align: center;
   padding: 20px;
-  max-width: 500px;
-  margin: auto;
+  font-size: 24px;
+  text-shadow: 0 0 10px #00e676;
 }
 
 .card {
   background: rgba(30,30,30,0.6);
   padding: 20px;
   border-radius: 15px;
-  margin-bottom: 15px;
+  margin: 15px;
   box-shadow: 0 0 15px rgba(0,255,200,0.2);
-  transition: 0.3s;
-}
-
-.card:hover {
-  box-shadow: 0 0 25px rgba(0,255,200,0.4);
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #2a2a2a;
-  color: white;
 }
 
 button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
+  margin-top: 10px;
   border-radius: 10px;
   border: none;
-  margin-top: 10px;
   background: #444;
   color: white;
 }
@@ -65,123 +42,79 @@ button:hover {
   box-shadow: 0 0 15px #00e676;
 }
 
-.big { font-size: 26px; }
+.result {
+  margin-top: 15px;
+  white-space: pre-line;
+}
 </style>
 </head>
 
 <body>
 
-<div class="nav">
-  <a href="index.html">Home</a>
-  <a href="tips.html">Tips</a>
-  <a href="about.html">About</a>
-</div>
-
-<div class="container">
+<div class="header">🧠 Life Mode</div>
 
 <div class="card">
-  <h3>📷 AI Item Scan</h3>
-  <input type="file" accept="image/*" capture="environment" id="camera">
-  <button onclick="scanItem()">Scan Item</button>
+  <button onclick="setMode('broke')">💸 Broke</button>
+  <button onclick="setMode('hustle')">🔥 Hustle</button>
+  <button onclick="setMode('stable')">🧘 Stable</button>
+  <button onclick="setMode('emergency')">🚨 Emergency</button>
 
-  <div id="scanDesc"></div>
-  <div class="big" id="worth">$0</div>
-  <div class="big" id="sell">$0</div>
-  <div class="big" id="profitScan">$0</div>
+  <div id="output" class="result"></div>
 </div>
 
 <div class="card">
-  <h3>🧠 Smart Scanner</h3>
-  <input id="item" placeholder="Type item">
-
-  <button onclick="scan('new')">New</button>
-  <button onclick="scan('used')">Used</button>
-  <button onclick="scan('cracked')">Cracked</button>
-
-  <div id="scanTextResult"></div>
+  <h3>✅ Track Wins</h3>
+  <input id="taskInput" placeholder="What did you complete?">
+  <button onclick="addTask()">Add</button>
+  <ul id="taskList"></ul>
 </div>
 
+<!-- ✅ BACK BUTTON CARD -->
 <div class="card">
-  <h3>💰 Profit Calculator</h3>
-  <input id="buy" type="number" placeholder="Buy Price">
-  <input id="sellInput" type="number" placeholder="Sell Price">
-
-  <button onclick="calc()">Check Profit</button>
-
-  <div class="big" id="profit">$0</div>
-</div>
-
-<div class="card">
-  <h3>🏆 Progress</h3>
-  <div id="points">Points: 0</div>
-</div>
-
-<div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back</button>
-</div>
-
+  <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
 </div>
 
 <script>
-let points = 0;
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-function reward(profit=0){
-  points += 10;
-  document.getElementById("points").innerText = "Points: " + points;
-
-  let total = parseInt(localStorage.getItem("money")) || 0;
-  total += profit;
-  localStorage.setItem("money", total);
+function render(){
+  let list = document.getElementById("taskList");
+  list.innerHTML="";
+  tasks.forEach((t,i)=>{
+    let li=document.createElement("li");
+    li.innerHTML = `<input type="checkbox" ${t.done?"checked":""} onclick="toggle(${i})"> ${t.text}`;
+    list.appendChild(li);
+  });
 }
 
-document.getElementById("camera").addEventListener("change", autoScan);
-
-function scanItem(){
-  let cam = document.getElementById("camera");
-  if(!cam.files.length) cam.click();
+function addTask(){
+  let val=document.getElementById("taskInput").value;
+  if(!val) return;
+  tasks.push({text:val,done:false});
+  save();
 }
 
-function autoScan(){
-  document.getElementById("scanDesc").innerText = "Scanning...";
-
-  setTimeout(()=>{
-    let worth = Math.floor(Math.random()*100)+50;
-    let sellLow = Math.floor(worth*1.3);
-    let sellHigh = Math.floor(worth*1.5);
-    let profit = sellLow - worth;
-
-    document.getElementById("scanDesc").innerText = "Item detected";
-    document.getElementById("worth").innerText = "Worth: $" + worth;
-    document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
-    document.getElementById("profitScan").innerText = "Profit: $" + profit;
-
-    reward(profit);
-  },1000);
+function toggle(i){
+  tasks[i].done=!tasks[i].done;
+  save();
 }
 
-function scan(type){
-  let worth = Math.floor(Math.random()*80)+30;
-  if(type==="new") worth+=50;
-  if(type==="used") worth+=10;
-  if(type==="cracked") worth-=15;
-
-  let sellLow = Math.floor(worth*1.3);
-  let profit = sellLow - worth;
-
-  document.getElementById("scanTextResult").innerText =
-    "Worth: $" + worth + "\nSell: $" + sellLow + "\nProfit: $" + profit;
-
-  reward(profit);
+function save(){
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+  render();
 }
 
-function calc(){
-  let buy = +document.getElementById("buy").value || 0;
-  let sell = +document.getElementById("sellInput").value || 0;
-  let profit = sell - buy;
+function setMode(mode){
+  let msg="";
+  if(mode==="broke") msg="Spend under $15\nFlip something";
+  if(mode==="hustle") msg="Make $100\nSell fast";
+  if(mode==="stable") msg="Save money\nStay consistent";
+  if(mode==="emergency") msg="STOP spending\nGet money now";
 
-  document.getElementById("profit").innerText = "$" + profit;
-  reward(profit);
+  document.getElementById("output").innerText = msg;
 }
+
+render();
 </script>
 
 </body>
