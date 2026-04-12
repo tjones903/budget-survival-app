@@ -3,135 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget Survival Toolkit</title>
-
-<link rel="manifest" href="manifest.json">
+<title>Budget Survival</title>
 
 <style>
 body {
   margin: 0;
   font-family: system-ui;
-  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
+  background: #111;
   color: white;
-  overflow-x: hidden;
 }
 
-/* 🔥 GLOW HEADER */
 .header {
   text-align: center;
-  padding: 20px;
-  font-size: 24px;
+  padding: 15px;
+  font-size: 22px;
   font-weight: bold;
-  text-shadow: 0 0 10px #00ffcc;
 }
 
-/* NAV */
 .nav {
   display: flex;
   justify-content: space-around;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(10px);
+  background: #1a1a1a;
   padding: 12px;
 }
 
 .nav a {
-  color: #00e676;
+  color: white;
   text-decoration: none;
 }
 
-/* CONTAINER */
 .container {
   padding: 20px;
   max-width: 500px;
   margin: auto;
 }
 
-/* CARDS */
 .card {
-  background: rgba(30,30,30,0.6);
-  backdrop-filter: blur(15px);
+  background: #1e1e1e;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 0 15px rgba(0,255,200,0.2);
-  animation: fadeIn 0.6s ease;
 }
 
-/* INPUTS */
 input {
   width: 100%;
-  padding: 14px;
-  margin: 8px 0;
+  padding: 12px;
+  margin-top: 10px;
   border-radius: 10px;
   border: none;
-  background: #1a1a1a;
+  background: #2a2a2a;
   color: white;
 }
 
-/* BUTTONS */
 button {
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
   margin-top: 10px;
   font-size: 16px;
   color: white;
-  transition: 0.3s;
 }
 
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0,255,200,0.5);
-}
-
-.green { background: linear-gradient(45deg,#00c853,#00e676); }
-.orange { background: linear-gradient(45deg,orange,#ff9800); }
-.blue { background: linear-gradient(45deg,#2196f3,#03a9f4); }
-.purple { background: linear-gradient(45deg,purple,#9c27b0); }
+.green { background: #00c853; }
+.orange { background: orange; }
+.blue { background: #2196f3; }
 
 .big {
-  font-size: 32px;
-  text-shadow: 0 0 8px #00e676;
+  font-size: 28px;
 }
 
-/* PROGRESS */
-.progress {
-  height: 8px;
-  background: #333;
-  border-radius: 10px;
-  margin-top: 10px;
-}
-
-.progress-bar {
-  height: 8px;
-  background: #00e676;
-  border-radius: 10px;
-  width: 0%;
-  transition: 0.5s;
-}
-
-/* STATUS COLORS */
+/* COLORS BACK */
 .status-good { color: #00e676; }
 .status-warning { color: orange; }
 .status-danger { color: red; }
-
-.guide {
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-/* ANIMATION */
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
-}
 </style>
 </head>
 
 <body>
 
-<div class="header">💰 Budget Survival Toolkit</div>
+<div class="header">💰 Budget Survival</div>
 
 <div class="nav">
   <a href="index.html">Home</a>
@@ -142,8 +93,8 @@ button:hover {
 <div class="container">
 
 <div class="card">
-  <input type="number" id="income" placeholder="Income ($)">
-  <input type="number" id="expenses" placeholder="Expenses ($)">
+  <input type="number" id="income" placeholder="Income">
+  <input type="number" id="expenses" placeholder="Expenses">
   <input type="number" id="days" placeholder="Days until payday">
 
   <button class="green" onclick="calculate()">Calculate</button>
@@ -157,18 +108,11 @@ button:hover {
   <div>Daily Budget</div>
   <div class="big" id="daily">$0.00</div>
 
-  <div id="daysWarning">Enter values</div>
-
-  <div class="progress">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-
   <div id="status"></div>
-  <div id="actionGuide" class="guide"></div>
+  <div id="message"></div>
 
-  <button class="orange" onclick="goFlip()">💸 Make Money</button>
-  <button class="purple" onclick="goLife()">🧠 Life Mode</button>
-  <button class="blue" onclick="shareApp()">📤 Share</button>
+  <button class="orange" onclick="goFlip()">💸 Make Money Now</button>
+  <button class="blue" onclick="goLife()">🧠 Life Mode</button>
 
 </div>
 
@@ -186,31 +130,31 @@ function calculate() {
   document.getElementById("moneyLeft").innerText = "$" + moneyLeft.toFixed(2);
   document.getElementById("daily").innerText = "$" + daily.toFixed(2);
 
-  let percent = income > 0 ? (expenses / income) * 100 : 0;
-  document.getElementById("progressBar").style.width = percent + "%";
-
   let statusText = "";
   let statusClass = "";
+  let message = "";
 
   if (daily < 10) {
-    statusText = "🔴 Risk";
+    statusText = "🔴 Risk of running out";
     statusClass = "status-danger";
-  } else if (daily < 30) {
-    statusText = "🟡 Caution";
+    message = "🚨 You are about to run out of money. Tap 'Make Money Now' ASAP.";
+  } 
+  else if (daily < 30) {
+    statusText = "🟡 Be careful";
     statusClass = "status-warning";
-  } else {
-    statusText = "🟢 Good";
+    message = "⚠️ You should earn extra income.";
+  } 
+  else {
+    statusText = "🟢 You're in control";
     statusClass = "status-good";
+    message = "✅ You are doing good.";
   }
 
   const statusEl = document.getElementById("status");
   statusEl.innerText = statusText;
   statusEl.className = statusClass;
 
-  document.getElementById("actionGuide").innerText =
-    daily < 10 ? "🚨 Make money now"
-    : daily < 30 ? "⚠️ Earn extra"
-    : "✅ Stay consistent";
+  document.getElementById("message").innerText = message;
 }
 
 function goFlip() {
@@ -219,10 +163,6 @@ function goFlip() {
 
 function goLife() {
   window.location.href = "lifemode.html";
-}
-
-function shareApp() {
-  alert("Share your app link");
 }
 </script>
 
