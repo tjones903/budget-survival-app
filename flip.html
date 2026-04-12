@@ -9,251 +9,53 @@
 body {
   margin: 0;
   font-family: system-ui;
-  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
+  background: #111;
   color: white;
 }
 
-/* NAV */
 .nav {
   display: flex;
   justify-content: space-around;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(10px);
+  background: #1a1a1a;
   padding: 12px;
 }
 
 .nav a {
-  color: #00e676;
+  color: white;
   text-decoration: none;
 }
 
-/* CONTAINER */
 .container {
   padding: 20px;
   max-width: 500px;
   margin: auto;
 }
 
-/* CARD */
 .card {
-  background: rgba(30,30,30,0.6);
-  backdrop-filter: blur(15px);
+  background: #1e1e1e;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 0 15px rgba(0,255,200,0.2);
 }
 
 /* INPUT */
 input {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   margin-top: 10px;
   border-radius: 10px;
   border: none;
-  background: #1a1a1a;
+  background: #2a2a2a;
   color: white;
 }
 
-/* BASE BUTTON */
+/* BUTTON BASE */
 button {
   width: 100%;
-  padding: 14px;
-  margin-top: 10px;
+  padding: 12px;
   border-radius: 10px;
   border: none;
+  margin-top: 10px;
   font-size: 16px;
   color: white;
-  transition: 0.3s;
-}
-
-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0,255,200,0.5);
-}
-
-/* 🔥 COLOR BUTTONS (RESTORED) */
-.new-btn {
-  background: linear-gradient(45deg, #00c853, #00e676);
-}
-
-.used-btn {
-  background: linear-gradient(45deg, orange, #ff9800);
-}
-
-.cracked-btn {
-  background: linear-gradient(45deg, red, #ff5252);
-}
-
-/* OTHER BUTTONS */
-.primary-btn {
-  background: linear-gradient(45deg,#00c853,#00e676);
-}
-
-.link-btn {
-  background: linear-gradient(45deg,#2196f3,#03a9f4);
-}
-
-.big {
-  font-size: 28px;
-  text-shadow: 0 0 8px #00e676;
-}
-
-.tip {
-  background: #1a1a1a;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 8px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="nav">
-  <a href="index.html">Home</a>
-  <a href="tips.html">Tips</a>
-  <a href="about.html">About</a>
-</div>
-
-<div class="container">
-
-<!-- 📷 IMAGE SCANNER -->
-<div class="card">
-  <h3>📷 Item Scanner</h3>
-
-  <input type="file" accept="image/*" onchange="previewImage(event)">
-  <img id="preview" style="width:100%; margin-top:10px; border-radius:10px; display:none;" />
-
-  <button class="primary-btn" onclick="analyzeImage()">Scan Item</button>
-
-  <div id="scanStatus"></div>
-  <div id="scanResult"></div>
-</div>
-
-<!-- 🧠 SMART SCANNER (RESTORED) -->
-<div class="card">
-  <h3>🧠 Smart Scanner</h3>
-
-  <input type="text" id="item" placeholder="Type item manually">
-
-  <button class="new-btn" onclick="scan('new')">New</button>
-  <button class="used-btn" onclick="scan('used')">Used</button>
-  <button class="cracked-btn" onclick="scan('cracked')">Cracked</button>
-
-  <div id="scanTextResult"></div>
-</div>
-
-<!-- 💰 PROFIT -->
-<div class="card">
-  <h3>💰 Profit Calculator</h3>
-
-  <input type="number" id="buy" placeholder="Buy Price">
-  <input type="number" id="sell" placeholder="Sell Price">
-
-  <button class="primary-btn" onclick="calc()">Check Profit</button>
-
-  <div class="big" id="profit">$0</div>
-  <div id="rating"></div>
-</div>
-
-<!-- 🔗 MARKET -->
-<div class="card">
-  <h3>🔗 Sell Fast</h3>
-
-  <button class="link-btn" onclick="goMarket('fb')">Facebook Marketplace</button>
-  <button class="link-btn" onclick="goMarket('ebay')">eBay</button>
-  <button class="link-btn" onclick="goMarket('offerup')">OfferUp</button>
-</div>
-
-<!-- 📊 TRENDING -->
-<div class="card">
-  <h3>📊 Trending</h3>
-
-  <div class="tip">📱 Phones</div>
-  <div class="tip">🪑 Furniture</div>
-  <div class="tip">👟 Shoes</div>
-</div>
-
-<div class="card">
-  <button class="primary-btn" onclick="window.location.href='index.html'">⬅ Back</button>
-</div>
-
-</div>
-
-<script>
-function previewImage(event) {
-  const img = document.getElementById("preview");
-  img.src = URL.createObjectURL(event.target.files[0]);
-  img.style.display = "block";
-}
-
-function analyzeImage() {
-  const status = document.getElementById("scanStatus");
-  const result = document.getElementById("scanResult");
-
-  status.innerText = "🔍 Analyzing...";
-  result.innerText = "";
-
-  setTimeout(() => {
-    const outcomes = [
-      "📱 Phone detected",
-      "🪑 Furniture detected",
-      "👟 Shoes detected",
-      "📦 General item"
-    ];
-    const random = outcomes[Math.floor(Math.random()*outcomes.length)];
-    status.innerText = "✅ Done";
-    result.innerText = random;
-  }, 2000);
-}
-
-function scan(type) {
-  let item = document.getElementById("item").value.toLowerCase();
-  let result = "";
-
-  if (!item) {
-    result = "Enter item first";
-  } else {
-    if (item.includes("phone")) {
-      if (type === "new") result = "📱 New phone: High resale value ($200+)";
-      if (type === "used") result = "📱 Used phone: Good flip ($80–$150)";
-      if (type === "cracked") result = "📱 Cracked phone: Fix & flip ($40–$100)";
-    } 
-    else if (item.includes("shoes")) {
-      if (type === "new") result = "👟 New shoes: Flip $60–$120";
-      if (type === "used") result = "👟 Used shoes: Clean & resell $30–$80";
-      if (type === "cracked") result = "👟 Damaged shoes: Low value";
-    } 
-    else if (item.includes("couch")) {
-      if (type === "new") result = "🪑 New couch: Big flip $150+";
-      if (type === "used") result = "🪑 Used couch: Flip $50–$120";
-      if (type === "cracked") result = "🪑 Damaged couch: Avoid or cheap flip";
-    } 
-    else {
-      result = "Check demand locally and resell";
-    }
-  }
-
-  document.getElementById("scanTextResult").innerText = result;
-}
-
-function calc() {
-  let buy = +document.getElementById("buy").value || 0;
-  let sell = +document.getElementById("sell").value || 0;
-  let profit = sell - buy;
-
-  document.getElementById("profit").innerText = "$" + profit;
-  document.getElementById("rating").innerText =
-    profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
-}
-
-function goMarket(type) {
-  if (type === "fb") window.open("https://facebook.com/marketplace");
-  if (type === "ebay") window.open("https://ebay.com");
-  if (type === "offerup") window.open("https://offerup.com");
-}
-</script>
-
-</body>
-</html>
+  transition
