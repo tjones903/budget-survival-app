@@ -9,21 +9,19 @@
 body {
   margin: 0;
   font-family: system-ui;
-  background: #111;
+  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
   color: white;
 }
 
 .nav {
   display: flex;
   justify-content: space-around;
-  background: #1a1a1a;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
   padding: 12px;
 }
 
-.nav a {
-  color: white;
-  text-decoration: none;
-}
+.nav a { color: white; text-decoration: none; }
 
 .container {
   padding: 20px;
@@ -32,10 +30,17 @@ body {
 }
 
 .card {
-  background: #1e1e1e;
+  background: rgba(30,30,30,0.6);
+  backdrop-filter: blur(15px);
   padding: 20px;
   border-radius: 15px;
   margin-bottom: 15px;
+  box-shadow: 0 0 15px rgba(0,255,200,0.2);
+  transition: 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 0 25px rgba(0,255,200,0.5);
 }
 
 input {
@@ -48,6 +53,8 @@ input {
   color: white;
 }
 
+input:focus { box-shadow: 0 0 10px #00e676; }
+
 button {
   width: 100%;
   padding: 12px;
@@ -57,6 +64,12 @@ button {
   font-size: 16px;
   color: white;
   background: #444;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #00e676;
 }
 
 .big { font-size: 26px; }
@@ -73,144 +86,94 @@ button {
 
 <div class="container">
 
-<!-- 📷 AI ITEM SCAN -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
-
   <input type="file" accept="image/*" capture="environment" id="camera">
-
   <button onclick="scanItem()">Scan Item</button>
 
   <div id="scanDesc"></div>
-
   <div class="big" id="worth">$0</div>
   <div class="big" id="sell">$0</div>
   <div class="big" id="profitScan">$0</div>
 </div>
 
-<!-- 🧠 SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
-
   <input type="text" id="item" placeholder="Type item">
-
   <button onclick="scan('new')">New</button>
   <button onclick="scan('used')">Used</button>
   <button onclick="scan('cracked')">Cracked</button>
-
   <div id="scanTextResult"></div>
 </div>
 
-<!-- 💰 PROFIT CALCULATOR -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
-
   <input type="number" id="buy" placeholder="Buy Price">
   <input type="number" id="sellInput" placeholder="Sell Price">
-
   <button onclick="calc()">Check Profit</button>
-
   <div class="big" id="profit">$0</div>
   <div id="rating"></div>
 </div>
 
-<!-- 🔗 MARKET -->
 <div class="card">
-  <h3>🔗 Sell Fast</h3>
-
-  <button onclick="goMarket('fb')">Facebook Marketplace</button>
-  <button onclick="goMarket('ebay')">eBay</button>
-  <button onclick="goMarket('offerup')">OfferUp</button>
-</div>
-
-<div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back</button>
+  <h3>🏆 Your Progress</h3>
+  <div id="points">Points: 0</div>
+  <div id="streak">Streak: 0</div>
 </div>
 
 </div>
 
 <script>
-// 📷 AUTO DETECT AFTER PHOTO
+let points = 0;
+let streak = 0;
+
+function reward() {
+  points += 10;
+  streak += 1;
+  document.getElementById("points").innerText = "Points: " + points;
+  document.getElementById("streak").innerText = "Streak: " + streak;
+}
+
 document.getElementById("camera").addEventListener("change", autoScan);
 
 function scanItem() {
   const input = document.getElementById("camera");
-
-  if (!input.files.length) {
-    input.click(); // open camera
-  }
+  if (!input.files.length) input.click();
 }
 
 function autoScan() {
-  const input = document.getElementById("camera");
-
-  document.getElementById("scanDesc").innerText = "🔍 Scanning item...";
+  document.getElementById("scanDesc").innerText = "🔍 Scanning...";
 
   setTimeout(() => {
-
-    const fileName = input.files[0].name.toLowerCase();
-
-    let item = "Item";
-    let base = Math.floor(Math.random() * 100) + 40;
-
-    // 🔍 SMART MATCH
-    if (fileName.includes("phone")) {
-      item = "Phone";
-      base += 80;
-    } else if (fileName.includes("shoe")) {
-      item = "Shoes";
-      base += 40;
-    } else if (fileName.includes("chair") || fileName.includes("couch")) {
-      item = "Furniture";
-      base += 60;
-    } else if (fileName.includes("tv") || fileName.includes("laptop")) {
-      item = "Electronics";
-      base += 90;
-    }
-
-    let worth = base;
-    let sellLow = Math.floor(worth * 1.3);
-    let sellHigh = Math.floor(worth * 1.5);
+    let worth = Math.floor(Math.random()*100)+50;
+    let sellLow = Math.floor(worth*1.3);
+    let sellHigh = Math.floor(worth*1.5);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = "Detected: " + item;
+    document.getElementById("scanDesc").innerText = "Detected item";
     document.getElementById("worth").innerText = "Worth: $" + worth;
-    document.getElementById("sell").innerText =
-      "Sell: $" + sellLow + " - $" + sellHigh;
-    document.getElementById("profitScan").innerText =
-      "Profit: $" + profit;
+    document.getElementById("sell").innerText = "Sell: $" + sellLow + " - $" + sellHigh;
+    document.getElementById("profitScan").innerText = "Profit: $" + profit;
 
-  }, 1200);
+    reward();
+  },1000);
 }
 
-// 🧠 SMART SCANNER
 function scan(type) {
-  let item = document.getElementById("item").value.toLowerCase();
-  let result = "";
+  let worth = Math.floor(Math.random()*80)+30;
+  if(type==="new") worth+=50;
+  if(type==="used") worth+=10;
+  if(type==="cracked") worth-=15;
 
-  if (!item) {
-    result = "Enter item first";
-  } else {
-    let worth = Math.floor(Math.random() * 80) + 30;
+  let sellLow = Math.floor(worth*1.3);
+  let profit = sellLow - worth;
 
-    if (type === "new") worth += 50;
-    if (type === "used") worth += 10;
-    if (type === "cracked") worth -= 15;
+  document.getElementById("scanTextResult").innerText =
+    "Worth: $" + worth + "\nSell: $" + sellLow + "\nProfit: $" + profit;
 
-    let sellLow = Math.floor(worth * 1.3);
-    let sellHigh = Math.floor(worth * 1.5);
-    let profit = sellLow - worth;
-
-    result =
-      "Worth: $" + worth +
-      "\nSell: $" + sellLow + " - $" + sellHigh +
-      "\nProfit: $" + profit;
-  }
-
-  document.getElementById("scanTextResult").innerText = result;
+  reward();
 }
 
-// 💰 PROFIT
 function calc() {
   let buy = +document.getElementById("buy").value || 0;
   let sell = +document.getElementById("sellInput").value || 0;
@@ -219,12 +182,8 @@ function calc() {
   document.getElementById("profit").innerText = "$" + profit;
   document.getElementById("rating").innerText =
     profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
-}
 
-function goMarket(type) {
-  if (type === "fb") window.open("https://facebook.com/marketplace");
-  if (type === "ebay") window.open("https://ebay.com");
-  if (type === "offerup") window.open("https://offerup.com");
+  reward();
 }
 </script>
 
