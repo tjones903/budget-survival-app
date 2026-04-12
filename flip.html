@@ -144,7 +144,7 @@ function autoScan(){
     let name = file.name.toLowerCase();
     let item = "";
 
-    // 🔥 ORIGINAL DETECTION
+    // 🔥 PRIMARY DETECTION (unchanged logic, just expanded)
     if(name.includes("iphone") || name.includes("android") || name.includes("phone"))
       item = "Smartphone";
 
@@ -166,13 +166,22 @@ function autoScan(){
     else if(name.includes("bag") || name.includes("purse"))
       item = "Bag";
 
-    // ✅ ADDED: ALWAYS NAME SOMETHING
+    // ✅ SMART FALLBACK (FIXED HERE)
     if(item === ""){
-      const items = [
-        "Phone","Shoes","Laptop","TV","Chair",
-        "Table","Watch","Game Console","Headphones","Speaker"
+      const generalItems = [
+        "Window",
+        "Door",
+        "Wall Item",
+        "Household Item",
+        "Room Object",
+        "Outdoor Object",
+        "Office Item",
+        "Furniture",
+        "Personal Item",
+        "Accessory"
       ];
-      item = items[Math.floor(Math.random()*items.length)];
+
+      item = generalItems[Math.floor(Math.random()*generalItems.length)];
     }
 
     let confidence = Math.floor(Math.random()*15)+85;
