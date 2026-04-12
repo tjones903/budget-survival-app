@@ -7,6 +7,10 @@
 
 <link rel="icon" href="icon.png">
 
+<!-- ✅ ADDED REAL AI (DO NOT REMOVE ANYTHING ELSE) -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+
 <style>
 body {
   margin: 0;
@@ -86,6 +90,9 @@ button:hover {
 
   <input type="file" accept="image/*" capture="environment" id="camera">
 
+  <!-- ✅ ADDED IMAGE PREVIEW -->
+  <img id="preview" width="100%" style="margin-top:10px; border-radius:10px; display:none;">
+
   <button onclick="scanItem()">Scan Item</button>
 
   <div id="scanDesc"></div>
@@ -132,7 +139,13 @@ button:hover {
 
 <script>
 let points = 0;
-let lastItem = ""; // ✅ prevents repeat
+let lastItem = "";
+let model; // ✅ AI model
+
+// ✅ LOAD AI (ADDED ONLY)
+mobilenet.load().then(m => {
+  model = m;
+});
 
 function reward(profit=0){
   points += 10;
@@ -150,6 +163,7 @@ function scanItem(){
   if(!cam.files.length) cam.click();
 }
 
+// ✅ REAL AI VERSION (REPLACED BUT SAME STRUCTURE)
 function autoScan(){
   const fileInput = document.getElementById("camera");
   const file = fileInput.files[0];
@@ -159,72 +173,43 @@ function autoScan(){
     return;
   }
 
-  document.getElementById("scanDesc").innerText = "🔍 Scanning item...";
+  const img = document.getElementById("preview");
+  img.style.display = "block";
+  img.src = URL.createObjectURL(file);
 
-  setTimeout(()=>{
+  document.getElementById("scanDesc").innerText = "🔍 AI scanning...";
 
-    let name = file.name.toLowerCase();
+  img.onload = async () => {
 
-    let item = "";
-    let desc = "";
-
-    // DIRECT MATCH (BEST CASE)
-    if(name.includes("phone")) item = "Smartphone";
-    else if(name.includes("shoe")) item = "Shoes";
-    else if(name.includes("laptop")) item = "Laptop";
-    else if(name.includes("tv")) item = "Television";
-    else if(name.includes("sofa") || name.includes("couch")) item = "Sofa";
-    else if(name.includes("bed")) item = "Bed";
-    else if(name.includes("desk")) item = "Desk";
-    else if(name.includes("chair")) item = "Chair";
-    else if(name.includes("table")) item = "Table";
-
-    // 🔥 CATEGORY BASED (CLOSER MATCH — NOT RANDOM)
-    if(item === ""){
-      let category = [];
-
-      // try to guess category from filename length / pattern
-      if(name.length < 10){
-        category = ["Phone","Shoes"];
-      } else if(name.length < 20){
-        category = ["Chair","Table","Desk"];
-      } else {
-        category = ["Sofa","Bed","TV","Laptop"];
-      }
-
-      item = category[Math.floor(Math.random()*category.length)];
+    if(!model){
+      document.getElementById("scanDesc").innerText = "Loading AI...";
+      return;
     }
 
-    // 🔥 PREVENT REPEAT
-    if(item === lastItem){
-      const alt = ["Chair","Table","Desk","Sofa","Bed","TV","Laptop","Shoes","Phone"];
-      item = alt[Math.floor(Math.random()*alt.length)];
+    const predictions = await model.classify(img);
+
+    let item = predictions[0].className.split(",")[0];
+
+    // prevent repeat
+    if(item === lastItem && predictions[1]){
+      item = predictions[1].className.split(",")[0];
     }
 
     lastItem = item;
-
-    desc = "Identified item. Check condition and demand.";
 
     let worth = Math.floor(Math.random()*100)+50;
     let sellLow = Math.floor(worth*1.3);
     let sellHigh = Math.floor(worth*1.5);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText =
-      item + "\n" + desc;
+    document.getElementById("scanDesc").innerText = item;
 
-    document.getElementById("worth").innerText =
-      "Worth: $" + worth;
-
-    document.getElementById("sell").innerText =
-      "Sell: $" + sellLow + " - $" + sellHigh;
-
-    document.getElementById("profitScan").innerText =
-      "Profit: $" + profit;
+    document.getElementById("worth").innerText = "Worth: $" + worth;
+    document.getElementById("sell").innerText = "Sell: $" + sellLow + " - $" + sellHigh;
+    document.getElementById("profitScan").innerText = "Profit: $" + profit;
 
     reward(profit);
-
-  },1000);
+  };
 }
 
 function scan(type){
