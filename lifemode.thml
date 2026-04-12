@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Mode</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: system-ui;
+  background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
+  color: white;
+}
+
+.header {
+  text-align: center;
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.container {
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
+
+.card {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+  color: white;
+}
+
+.broke { background: red; }
+.hustle { background: orange; }
+.stable { background: #00c853; }
+.emergency { background: purple; }
+
+.result {
+  margin-top: 15px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🧠 Life Mode</div>
+
+<div class="container">
+
+<div class="card">
+  <h3>Select Your Mode</h3>
+
+  <button class="broke" onclick="setMode('broke')">💸 Broke Mode</button>
+  <button class="hustle" onclick="setMode('hustle')">🔥 Hustle Mode</button>
+  <button class="stable" onclick="setMode('stable')">🧘 Stability Mode</button>
+  <button class="emergency" onclick="setMode('emergency')">🚨 Emergency Mode</button>
+
+  <div id="output" class="result"></div>
+</div>
+
+<div class="card">
+  <button onclick="goBack()">⬅ Back to Budget</button>
+</div>
+
+</div>
+
+<script>
+function setMode(mode) {
+  let message = "";
+
+  if (mode === "broke") {
+    message = `
+    💸 BROKE MODE
+
+    Spend: Under $15 today
+
+    Action:
+    • Flip 1 item
+    • Sell something you already own
+
+    Warning:
+    You are at risk of running out soon.
+    `;
+  }
+
+  if (mode === "hustle") {
+    message = `
+    🔥 HUSTLE MODE
+
+    Goal: Make $100 today
+
+    Action:
+    • Flip item
+    • Offer a quick service
+    • Post something for sale
+
+    Stay active and move fast.
+    `;
+  }
+
+  if (mode === "stable") {
+    message = `
+    🧘 STABILITY MODE
+
+    Spend normally
+
+    Action:
+    • Save some money
+    • Avoid unnecessary spending
+
+    You are in a good position.
+    `;
+  }
+
+  if (mode === "emergency") {
+    message = `
+    🚨 EMERGENCY MODE
+
+    Stop spending immediately
+
+    Action:
+    • Sell 1–2 items today
+    • Cut subscriptions
+    • Find quick cash
+
+    Priority: Survival first.
+    `;
+  }
+
+  document.getElementById("output").innerText = message;
+}
+
+function goBack() {
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
