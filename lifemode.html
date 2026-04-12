@@ -17,7 +17,7 @@ body {
   text-align: center;
   padding: 20px;
   font-size: 24px;
-  text-shadow: 0 0 10px #00e676;
+  text-shadow: 0 0 12px #00e676;
 }
 
 .card {
@@ -25,7 +25,12 @@ body {
   padding: 20px;
   border-radius: 15px;
   margin: 15px;
-  box-shadow: 0 0 15px rgba(0,255,200,0.2);
+  box-shadow: 0 0 20px rgba(0,255,200,0.25);
+  transition: 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 0 30px rgba(0,255,200,0.4);
 }
 
 button {
@@ -34,17 +39,25 @@ button {
   margin-top: 10px;
   border-radius: 10px;
   border: none;
-  background: #444;
   color: white;
+  transition: 0.3s;
 }
 
+/* COLORS */
+.broke { background: linear-gradient(45deg, red, #ff5252); }
+.hustle { background: linear-gradient(45deg, orange, #ff9800); }
+.stable { background: linear-gradient(45deg, #00c853, #00e676); }
+.emergency { background: linear-gradient(45deg, purple, #9c27b0); }
+
 button:hover {
-  box-shadow: 0 0 15px #00e676;
+  box-shadow: 0 0 20px #00e676;
+  transform: scale(1.05);
 }
 
 .result {
   margin-top: 15px;
   white-space: pre-line;
+  line-height: 1.6;
 }
 
 input {
@@ -62,10 +75,10 @@ input {
 <div class="header">🧠 Life Mode</div>
 
 <div class="card">
-  <button onclick="setMode('broke')">💸 Broke</button>
-  <button onclick="setMode('hustle')">🔥 Hustle</button>
-  <button onclick="setMode('stable')">🧘 Stable</button>
-  <button onclick="setMode('emergency')">🚨 Emergency</button>
+  <button class="broke" onclick="setMode('broke')">💸 Broke</button>
+  <button class="hustle" onclick="setMode('hustle')">🔥 Hustle</button>
+  <button class="stable" onclick="setMode('stable')">🧘 Stable</button>
+  <button class="emergency" onclick="setMode('emergency')">🚨 Emergency</button>
 
   <div id="output" class="result"></div>
 </div>
@@ -78,7 +91,7 @@ input {
 </div>
 
 <div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back</button>
+  <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
 </div>
 
 <script>
@@ -111,12 +124,57 @@ function save(){
   render();
 }
 
+/* ✅ ONLY WORDING UPGRADED */
 function setMode(mode){
   let msg="";
-  if(mode==="broke") msg="Spend under $15\nFlip something";
-  if(mode==="hustle") msg="Make $100\nSell fast";
-  if(mode==="stable") msg="Save money\nStay consistent";
-  if(mode==="emergency") msg="STOP spending\nGet money now";
+
+  if(mode==="broke") msg=
+`💸 BROKE MODE
+
+Spend: Under $15 today
+
+Action:
+• Flip 1 item immediately
+• Sell something you already own
+• Check Facebook Marketplace for cheap items
+
+Goal: Make at least $20 today`;
+
+  if(mode==="hustle") msg=
+`🔥 HUSTLE MODE
+
+Goal: Make $100 today
+
+Action:
+• Flip 1–2 items
+• Offer a quick service (cleaning, yard work)
+• Post items on Facebook & OfferUp
+
+Move fast and stay active`;
+
+  if(mode==="stable") msg=
+`🧘 STABLE MODE
+
+You are in control
+
+Action:
+• Save extra money
+• Look for 1 flip opportunity
+• Avoid unnecessary spending
+
+Build momentum`;
+
+  if(mode==="emergency") msg=
+`🚨 EMERGENCY MODE
+
+STOP spending immediately
+
+Action:
+• Sell 1–2 items NOW
+• Use Flip It tool
+• Find fast cash opportunities
+
+Priority: Survival`;
 
   document.getElementById("output").innerText = msg;
 }
