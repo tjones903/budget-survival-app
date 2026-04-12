@@ -34,26 +34,13 @@ button {
   margin-top: 10px;
   border-radius: 10px;
   border: none;
-  color: white;
   background: #444;
+  color: white;
 }
 
-button:hover {
-  box-shadow: 0 0 15px #00e676;
-}
+button:hover { box-shadow: 0 0 15px #00e676; }
 
-.result {
-  margin-top: 15px;
-  white-space: pre-line;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: none;
-}
+.result { margin-top: 15px; white-space: pre-line; }
 </style>
 </head>
 
@@ -62,89 +49,62 @@ input {
 <div class="header">🧠 Life Mode</div>
 
 <div class="card">
-  <button onclick="setMode('broke')">💸 Broke Mode</button>
-  <button onclick="setMode('hustle')">🔥 Hustle Mode</button>
-  <button onclick="setMode('stable')">🧘 Stability Mode</button>
-  <button onclick="setMode('emergency')">🚨 Emergency Mode</button>
+  <button onclick="setMode('broke')">💸 Broke</button>
+  <button onclick="setMode('hustle')">🔥 Hustle</button>
+  <button onclick="setMode('stable')">🧘 Stable</button>
+  <button onclick="setMode('emergency')">🚨 Emergency</button>
 
   <div id="output" class="result"></div>
 </div>
 
 <div class="card">
-  <h3>✅ Track Your Wins</h3>
-
+  <h3>✅ Track Wins</h3>
   <input id="taskInput" placeholder="What did you complete?">
-
   <button onclick="addTask()">Add</button>
-
   <ul id="taskList"></ul>
-</div>
-
-<div class="card">
-  <button onclick="goBack()">⬅ Back</button>
 </div>
 
 <script>
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-function renderTasks() {
-  const list = document.getElementById("taskList");
-  list.innerHTML = "";
-
-  tasks.forEach((t, i) => {
-    const li = document.createElement("li");
-    li.innerHTML = `
-      <input type="checkbox" ${t.done ? "checked" : ""} onchange="toggle(${i})">
-      ${t.text}
-    `;
+function render(){
+  let list = document.getElementById("taskList");
+  list.innerHTML="";
+  tasks.forEach((t,i)=>{
+    let li=document.createElement("li");
+    li.innerHTML = `<input type="checkbox" ${t.done?"checked":""} onclick="toggle(${i})"> ${t.text}`;
     list.appendChild(li);
   });
 }
 
-function addTask() {
-  const input = document.getElementById("taskInput");
-  if (!input.value) return;
-
-  tasks.push({ text: input.value, done: false });
-  input.value = "";
-
+function addTask(){
+  let val=document.getElementById("taskInput").value;
+  if(!val) return;
+  tasks.push({text:val,done:false});
   save();
 }
 
-function toggle(i) {
-  tasks[i].done = !tasks[i].done;
+function toggle(i){
+  tasks[i].done=!tasks[i].done;
   save();
 }
 
-function save() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-  renderTasks();
+function save(){
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+  render();
 }
 
-function setMode(mode) {
-  let message = "";
+function setMode(mode){
+  let msg="";
+  if(mode==="broke") msg="Spend under $15\nFlip something";
+  if(mode==="hustle") msg="Make $100\nSell fast";
+  if(mode==="stable") msg="Save money\nStay consistent";
+  if(mode==="emergency") msg="STOP spending\nGet money now";
 
-  if (mode === "broke") {
-    message = "💸 Spend under $15\nFlip something today";
-  }
-  if (mode === "hustle") {
-    message = "🔥 Make $100 today\nSell or hustle";
-  }
-  if (mode === "stable") {
-    message = "🧘 Save money\nStay consistent";
-  }
-  if (mode === "emergency") {
-    message = "🚨 STOP spending\nFind money NOW";
-  }
-
-  document.getElementById("output").innerText = message;
+  document.getElementById("output").innerText = msg;
 }
 
-function goBack() {
-  window.location.href = "index.html";
-}
-
-renderTasks();
+render();
 </script>
 
 </body>
