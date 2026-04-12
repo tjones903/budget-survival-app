@@ -29,8 +29,6 @@ body {
   padding: 20px;
   border-radius: 15px;
   margin: 15px;
-
-  /* ✅ glow added */
   box-shadow: 0 0 20px rgba(0,255,200,0.2);
   transition: 0.3s;
 }
@@ -51,13 +49,12 @@ button {
   transition: 0.3s;
 }
 
-/* ✅ COLORS ADDED ONLY */
+/* COLORS */
 .broke { background: linear-gradient(45deg, red, #ff5252); }
 .hustle { background: linear-gradient(45deg, orange, #ff9800); }
 .stable { background: linear-gradient(45deg, #00c853, #00e676); }
 .emergency { background: linear-gradient(45deg, purple, #9c27b0); }
 
-/* hover glow */
 button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 20px #00e676;
@@ -68,7 +65,6 @@ button:hover {
   white-space: pre-line;
 }
 
-/* INPUT */
 input {
   width: 100%;
   padding: 10px;
@@ -84,7 +80,6 @@ input {
 <div class="header">🧠 Life Mode</div>
 
 <div class="card">
-  <!-- ✅ SAME BUTTONS JUST COLOR ADDED -->
   <button class="broke" onclick="setMode('broke')">💸 Broke</button>
   <button class="hustle" onclick="setMode('hustle')">🔥 Hustle</button>
   <button class="stable" onclick="setMode('stable')">🧘 Stable</button>
@@ -97,15 +92,13 @@ input {
   <h3>✅ Track Wins</h3>
   <input id="taskInput" placeholder="What did you complete?">
 
-  <!-- ✅ ONLY STYLE ADDED -->
-  <button style="background:linear-gradient(45deg,#2196f3,#00e5ff); color:black;">
+  <button onclick="addTask()" style="background:linear-gradient(45deg,#2196f3,#00e5ff); color:black;">
 Add
 </button>
 
   <ul id="taskList"></ul>
 </div>
 
-<!-- ✅ BACK BUTTON FIXED -->
 <div class="card">
   <button onclick="window.location.href='index.html'" 
     style="background:linear-gradient(45deg,#00e676,#00c853); color:black;">
@@ -143,13 +136,21 @@ function save(){
   render();
 }
 
-/* ✅ YOUR ORIGINAL WORDING (UNCHANGED) */
+/* ✅ ONLY ADDED ACTION STEPS */
 function setMode(mode){
   let msg="";
-  if(mode==="broke") msg="Spend under $15\nFlip something";
-  if(mode==="hustle") msg="Make $100\nSell fast";
-  if(mode==="stable") msg="Save money\nStay consistent";
-  if(mode==="emergency") msg="STOP spending\nGet money now";
+
+  if(mode==="broke") msg=
+"Spend under $15\nFlip something\n\nAction:\n• Flip 1 item today\n• Sell something you already own";
+
+  if(mode==="hustle") msg=
+"Make $100\nSell fast\n\nAction:\n• Flip 1–2 items\n• Post on Facebook Marketplace\n• Offer quick services";
+
+  if(mode==="stable") msg=
+"Save money\nStay consistent\n\nAction:\n• Flip 1 item for extra profit\n• Avoid unnecessary spending";
+
+  if(mode==="emergency") msg=
+"STOP spending\nGet money now\n\nAction:\n• Flip 2 items immediately\n• Sell anything of value\n• Use Flip It tool now";
 
   document.getElementById("output").innerText = msg;
 }
