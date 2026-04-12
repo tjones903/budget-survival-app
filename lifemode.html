@@ -42,7 +42,18 @@ button:hover {
   box-shadow: 0 0 15px #00e676;
 }
 
-.result { margin-top: 15px; white-space: pre-line; }
+.result {
+  margin-top: 15px;
+  white-space: pre-line;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: none;
+}
 </style>
 </head>
 
@@ -51,32 +62,89 @@ button:hover {
 <div class="header">🧠 Life Mode</div>
 
 <div class="card">
-  <button onclick="setMode('broke')">💸 Broke</button>
-  <button onclick="setMode('hustle')">🔥 Hustle</button>
-  <button onclick="setMode('stable')">🧘 Stable</button>
-  <button onclick="setMode('emergency')">🚨 Emergency</button>
+  <button onclick="setMode('broke')">💸 Broke Mode</button>
+  <button onclick="setMode('hustle')">🔥 Hustle Mode</button>
+  <button onclick="setMode('stable')">🧘 Stability Mode</button>
+  <button onclick="setMode('emergency')">🚨 Emergency Mode</button>
 
   <div id="output" class="result"></div>
-  <div id="score"></div>
+</div>
+
+<div class="card">
+  <h3>✅ Track Your Wins</h3>
+
+  <input id="taskInput" placeholder="What did you complete?">
+
+  <button onclick="addTask()">Add</button>
+
+  <ul id="taskList"></ul>
+</div>
+
+<div class="card">
+  <button onclick="goBack()">⬅ Back</button>
 </div>
 
 <script>
-let score = 0;
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+function renderTasks() {
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
+
+  tasks.forEach((t, i) => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <input type="checkbox" ${t.done ? "checked" : ""} onchange="toggle(${i})">
+      ${t.text}
+    `;
+    list.appendChild(li);
+  });
+}
+
+function addTask() {
+  const input = document.getElementById("taskInput");
+  if (!input.value) return;
+
+  tasks.push({ text: input.value, done: false });
+  input.value = "";
+
+  save();
+}
+
+function toggle(i) {
+  tasks[i].done = !tasks[i].done;
+  save();
+}
+
+function save() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  renderTasks();
+}
 
 function setMode(mode) {
-  score += 5;
+  let message = "";
 
-  let msg = "";
+  if (mode === "broke") {
+    message = "💸 Spend under $15\nFlip something today";
+  }
+  if (mode === "hustle") {
+    message = "🔥 Make $100 today\nSell or hustle";
+  }
+  if (mode === "stable") {
+    message = "🧘 Save money\nStay consistent";
+  }
+  if (mode === "emergency") {
+    message = "🚨 STOP spending\nFind money NOW";
+  }
 
-  if(mode==="broke") msg="Spend under $15\nFlip something today";
-  if(mode==="hustle") msg="Make $100 today\nSell or flip fast";
-  if(mode==="stable") msg="Save money\nStay consistent";
-  if(mode==="emergency") msg="STOP spending\nFind money now";
-
-  msg += "\n\nScore: " + score;
-
-  document.getElementById("output").innerText = msg;
+  document.getElementById("output").innerText = message;
 }
+
+function goBack() {
+  window.location.href = "index.html";
+}
+
+renderTasks();
 </script>
 
 </body>
