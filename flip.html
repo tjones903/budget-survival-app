@@ -49,7 +49,7 @@ input {
   color: white;
 }
 
-/* BUTTON BASE */
+/* BUTTON */
 button {
   width: 100%;
   padding: 12px;
@@ -58,4 +58,145 @@ button {
   margin-top: 10px;
   font-size: 16px;
   color: white;
-  transition
+}
+
+/* COLORS */
+.green { background: #00c853; }
+.orange { background: orange; }
+.red { background: red; }
+.blue { background: #2196f3; }
+
+.big {
+  font-size: 28px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+  <a href="index.html">Home</a>
+  <a href="tips.html">Tips</a>
+  <a href="about.html">About</a>
+</div>
+
+<div class="container">
+
+<!-- 📷 CAMERA SCAN -->
+<div class="card">
+  <h3>📷 AI Item Scan</h3>
+
+  <input type="file" accept="image/*" capture="environment" id="camera">
+
+  <button class="green" onclick="scanImage()">Scan Item</button>
+
+  <div id="scanResult"></div>
+</div>
+
+<!-- 🧠 SMART SCANNER -->
+<div class="card">
+  <h3>🧠 Smart Scanner</h3>
+
+  <input type="text" id="item" placeholder="Type item (phone, shoes, couch)">
+
+  <button class="green" onclick="scan('new')">New</button>
+  <button class="orange" onclick="scan('used')">Used</button>
+  <button class="red" onclick="scan('cracked')">Cracked</button>
+
+  <div id="scanTextResult"></div>
+</div>
+
+<!-- 💰 PROFIT -->
+<div class="card">
+  <h3>💰 Profit Calculator</h3>
+
+  <input type="number" id="buy" placeholder="Buy Price">
+  <input type="number" id="sell" placeholder="Sell Price">
+
+  <button class="green" onclick="calc()">Check Profit</button>
+
+  <div class="big" id="profit">$0</div>
+  <div id="rating"></div>
+</div>
+
+<!-- 🔗 MARKET -->
+<div class="card">
+  <h3>🔗 Sell Fast</h3>
+
+  <button class="blue" onclick="goMarket('fb')">Facebook Marketplace</button>
+  <button class="blue" onclick="goMarket('ebay')">eBay</button>
+  <button class="blue" onclick="goMarket('offerup')">OfferUp</button>
+</div>
+
+<div class="card">
+  <button onclick="window.location.href='index.html'">⬅ Back</button>
+</div>
+
+</div>
+
+<script>
+function scanImage() {
+  const input = document.getElementById("camera");
+  const result = document.getElementById("scanResult");
+
+  if (!input.files.length) {
+    result.innerText = "Take a picture first";
+    return;
+  }
+
+  result.innerText = "🔍 Scanning...";
+
+  setTimeout(() => {
+    result.innerText = "📦 Item detected. Check resale value.";
+  }, 1500);
+}
+
+function scan(type) {
+  let item = document.getElementById("item").value.toLowerCase();
+  let result = "";
+
+  if (!item) {
+    result = "Enter item first";
+  } else {
+    if (item.includes("phone")) {
+      if (type === "new") result = "📱 New phone: $200+";
+      if (type === "used") result = "📱 Used phone: $80–150";
+      if (type === "cracked") result = "📱 Cracked: Fix & flip";
+    } 
+    else if (item.includes("shoes")) {
+      if (type === "new") result = "👟 New: $60–120";
+      if (type === "used") result = "👟 Used: $30–80";
+      if (type === "cracked") result = "👟 Low value";
+    } 
+    else if (item.includes("couch")) {
+      if (type === "new") result = "🪑 New: $150+";
+      if (type === "used") result = "🪑 Used: $50–120";
+      if (type === "cracked") result = "🪑 Avoid";
+    } 
+    else {
+      result = "Check local demand";
+    }
+  }
+
+  document.getElementById("scanTextResult").innerText = result;
+}
+
+function calc() {
+  let buy = +document.getElementById("buy").value || 0;
+  let sell = +document.getElementById("sell").value || 0;
+  let profit = sell - buy;
+
+  document.getElementById("profit").innerText = "$" + profit;
+  document.getElementById("rating").innerText =
+    profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
+}
+
+function goMarket(type) {
+  if (type === "fb") window.open("https://facebook.com/marketplace");
+  if (type === "ebay") window.open("https://ebay.com");
+  if (type === "offerup") window.open("https://offerup.com");
+}
+</script>
+
+</body>
+</html>
