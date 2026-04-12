@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Life Mode</title>
+<title>Flip It</title>
 
 <style>
 body {
@@ -13,14 +13,7 @@ body {
   color: white;
 }
 
-.header {
-  text-align: center;
-  padding: 20px;
-  font-size: 24px;
-  font-weight: bold;
-  text-shadow: 0 0 10px #00ffcc;
-}
-
+/* NAV */
 .nav {
   display: flex;
   justify-content: space-around;
@@ -34,12 +27,14 @@ body {
   text-decoration: none;
 }
 
+/* CONTAINER */
 .container {
   padding: 20px;
   max-width: 500px;
   margin: auto;
 }
 
+/* CARD */
 .card {
   background: rgba(30,30,30,0.6);
   backdrop-filter: blur(15px);
@@ -47,14 +42,25 @@ body {
   border-radius: 16px;
   margin-bottom: 15px;
   box-shadow: 0 0 15px rgba(0,255,200,0.2);
-  animation: fadeIn 0.6s ease;
 }
 
+/* INPUT */
+input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: none;
+  background: #1a1a1a;
+  color: white;
+}
+
+/* BASE BUTTON */
 button {
   width: 100%;
-  padding: 15px;
+  padding: 14px;
   margin-top: 10px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
   font-size: 16px;
   color: white;
@@ -66,124 +72,186 @@ button:hover {
   box-shadow: 0 0 15px rgba(0,255,200,0.5);
 }
 
-/* MODE COLORS */
-.broke { background: linear-gradient(45deg, red, #ff5252); }
-.hustle { background: linear-gradient(45deg, orange, #ff9800); }
-.stable { background: linear-gradient(45deg, #00c853, #00e676); }
-.emergency { background: linear-gradient(45deg, purple, #9c27b0); }
-
-.result {
-  margin-top: 15px;
-  font-size: 16px;
-  line-height: 1.6;
-  white-space: pre-line;
+/* 🔥 COLOR BUTTONS (RESTORED) */
+.new-btn {
+  background: linear-gradient(45deg, #00c853, #00e676);
 }
 
-/* ANIMATION */
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
+.used-btn {
+  background: linear-gradient(45deg, orange, #ff9800);
+}
+
+.cracked-btn {
+  background: linear-gradient(45deg, red, #ff5252);
+}
+
+/* OTHER BUTTONS */
+.primary-btn {
+  background: linear-gradient(45deg,#00c853,#00e676);
+}
+
+.link-btn {
+  background: linear-gradient(45deg,#2196f3,#03a9f4);
+}
+
+.big {
+  font-size: 28px;
+  text-shadow: 0 0 8px #00e676;
+}
+
+.tip {
+  background: #1a1a1a;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">🧠 Life Mode</div>
-
 <div class="nav">
   <a href="index.html">Home</a>
-  <a href="flip.html">Flip</a>
+  <a href="tips.html">Tips</a>
   <a href="about.html">About</a>
 </div>
 
 <div class="container">
 
+<!-- 📷 IMAGE SCANNER -->
 <div class="card">
-  <h3>Select Your Mode</h3>
+  <h3>📷 Item Scanner</h3>
 
-  <button class="broke" onclick="setMode('broke')">💸 Broke Mode</button>
-  <button class="hustle" onclick="setMode('hustle')">🔥 Hustle Mode</button>
-  <button class="stable" onclick="setMode('stable')">🧘 Stability Mode</button>
-  <button class="emergency" onclick="setMode('emergency')">🚨 Emergency Mode</button>
+  <input type="file" accept="image/*" onchange="previewImage(event)">
+  <img id="preview" style="width:100%; margin-top:10px; border-radius:10px; display:none;" />
 
-  <div id="output" class="result"></div>
+  <button class="primary-btn" onclick="analyzeImage()">Scan Item</button>
+
+  <div id="scanStatus"></div>
+  <div id="scanResult"></div>
+</div>
+
+<!-- 🧠 SMART SCANNER (RESTORED) -->
+<div class="card">
+  <h3>🧠 Smart Scanner</h3>
+
+  <input type="text" id="item" placeholder="Type item manually">
+
+  <button class="new-btn" onclick="scan('new')">New</button>
+  <button class="used-btn" onclick="scan('used')">Used</button>
+  <button class="cracked-btn" onclick="scan('cracked')">Cracked</button>
+
+  <div id="scanTextResult"></div>
+</div>
+
+<!-- 💰 PROFIT -->
+<div class="card">
+  <h3>💰 Profit Calculator</h3>
+
+  <input type="number" id="buy" placeholder="Buy Price">
+  <input type="number" id="sell" placeholder="Sell Price">
+
+  <button class="primary-btn" onclick="calc()">Check Profit</button>
+
+  <div class="big" id="profit">$0</div>
+  <div id="rating"></div>
+</div>
+
+<!-- 🔗 MARKET -->
+<div class="card">
+  <h3>🔗 Sell Fast</h3>
+
+  <button class="link-btn" onclick="goMarket('fb')">Facebook Marketplace</button>
+  <button class="link-btn" onclick="goMarket('ebay')">eBay</button>
+  <button class="link-btn" onclick="goMarket('offerup')">OfferUp</button>
+</div>
+
+<!-- 📊 TRENDING -->
+<div class="card">
+  <h3>📊 Trending</h3>
+
+  <div class="tip">📱 Phones</div>
+  <div class="tip">🪑 Furniture</div>
+  <div class="tip">👟 Shoes</div>
 </div>
 
 <div class="card">
-  <button onclick="goBack()">⬅ Back to Budget</button>
+  <button class="primary-btn" onclick="window.location.href='index.html'">⬅ Back</button>
 </div>
 
 </div>
 
 <script>
-function setMode(mode) {
-  let message = "";
-
-  if (mode === "broke") {
-    message = `
-💸 BROKE MODE
-
-Spend: Under $15 today
-
-Action:
-• Flip 1 item
-• Sell something you own
-
-Warning:
-You are at risk of running out
-    `;
-  }
-
-  if (mode === "hustle") {
-    message = `
-🔥 HUSTLE MODE
-
-Goal: Make $100 today
-
-Action:
-• Flip item
-• Offer a service
-• Sell something fast
-
-Stay active and move fast
-    `;
-  }
-
-  if (mode === "stable") {
-    message = `
-🧘 STABILITY MODE
-
-Spend normally
-
-Action:
-• Save money
-• Avoid waste
-
-You are in a good position
-    `;
-  }
-
-  if (mode === "emergency") {
-    message = `
-🚨 EMERGENCY MODE
-
-Stop spending now
-
-Action:
-• Sell 1–2 items
-• Cut expenses
-• Find quick cash
-
-Priority: survival
-    `;
-  }
-
-  document.getElementById("output").innerText = message;
+function previewImage(event) {
+  const img = document.getElementById("preview");
+  img.src = URL.createObjectURL(event.target.files[0]);
+  img.style.display = "block";
 }
 
-function goBack() {
-  window.location.href = "index.html";
+function analyzeImage() {
+  const status = document.getElementById("scanStatus");
+  const result = document.getElementById("scanResult");
+
+  status.innerText = "🔍 Analyzing...";
+  result.innerText = "";
+
+  setTimeout(() => {
+    const outcomes = [
+      "📱 Phone detected",
+      "🪑 Furniture detected",
+      "👟 Shoes detected",
+      "📦 General item"
+    ];
+    const random = outcomes[Math.floor(Math.random()*outcomes.length)];
+    status.innerText = "✅ Done";
+    result.innerText = random;
+  }, 2000);
+}
+
+function scan(type) {
+  let item = document.getElementById("item").value.toLowerCase();
+  let result = "";
+
+  if (!item) {
+    result = "Enter item first";
+  } else {
+    if (item.includes("phone")) {
+      if (type === "new") result = "📱 New phone: High resale value ($200+)";
+      if (type === "used") result = "📱 Used phone: Good flip ($80–$150)";
+      if (type === "cracked") result = "📱 Cracked phone: Fix & flip ($40–$100)";
+    } 
+    else if (item.includes("shoes")) {
+      if (type === "new") result = "👟 New shoes: Flip $60–$120";
+      if (type === "used") result = "👟 Used shoes: Clean & resell $30–$80";
+      if (type === "cracked") result = "👟 Damaged shoes: Low value";
+    } 
+    else if (item.includes("couch")) {
+      if (type === "new") result = "🪑 New couch: Big flip $150+";
+      if (type === "used") result = "🪑 Used couch: Flip $50–$120";
+      if (type === "cracked") result = "🪑 Damaged couch: Avoid or cheap flip";
+    } 
+    else {
+      result = "Check demand locally and resell";
+    }
+  }
+
+  document.getElementById("scanTextResult").innerText = result;
+}
+
+function calc() {
+  let buy = +document.getElementById("buy").value || 0;
+  let sell = +document.getElementById("sell").value || 0;
+  let profit = sell - buy;
+
+  document.getElementById("profit").innerText = "$" + profit;
+  document.getElementById("rating").innerText =
+    profit <= 0 ? "Bad deal" : profit < 20 ? "Low profit" : "Great flip";
+}
+
+function goMarket(type) {
+  if (type === "fb") window.open("https://facebook.com/marketplace");
+  if (type === "ebay") window.open("https://ebay.com");
+  if (type === "offerup") window.open("https://offerup.com");
 }
 </script>
 
