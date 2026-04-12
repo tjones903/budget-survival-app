@@ -6,7 +6,6 @@
 <title>Budget Survival Toolkit</title>
 
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00c853">
 
 <style>
 body {
@@ -15,22 +14,85 @@ body {
   background: linear-gradient(180deg, #0f0f0f, #1c1c1c);
   color: white;
 }
-.header { text-align:center; padding:15px; font-size:22px; font-weight:bold;}
-.nav { display:flex; justify-content:space-around; background:#1a1a1a; padding:12px;}
-.nav a { color:white; text-decoration:none;}
-.container { padding:20px; max-width:500px; margin:auto;}
-.card { background:#1e1e1e; padding:20px; border-radius:16px; margin-bottom:15px;}
-input { width:100%; padding:14px; margin:8px 0; border-radius:10px; border:none; background:#2a2a2a; color:white;}
-button { width:100%; padding:14px; border-radius:12px; background:#00c853; color:white; border:none; margin-top:10px;}
-.big { font-size:32px;}
-.progress { height:8px; background:#333; border-radius:10px; margin-top:10px;}
-.progress-bar { height:8px; background:#00e676; border-radius:10px; width:0%;}
-.money-btn { background:orange;}
-.share-btn { background:#2196f3;}
-.guide { margin-top:10px; font-size:14px;}
-.status-good { color:#00e676;}
-.status-warning { color:orange;}
-.status-danger { color:red;}
+
+.header {
+  text-align: center;
+  padding: 15px;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-around;
+  background: #1a1a1a;
+  padding: 12px;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+}
+
+.container {
+  padding: 20px;
+  max-width: 500px;
+  margin: auto;
+}
+
+.card {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: none;
+  background: #2a2a2a;
+  color: white;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  margin-top: 10px;
+  font-size: 16px;
+  color: white;
+}
+
+.green { background: #00c853; }
+.orange { background: orange; }
+.blue { background: #2196f3; }
+.purple { background: purple; }
+
+.big { font-size: 32px; }
+
+.progress {
+  height: 8px;
+  background: #333;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #00e676;
+  border-radius: 10px;
+  width: 0%;
+}
+
+.status-good { color: #00e676; }
+.status-warning { color: orange; }
+.status-danger { color: red; }
+
+.guide { margin-top: 10px; font-size: 14px; }
 </style>
 </head>
 
@@ -50,7 +112,8 @@ button { width:100%; padding:14px; border-radius:12px; background:#00c853; color
   <input type="number" id="income" placeholder="Income ($)">
   <input type="number" id="expenses" placeholder="Expenses ($)">
   <input type="number" id="days" placeholder="Days until payday">
-  <button onclick="calculate()">Calculate</button>
+
+  <button class="green" onclick="calculate()">Calculate</button>
 </div>
 
 <div class="card">
@@ -61,7 +124,7 @@ button { width:100%; padding:14px; border-radius:12px; background:#00c853; color
   <div>Daily Budget</div>
   <div class="big" id="daily">$0.00</div>
 
-  <div id="daysWarning">Enter values to begin</div>
+  <div id="daysWarning">Enter values</div>
 
   <div class="progress">
     <div class="progress-bar" id="progressBar"></div>
@@ -70,19 +133,20 @@ button { width:100%; padding:14px; border-radius:12px; background:#00c853; color
   <div id="status"></div>
   <div id="actionGuide" class="guide"></div>
 
-  <!-- 🔥 VALUE SYSTEM -->
+  <!-- 💰 FLIP VALUE -->
   <div class="card">
-    <div>💰 Quick Flip Value</div>
+    <div>💰 Flip Target</div>
     <div class="big" id="flipWorth">$0</div>
 
-    <div>🏷 Potential Sell Value</div>
+    <div>🏷 Sell Range</div>
     <div class="big" id="flipSell">$0</div>
   </div>
 
-  <button class="money-btn" onclick="goFlip()">💸 Make Money Now</button>
-
-  <button onclick="installApp()">⬇️ Install App</button>
-  <button class="share-btn" onclick="shareApp()">📤 Share App</button>
+  <!-- 🔗 BUTTONS -->
+  <button class="orange" onclick="goFlip()">💸 Make Money Now</button>
+  <button class="purple" onclick="goLife()">🧠 Life Mode</button>
+  <button class="green" onclick="installApp()">⬇️ Install</button>
+  <button class="blue" onclick="shareApp()">📤 Share</button>
 
 </div>
 
@@ -110,13 +174,13 @@ function calculate() {
   let statusClass = "";
 
   if (daily < 10) {
-    statusText = "🔴 Risk of running out";
+    statusText = "🔴 Risk";
     statusClass = "status-danger";
   } else if (daily < 30) {
-    statusText = "🟡 Be careful";
+    statusText = "🟡 Caution";
     statusClass = "status-warning";
   } else {
-    statusText = "🟢 You're in control";
+    statusText = "🟢 Good";
     statusClass = "status-good";
   }
 
@@ -124,27 +188,22 @@ function calculate() {
   statusEl.innerText = statusText;
   statusEl.className = statusClass;
 
-  // 🔥 SMART ACTION + VALUE
   let guide = "";
   let flipWorth = 0;
 
   if (daily < 10) {
-    guide = "🚨 You are about to run out of money. Tap 'Make Money Now' ASAP.";
+    guide = "🚨 Make money now. Go to Flip or Life Mode.";
     flipWorth = 50;
   } else if (daily < 30) {
-    guide = "⚠️ You need extra income. Flip something today.";
+    guide = "⚠️ Earn extra today.";
     flipWorth = 100;
   } else {
-    guide = "✅ You're doing well. Keep going.";
+    guide = "✅ Stay consistent.";
     flipWorth = 150;
   }
 
   const guideEl = document.getElementById("actionGuide");
   guideEl.innerText = guide;
-
-  if (daily < 10) guideEl.style.color = "red";
-  else if (daily < 30) guideEl.style.color = "orange";
-  else guideEl.style.color = "#00e676";
 
   document.getElementById("flipWorth").innerText = "$" + flipWorth;
   document.getElementById("flipSell").innerText =
@@ -155,12 +214,16 @@ function goFlip() {
   window.location.href = "flip.html";
 }
 
+function goLife() {
+  window.location.href = "lifemode.html";
+}
+
 function installApp() {
-  alert("Tap Share → Add to Home Screen");
+  alert("Add to home screen");
 }
 
 function shareApp() {
-  alert("Copy link to share");
+  alert("Share this app");
 }
 </script>
 
