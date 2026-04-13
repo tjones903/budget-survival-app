@@ -196,8 +196,18 @@ function getPriceRange(item, brand){
   if(item==="table") return [120,220];
   if(item==="lamp") return [30,120];
 
-  if(item==="tv") return [400,700];
+  if(item==="tv") return [300,1200];
   if(item==="computer") return [300,1200];
+
+  if(item==="washer") return [200,600];
+  if(item==="dryer") return [200,600];
+  if(item==="stove") return [300,900];
+
+  if(item==="lawn mower") return [150,500];
+  if(item==="weed eater") return [50,200];
+
+  if(item==="leash") return [5,25];
+  if(item==="tool") return [40,300];
 
   if(item==="car") return [3000,10000];
   if(item==="truck") return [5000,15000];
@@ -236,7 +246,7 @@ async function processImage(base64Image){
     let text = labels.map(l=>l.description.toLowerCase()).join(" ");
     let brand = logos.length ? logos[0].description : "";
 
-    // 🔥 ADDED DETECTION
+    // 🔥 MASS DETECTION ADD
     if(text.includes("slide") || text.includes("slipper")) text="slide";
     else if(text.includes("shoe") || text.includes("sneaker") || text.includes("footwear")) text="shoe";
     else if(text.includes("lamp")) text="lamp";
@@ -246,6 +256,13 @@ async function processImage(base64Image){
     else if(text.includes("car") || text.includes("vehicle")) text="car";
     else if(text.includes("truck")) text="truck";
     else if(text.includes("tv") || text.includes("screen")) text="tv";
+    else if(text.includes("washer")) text="washer";
+    else if(text.includes("dryer")) text="dryer";
+    else if(text.includes("stove") || text.includes("oven")) text="stove";
+    else if(text.includes("mower")) text="lawn mower";
+    else if(text.includes("trimmer")) text="weed eater";
+    else if(text.includes("leash")) text="leash";
+    else if(text.includes("tool")) text="tool";
     else if(text.includes("chip") || text.includes("food")) text="snack";
     else if(text.includes("bottle")) text="water bottle";
     else text = text || "unknown item";
@@ -255,12 +272,22 @@ async function processImage(base64Image){
     if(text.includes("jordan")) brand="Jordan";
     if(text.includes("adidas")) brand="Adidas";
 
+    // 🔥 UNKNOWN MESSAGE
+    if(text==="unknown item"){
+      document.getElementById("scanDesc").innerText = "⚠️ Could not detect — type manually below";
+    }
+
     let [low, high] = getPriceRange(text, brand);
 
-    // 🔥 SIZE / QUALITY BOOST
-    if(brand==="Nike" || brand==="Jordan"){
-      high += 40;
+    // 🔥 SIZE + COLOR BOOST
+    if(text.includes("shoe")){
       low += 20;
+      high += 40;
+    }
+
+    if(text.includes("red") || text.includes("black")){
+      low += 20;
+      high += 40;
     }
 
     let worth = Math.floor((low+high)/2);
@@ -280,7 +307,6 @@ async function processImage(base64Image){
   }
 }
 
-/* SMART SCANNER + CALC unchanged */
 function scanText(type){
   let text=document.getElementById("item").value.toLowerCase();
 
