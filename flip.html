@@ -182,6 +182,15 @@ function takePhoto(){
 
 function getPriceRange(item, brand){
 
+  if(item==="fridge") return [300,1500];
+  if(item==="air fryer") return [40,150];
+
+  if(item==="clock") return [15,150];
+
+  if(item==="perfume" || item==="cologne") return [40,200];
+
+  if(item==="clothes") return [10,150];
+
   if(item==="snack") return [2,6];
   if(item==="water bottle") return [2,10];
 
@@ -243,7 +252,14 @@ async function processImage(base64Image){
   let displayText = text;
   let itemType = "unknown";
 
-  if(text.includes("computer") || text.includes("monitor") || text.includes("display")) itemType="computer";
+  if(text.includes("fridge") || text.includes("refrigerator")) itemType="fridge";
+  else if(text.includes("air fryer")) itemType="air fryer";
+  else if(text.includes("clock")) itemType="clock";
+  else if(text.includes("perfume")) itemType="perfume";
+  else if(text.includes("cologne")) itemType="cologne";
+  else if(text.includes("shirt") || text.includes("hoodie") || text.includes("jacket")) itemType="clothes";
+
+  else if(text.includes("computer") || text.includes("monitor") || text.includes("display")) itemType="computer";
   else if(text.includes("tv")) itemType="tv";
   else if(text.includes("stove") || text.includes("oven")) itemType="stove";
   else if(text.includes("washer")) itemType="washer";
