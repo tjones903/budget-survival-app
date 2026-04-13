@@ -209,23 +209,23 @@ function autoScan(){
       if(item.includes("bowl") || item.includes("dish")) item = "dog bowl";
       if(item.includes("dog") || item.includes("pet")) item = "pet supplies";
 
-      // BRAND BOOST
-      let brand = "";
-      if(item.includes("nike")) brand = "Nike";
-      if(item.includes("apple") || item.includes("iphone")) brand = "Apple";
-      if(item.includes("samsung")) brand = "Samsung";
-      if(item.includes("cheetos")) brand = "Cheetos";
-
-      if(brand){
-        item = brand + " " + item;
-      }
+      // 🔥 NEW BRAND DETECTION (ADDED ONLY)
+      if(item.includes("nike") || item.includes("swoosh")) item = "Nike shoe";
+      if(item.includes("apple") || item.includes("iphone")) item = "Apple iPhone";
+      if(item.includes("samsung")) item = "Samsung phone";
+      if(item.includes("cheetos")) item = "Cheetos snack";
+      if(item.includes("coca") || item.includes("cola")) item = "Coca-Cola drink";
 
       document.getElementById("scanDesc").innerText = item;
 
       // PRICING
       let worth = 0;
 
-      if(item.includes("nike")) worth = 30 + Math.random()*40;
+      // 🚗 ADDED CAR FIX
+      if(item.includes("car") || item.includes("vehicle") || item.includes("automobile")){
+        worth = 2000 + Math.random()*8000;
+      }
+      else if(item.includes("nike")) worth = 30 + Math.random()*40;
       else if(item.includes("shoe")) worth = 30 + Math.random()*40;
       else if(item.includes("iphone")) worth = 200 + Math.random()*300;
       else if(item.includes("laptop")) worth = 250 + Math.random()*400;
@@ -241,14 +241,18 @@ function autoScan(){
 
       // DEMAND
       let demand = "";
-      if(item.includes("iphone") || item.includes("nike")) demand = "🔥 FAST SELL";
+      if(item.includes("car")) demand = "🔥 HIGH VALUE ITEM";
+      else if(item.includes("iphone") || item.includes("nike")) demand = "🔥 FAST SELL";
       else if(item.includes("shoe") || item.includes("laptop")) demand = "⚡ MEDIUM DEMAND";
       else demand = "🐢 SLOW SELL";
 
       // PLATFORMS
       let platforms = "";
 
-      if(item.includes("iphone") || item.includes("laptop")){
+      if(item.includes("car")){
+        platforms = "Sell on: Facebook Marketplace";
+      }
+      else if(item.includes("iphone") || item.includes("laptop")){
         platforms = "Sell on: Facebook Marketplace, eBay";
       }
       else if(item.includes("nike") || item.includes("shoe")){
