@@ -81,7 +81,6 @@ button {
   <div class="big" id="sell">$0</div>
   <div class="big" id="profitScan">$0</div>
 
-  <!-- SELL BUTTONS (ADDED) -->
   <button class="sell-btn" onclick="openFB()">Open Facebook Marketplace</button>
   <button class="sell-btn" onclick="openEbay()">Open eBay</button>
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
@@ -179,13 +178,28 @@ function autoScan(){
       // EXISTING FIXES
       if(item.includes("rubber") || item.includes("synthetic")) item = "shoe";
       if(item.includes("carbon") || item.includes("fiber") || item.includes("metal")) item = "household item";
-      if(item.includes("orange") || item.includes("food")) item = "snack";
 
+      // 🔥 STRONG SNACK FIX (ADDED)
+      if(
+        item.includes("orange") ||
+        item.includes("food") ||
+        item.includes("snack") ||
+        item.includes("chip") ||
+        item.includes("bag")
+      ){
+        item = "snack";
+      }
+
+      if(item.includes("cheeto") || item.includes("cheetos")){
+        item = "Cheetos snack";
+      }
+
+      // OTHER FIXES
       if(item.includes("fender")) item = "dog bowl";
       if(item.includes("bowl") || item.includes("dish")) item = "dog bowl";
       if(item.includes("dog") || item.includes("pet")) item = "pet supplies";
 
-      // 🔥 NEW STRONG FOOTWEAR FIX (ADDED ONLY)
+      // FOOTWEAR FIX
       if(
         item.includes("plastic") ||
         item.includes("footwear") ||
@@ -195,13 +209,20 @@ function autoScan(){
         item = "Nike slide";
       }
 
-      if(item.includes("slide")){
-        item = "Nike slide";
-      }
-
       document.getElementById("scanDesc").innerText = item;
 
-      let worth = Math.floor(20 + Math.random()*50);
+      let worth = 0;
+
+      // 🔥 SNACK PRICE FIX (ADDED)
+      if(item.includes("snack")){
+        worth = 2 + Math.random()*5;
+      }
+      else{
+        worth = 20 + Math.random()*50;
+      }
+
+      worth = Math.floor(worth);
+
       let sellLow = Math.floor(worth*1.4);
       let sellHigh = Math.floor(worth*1.8);
       let profit = sellLow - worth;
@@ -220,17 +241,16 @@ function autoScan(){
   reader.readAsDataURL(file);
 }
 
-// SELL LINKS (ADDED ONLY)
 function openFB(){
-  window.open("https://www.facebook.com/marketplace", "_blank");
+  window.open("https://www.facebook.com/marketplace","_blank");
 }
 
 function openEbay(){
-  window.open("https://www.ebay.com", "_blank");
+  window.open("https://www.ebay.com","_blank");
 }
 
 function openOfferUp(){
-  window.open("https://offerup.com", "_blank");
+  window.open("https://offerup.com","_blank");
 }
 </script>
 
