@@ -175,49 +175,32 @@ function autoScan(){
 
       let item = data.responses?.[0]?.labelAnnotations?.[0]?.description?.toLowerCase() || "unknown";
 
-      // EXISTING FIXES
-      if(item.includes("rubber") || item.includes("synthetic")) item = "shoe";
-      if(item.includes("carbon") || item.includes("fiber") || item.includes("metal")) item = "household item";
-
-      // 🔥 STRONG SNACK FIX (ADDED)
+      // 🔥 IGNORE JUNK DETECTIONS (ADDED)
       if(
-        item.includes("orange") ||
-        item.includes("food") ||
-        item.includes("snack") ||
-        item.includes("chip") ||
-        item.includes("bag")
+        item.includes("text") ||
+        item.includes("font") ||
+        item.includes("label") ||
+        item.includes("ingredients")
       ){
+        document.getElementById("scanDesc").innerText = "❌ Not a sellable item";
+        document.getElementById("worth").innerText = "$0";
+        document.getElementById("sell").innerText = "$0";
+        document.getElementById("profitScan").innerText = "❌ NOT WORTH SELLING";
+        return;
+      }
+
+      // SNACK FIX
+      if(item.includes("orange") || item.includes("chip") || item.includes("bag")){
         item = "snack";
-      }
-
-      if(item.includes("cheeto") || item.includes("cheetos")){
-        item = "Cheetos snack";
-      }
-
-      // OTHER FIXES
-      if(item.includes("fender")) item = "dog bowl";
-      if(item.includes("bowl") || item.includes("dish")) item = "dog bowl";
-      if(item.includes("dog") || item.includes("pet")) item = "pet supplies";
-
-      // FOOTWEAR FIX
-      if(
-        item.includes("plastic") ||
-        item.includes("footwear") ||
-        item.includes("slipper") ||
-        item.includes("sandal")
-      ){
-        item = "Nike slide";
       }
 
       document.getElementById("scanDesc").innerText = item;
 
       let worth = 0;
 
-      // 🔥 SNACK PRICE FIX (ADDED)
       if(item.includes("snack")){
         worth = 2 + Math.random()*5;
-      }
-      else{
+      } else {
         worth = 20 + Math.random()*50;
       }
 
@@ -227,9 +210,23 @@ function autoScan(){
       let sellHigh = Math.floor(worth*1.8);
       let profit = sellLow - worth;
 
+      // 🔥 PROFIT FILTER (ADDED)
+      let status = "";
+
+      if(profit > 25){
+        status = "🔥 GOOD FLIP";
+      }
+      else if(profit > 10){
+        status = "⚡ OKAY FLIP";
+      }
+      else{
+        status = "❌ NOT WORTH SELLING";
+      }
+
       document.getElementById("worth").innerText = "Worth: $" + worth;
       document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
-      document.getElementById("profitScan").innerText = "Profit: $" + profit;
+      document.getElementById("profitScan").innerText =
+        "Profit: $" + profit + " | " + status;
 
       reward(profit);
 
