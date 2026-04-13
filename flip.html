@@ -224,36 +224,46 @@ async function processImage(base64Image){
     let labels = data.responses?.[0]?.labelAnnotations || [];
     let logos = data.responses?.[0]?.logoAnnotations || [];
 
-    // 🔥 FIXED LABEL SYSTEM
-    let text = "";
-    if(labels.length){
-      text = labels.map(l=>l.description.toLowerCase()).join(" ");
-    }
-
+    let text = labels.map(l=>l.description.toLowerCase()).join(" ");
     let brand = logos.length ? logos[0].description : "";
 
-    // 🔥 FORCE CATEGORY (NO MORE "item")
-    if(text.includes("shoe") || text.includes("footwear") || text.includes("sneaker")) text="shoe";
-    else if(text.includes("chip") || text.includes("snack") || text.includes("food")) text="snack";
-    else if(text.includes("bottle")) text="water bottle";
-    else if(text.includes("couch") || text.includes("sofa")) text="couch";
-    else if(text.includes("table")) text="table";
-    else if(text.includes("tv")) text="tv";
-    else if(!text) text="object";
+    // 🔥 FIXED DETECTION
+    if(text.includes("shoe") || text.includes("footwear") || text.includes("sneaker") || text.includes("slide") || text.includes("sandal")){
+      text="shoe";
+    }
+    else if(text.includes("chip") || text.includes("snack") || text.includes("food") || text.includes("ingredient")){
+      text="snack";
+    }
+    else if(text.includes("bottle") || text.includes("drink")){
+      text="water bottle";
+    }
+    else if(text.includes("couch") || text.includes("sofa")){
+      text="couch";
+    }
+    else if(text.includes("table") || text.includes("desk")){
+      text="table";
+    }
+    else if(text.includes("tv") || text.includes("screen") || text.includes("monitor")){
+      text="tv";
+    }
+    else{
+      text = text || "unknown item";
+    }
 
-    if(text.includes("nike")) brand="Nike";
-    if(text.includes("jordan")) brand="Jordan";
+    // 🔥 BRAND BOOST
+    let fullText = text.toLowerCase();
+    if(fullText.includes("nike") || fullText.includes("swoosh")) brand="Nike";
+    if(fullText.includes("jordan") || fullText.includes("jumpman")) brand="Jordan";
+    if(fullText.includes("adidas")) brand="Adidas";
 
-    let item = text;
-
-    let [low, high] = getPriceRange(item, brand);
+    let [low, high] = getPriceRange(text, brand);
 
     let worth = Math.floor((low+high)/2);
     let sellLow = Math.floor(high);
     let sellHigh = Math.floor(high*1.3);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = brand ? brand+" "+item : item;
+    document.getElementById("scanDesc").innerText = brand ? brand+" "+text : text;
     document.getElementById("worth").innerText="Worth: $"+worth;
     document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
     document.getElementById("profitScan").innerText="Profit: $"+profit;
@@ -264,3 +274,56 @@ async function processImage(base64Image){
     document.getElementById("scanDesc").innerText="Scan failed";
   }
 }
+
+/* SMART SCANNER */
+function scanText(type){
+  let text=document.getElementById("item").value.toLowerCase();
+
+  let brand="";
+  if(text.includes("nike")) brand="Nike";
+  if(text.includes("jordan")) brand="Jordan";
+
+  let item="object";
+  if(text.includes("shoe")) item="shoe";
+  if(text.includes("tv")) item="tv";
+  if(text.includes("couch")) item="couch";
+
+  let [low, high] = getPriceRange(item, brand);
+
+  let worth = Math.floor((low+high)/2);
+
+  if(type==="used") worth*=0.8;
+  if(type==="cracked") worth*=0.5;
+
+  worth=Math.floor(worth);
+
+  let sellLow=Math.floor(high);
+  let sellHigh=Math.floor(high*1.3);
+  let profit=sellLow-worth;
+
+  document.getElementById("scanTextResult").innerText =
+    text+" ("+type+")\nWorth: $"+worth+
+    "\nSell: $"+sellLow+"-"+sellHigh+
+    "\nProfit: $"+profit;
+}
+
+/* PROFIT CALC */
+function calc(){
+  let buy=parseFloat(document.getElementById("buy").value)||0;
+  let sell=parseFloat(document.getElementById("sellInput").value)||0;
+  let profit=sell-buy;
+
+  let status = profit>20 ? "🔥 GOOD FLIP" : "❌ BAD DEAL";
+
+  document.getElementById("profit").innerText="$"+profit+" | "+status;
+}
+
+/* LINKS */
+function openFB(){window.open("https://www.facebook.com/marketplace","_blank");}
+function openEbay(){window.open("https://www.ebay.com","_blank");}
+function openOfferUp(){window.open("https://offerup.com","_blank");}
+
+</script>
+
+</body>
+</html>
