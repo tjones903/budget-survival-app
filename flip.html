@@ -302,6 +302,107 @@ async function processImage(base64Image){
   reward(profit);
 }
 </script>
+// 🔥 FIXED SMART SCANNER (WORKS WITH YOUR CURRENT CODE)
 
+function scanText(type){
+
+  let text = document.getElementById("item").value.toLowerCase();
+
+  if(!text){
+    document.getElementById("scanTextResult").innerText = "Type an item first";
+    return;
+  }
+
+  let brand = "";
+  if(text.includes("nike")) brand="Nike";
+  if(text.includes("jordan")) brand="Jordan";
+
+  let itemType = "unknown";
+
+  if(text.includes("house")) itemType="house";
+  else if(text.includes("fridge")) itemType="fridge";
+  else if(text.includes("air fryer")) itemType="air fryer";
+  else if(text.includes("clock")) itemType="clock";
+  else if(text.includes("perfume") || text.includes("cologne")) itemType="perfume";
+  else if(text.includes("shirt") || text.includes("hoodie") || text.includes("jacket")) itemType="clothes";
+
+  else if(text.includes("computer") || text.includes("monitor") || text.includes("display")) itemType="computer";
+  else if(text.includes("tv")) itemType="tv";
+  else if(text.includes("stove") || text.includes("oven")) itemType="stove";
+  else if(text.includes("washer")) itemType="washer";
+  else if(text.includes("dryer")) itemType="dryer";
+  else if(text.includes("couch") || text.includes("sofa")) itemType="couch";
+  else if(text.includes("table") || text.includes("desk")) itemType="table";
+  else if(text.includes("lamp")) itemType="lamp";
+  else if(text.includes("slide")) itemType="slide";
+  else if(text.includes("shoe") || text.includes("sneaker")) itemType="shoe";
+  else if(text.includes("cable") || text.includes("wire")) itemType="cable";
+  else if(text.includes("charger")) itemType="charger";
+  else if(text.includes("headphone")) itemType="headphones";
+  else if(text.includes("car")) itemType="car";
+
+  let [low, high] = getPriceRange(itemType, brand);
+
+  // adjust for condition
+  if(type==="used"){
+    low *= 0.8;
+    high *= 0.8;
+  }
+
+  if(type==="cracked"){
+    low *= 0.5;
+    high *= 0.5;
+  }
+
+  low = Math.floor(low);
+  high = Math.floor(high);
+
+  let worth = Math.floor((low + high) / 2);
+  let sellLow = high;
+  let sellHigh = Math.floor(high * 1.3);
+  let profit = sellLow - worth;
+
+  // demand label
+  let demand = "👍 GOOD FLIP";
+  if(profit > 50) demand = "🔥 HIGH DEMAND";
+  if(profit < 10) demand = "❌ NOT WORTH FLIPPING";
+
+  document.getElementById("scanTextResult").innerText =
+    text + " ("+type+")\n" +
+    "Worth: $" + worth +
+    "\nSell: $" + sellLow + "-" + sellHigh +
+    "\nProfit: $" + profit + " | " + demand;
+}
+
+
+// 🔥 FIXED PROFIT CALCULATOR (MATCHES YOUR INPUT IDs)
+
+function calc(){
+
+  let buy = parseFloat(document.getElementById("buy").value);
+  let sell = parseFloat(document.getElementById("sellInput").value);
+
+  if(isNaN(buy) || isNaN(sell)){
+    document.getElementById("profit").innerText = "Enter both prices";
+    return;
+  }
+
+  let profit = sell - buy;
+
+  let status = "👍 GOOD FLIP";
+
+  if(profit < 0){
+    status = "❌ BAD DEAL";
+  }
+  else if(profit < 20){
+    status = "⚠️ LOW PROFIT";
+  }
+  else if(profit > 50){
+    status = "🔥 GREAT FLIP";
+  }
+
+  document.getElementById("profit").innerText =
+    "$" + profit + " | " + status;
+}
 </body>
 </html>
