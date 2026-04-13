@@ -66,11 +66,12 @@ button {
 
 <div class="container">
 
-<!-- SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
-  <input type="file" accept="image/*" capture="environment" id="camera" style="display:none;">
+  <!-- 🔥 FIXED INPUT -->
+  <input type="file" accept="image/*" id="camera" style="display:none;">
+
   <img id="preview" width="100%" style="display:none; border-radius:10px;">
 
   <button onclick="scanItem()">Scan Item</button>
@@ -89,7 +90,6 @@ button {
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
 </div>
 
-<!-- SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
@@ -102,7 +102,6 @@ button {
   <div id="scanTextResult"></div>
 </div>
 
-<!-- PROFIT CALCULATOR -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
 
@@ -114,7 +113,6 @@ button {
   <div class="big" id="profit">$0</div>
 </div>
 
-<!-- PROGRESS -->
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
@@ -134,17 +132,20 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
-// FILE SCAN
-const cam = document.getElementById("camera");
-cam.addEventListener("change", autoScan);
-
+// 🔥 FIXED SCAN BUTTON
 function scanItem(){
-  cam.value = null;
-  cam.click();
+  const input = document.getElementById("camera");
+
+  input.value = ""; // reset so same file works again
+
+  setTimeout(() => {
+    input.click(); // force open file picker
+  }, 50);
 }
 
-function autoScan(){
-  const file = cam.files[0];
+// 🔥 FIXED FILE CHANGE
+document.getElementById("camera").addEventListener("change", function(){
+  const file = this.files[0];
   if(!file) return;
 
   const img = document.getElementById("preview");
@@ -154,7 +155,7 @@ function autoScan(){
   const reader = new FileReader();
   reader.onloadend = () => processImage(reader.result);
   reader.readAsDataURL(file);
-}
+});
 
 // CAMERA
 async function startCamera(){
@@ -176,6 +177,7 @@ function takePhoto(){
   canvas.height = video.videoHeight;
 
   canvas.getContext("2d").drawImage(video,0,0);
+
   const imgData = canvas.toDataURL("image/jpeg");
 
   video.srcObject.getTracks().forEach(t=>t.stop());
@@ -231,10 +233,10 @@ async function processImage(base64Image){
 
     let worth=0;
 
-    if(brand.toLowerCase().includes("nike")) worth=80+Math.random()*60;
-    else if(item.includes("shoe")) worth=40+Math.random()*40;
+    if(brand.toLowerCase().includes("nike")) worth=90+Math.random()*60;
+    else if(item.includes("shoe")) worth=50+Math.random()*50;
     else if(item.includes("snack")) worth=2+Math.random()*5;
-    else worth=20+Math.random()*50;
+    else worth=20+Math.random()*40;
 
     worth=Math.floor(worth);
 
@@ -258,17 +260,15 @@ async function processImage(base64Image){
 // SMART SCANNER
 function scanText(type){
   let item=document.getElementById("item").value;
-  document.getElementById("scanTextResult").innerText=
-    item+" ("+type+") → Sell higher";
+  document.getElementById("scanTextResult").innerText =
+    item+" ("+type+") → flip potential";
 }
 
 // PROFIT CALC
 function calc(){
   let buy=parseFloat(document.getElementById("buy").value)||0;
   let sell=parseFloat(document.getElementById("sellInput").value)||0;
-  let profit=sell-buy;
-
-  document.getElementById("profit").innerText="$"+profit;
+  document.getElementById("profit").innerText="$"+(sell-buy);
 }
 
 // LINKS
