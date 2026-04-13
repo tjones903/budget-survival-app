@@ -130,10 +130,11 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
+/* ✅ FIXED SCAN BUTTON */
 function scanItem(){
   const input = document.getElementById("camera");
-  input.value = "";
-  input.click();
+  input.value = null;
+  setTimeout(()=>{ input.click(); },50);
 }
 
 document.getElementById("camera").addEventListener("change", function(){
@@ -180,20 +181,20 @@ function takePhoto(){
   processImage(imgData);
 }
 
+/* ✅ FIXED PRICE LOGIC */
 function getPriceRange(item, brand){
+
+  if(item.includes("snack")) return [2,6];
+  if(item.includes("water bottle")) return [2,10];
+
   if(brand==="Jordan") return [140,180];
   if(brand==="Nike") return [100,140];
   if(brand==="Adidas") return [90,130];
 
-  if(item==="tv") return [400,700];
+  if(item==="shoe") return [70,120];
   if(item==="couch") return [250,400];
   if(item==="table") return [120,180];
-  if(item==="dresser") return [150,250];
-
-  if(item==="shoe") return [70,120];
-  if(item==="clothing") return [30,60];
-
-  if(item==="water bottle") return [2,10];
+  if(item==="tv") return [400,700];
 
   return [20,40];
 }
@@ -229,6 +230,10 @@ async function processImage(base64Image){
     let text = labels.map(l=>l.description.toLowerCase()).join(" ");
     let brand = logos.length ? logos[0].description : "";
 
+    // ✅ ADDED SMART FILTER
+    if(text.includes("food") || text.includes("chip") || text.includes("snack")) text="snack";
+    if(text.includes("bottle")) text="water bottle";
+
     if(text.includes("nike")) brand="Nike";
     if(text.includes("jordan")) brand="Jordan";
 
@@ -238,6 +243,8 @@ async function processImage(base64Image){
     if(text.includes("couch")||text.includes("sofa")) item="couch";
     if(text.includes("table")) item="table";
     if(text.includes("tv")) item="tv";
+    if(text.includes("snack")) item="snack";
+    if(text.includes("water bottle")) item="water bottle";
 
     let [low, high] = getPriceRange(item, brand);
 
