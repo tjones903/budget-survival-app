@@ -76,6 +76,11 @@ button {
 
   <button onclick="scanItem()">Scan Item</button>
 
+  <!-- 🔥 DESKTOP CAMERA (ADDED) -->
+  <button onclick="startCamera()">Use Camera (Desktop)</button>
+  <video id="video" width="100%" autoplay style="display:none;"></video>
+  <button onclick="takePhoto()" id="snapBtn" style="display:none;">Take Photo</button>
+
   <div id="scanDesc"></div>
   <div class="big" id="worth">$0</div>
   <div class="big" id="sell">$0</div>
@@ -149,95 +154,105 @@ function autoScan(){
   img.style.display = "block";
   img.src = URL.createObjectURL(file);
 
-  document.getElementById("scanDesc").innerText = "🔍 AI scanning...";
-
   const reader = new FileReader();
 
-  reader.onloadend = async () => {
-    const base64 = reader.result.split(',')[1];
-
-    try {
-      const res = await fetch(
-        "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            requests: [{
-              image: { content: base64 },
-              features: [{ type: "LABEL_DETECTION", maxResults: 5 }]
-            }]
-          })
-        }
-      );
-
-      const data = await res.json();
-
-      let item = data.responses?.[0]?.labelAnnotations?.[0]?.description?.toLowerCase() || "unknown";
-
-      // 🔥 IGNORE JUNK DETECTIONS (ADDED)
-      if(
-        item.includes("text") ||
-        item.includes("font") ||
-        item.includes("label") ||
-        item.includes("ingredients")
-      ){
-        document.getElementById("scanDesc").innerText = "❌ Not a sellable item";
-        document.getElementById("worth").innerText = "$0";
-        document.getElementById("sell").innerText = "$0";
-        document.getElementById("profitScan").innerText = "❌ NOT WORTH SELLING";
-        return;
-      }
-
-      // SNACK FIX
-      if(item.includes("orange") || item.includes("chip") || item.includes("bag")){
-        item = "snack";
-      }
-
-      document.getElementById("scanDesc").innerText = item;
-
-      let worth = 0;
-
-      if(item.includes("snack")){
-        worth = 2 + Math.random()*5;
-      } else {
-        worth = 20 + Math.random()*50;
-      }
-
-      worth = Math.floor(worth);
-
-      let sellLow = Math.floor(worth*1.4);
-      let sellHigh = Math.floor(worth*1.8);
-      let profit = sellLow - worth;
-
-      // 🔥 PROFIT FILTER (ADDED)
-      let status = "";
-
-      if(profit > 25){
-        status = "🔥 GOOD FLIP";
-      }
-      else if(profit > 10){
-        status = "⚡ OKAY FLIP";
-      }
-      else{
-        status = "❌ NOT WORTH SELLING";
-      }
-
-      document.getElementById("worth").innerText = "Worth: $" + worth;
-      document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
-      document.getElementById("profitScan").innerText =
-        "Profit: $" + profit + " | " + status;
-
-      reward(profit);
-
-    } catch(err){
-      document.getElementById("scanDesc").innerText = "Scan failed";
-    }
+  reader.onloadend = () => {
+    processImage(reader.result);
   };
 
   reader.readAsDataURL(file);
 }
 
+// 🔥 DESKTOP CAMERA FUNCTIONS
+async function startCamera(){
+  const video = document.getElementById("video");
+  const snapBtn = document.getElementById("snapBtn");
+
+  video.style.display = "block";
+  snapBtn.style.display = "block";
+
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+}
+
+function takePhoto(){
+  const video = document.getElementById("video");
+
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  const imgData = canvas.toDataURL("image/jpeg");
+
+  processImage(imgData);
+}
+
+// 🔥 MAIN SCAN FUNCTION (USED BY BOTH PHONE + DESKTOP)
+async function processImage(base64Image){
+
+  document.getElementById("scanDesc").innerText = "🔍 AI scanning...";
+
+  const base64 = base64Image.split(',')[1];
+
+  try {
+    const res = await fetch(
+      "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requests: [{
+            image: { content: base64 },
+            features: [{ type: "LABEL_DETECTION", maxResults: 5 }]
+          }]
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    let item = data.responses?.[0]?.labelAnnotations?.[0]?.description?.toLowerCase() || "unknown";
+
+    // 🔥 IGNORE JUNK
+    if(item.includes("ingredients") || item.includes("text")){
+      document.getElementById("scanDesc").innerText = "❌ NOT WORTH SELLING";
+      document.getElementById("worth").innerText = "$0";
+      document.getElementById("sell").innerText = "$0";
+      document.getElementById("profitScan").innerText = "";
+      return;
+    }
+
+    document.getElementById("scanDesc").innerText = item;
+
+    let worth = 20 + Math.random()*50;
+
+    if(item.includes("snack")){
+      worth = 2 + Math.random()*5;
+    }
+
+    worth = Math.floor(worth);
+
+    let sellLow = Math.floor(worth * 1.4);
+    let sellHigh = Math.floor(worth * 1.8);
+    let profit = sellLow - worth;
+
+    let status = profit > 20 ? "🔥 GOOD FLIP" : "❌ NOT WORTH SELLING";
+
+    document.getElementById("worth").innerText = "Worth: $" + worth;
+    document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
+    document.getElementById("profitScan").innerText = "Profit: $" + profit + " | " + status;
+
+    reward(profit);
+
+  } catch(err){
+    document.getElementById("scanDesc").innerText = "Scan failed";
+  }
+}
+
+// 🔥 SELL LINKS
 function openFB(){
   window.open("https://www.facebook.com/marketplace","_blank");
 }
