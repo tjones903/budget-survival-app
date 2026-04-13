@@ -202,33 +202,22 @@ function autoScan(){
         item = data.responses[0].labelAnnotations[0].description.toLowerCase();
       }
 
-      // 🔥 FIX MISLABELS (slides etc.)
-      if(item.includes("rubber") || item.includes("synthetic")){
-        item = "shoe";
-      }
+      // 🔥 FIX MATERIAL + COLOR MISLABELS
+      if(item.includes("rubber") || item.includes("synthetic")) item = "shoe";
+      if(item.includes("carbon") || item.includes("fiber") || item.includes("metal")) item = "household item";
+      if(item.includes("orange") || item.includes("food")) item = "snack";
 
-      // 🔥 FIX BAD DETECTIONS (like your dog feeder)
-      if(item.includes("fender")){
-        item = "dog bowl";
-      }
-
-      if(item.includes("bowl") || item.includes("dish")){
-        item = "dog bowl";
-      }
-
-      if(item.includes("plastic") || item.includes("container")){
-        item = "household item";
-      }
-
-      if(item.includes("dog") || item.includes("pet")){
-        item = "pet supplies";
-      }
+      // 🔥 FIX SPECIFIC OBJECTS
+      if(item.includes("fender")) item = "dog bowl";
+      if(item.includes("bowl") || item.includes("dish")) item = "dog bowl";
+      if(item.includes("dog") || item.includes("pet")) item = "pet supplies";
 
       // 🔥 BRAND BOOST
       let brand = "";
       if(item.includes("nike")) brand = "Nike";
       if(item.includes("apple") || item.includes("iphone")) brand = "Apple";
       if(item.includes("samsung")) brand = "Samsung";
+      if(item.includes("cheetos")) brand = "Cheetos";
 
       if(brand){
         item = brand + " " + item;
@@ -254,6 +243,7 @@ function autoScan(){
         if(item.includes("shoe")) worth = 40 + Math.floor(Math.random()*30);
         else if(item.includes("phone")) worth = 200 + Math.floor(Math.random()*300);
         else if(item.includes("laptop")) worth = 300 + Math.floor(Math.random()*400);
+        else if(item.includes("snack")) worth = 2 + Math.floor(Math.random()*5);
         else worth = 20 + Math.floor(Math.random()*50);
       }
 
