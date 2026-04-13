@@ -130,7 +130,6 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
-/* ✅ FIXED SCAN BUTTON */
 function scanItem(){
   const input = document.getElementById("camera");
   input.value = null;
@@ -181,9 +180,7 @@ function takePhoto(){
   processImage(imgData);
 }
 
-/* ✅ FIXED PRICE LOGIC */
 function getPriceRange(item, brand){
-
   if(item.includes("snack")) return [2,6];
   if(item.includes("water bottle")) return [2,10];
 
@@ -227,24 +224,27 @@ async function processImage(base64Image){
     let labels = data.responses?.[0]?.labelAnnotations || [];
     let logos = data.responses?.[0]?.logoAnnotations || [];
 
-    let text = labels.map(l=>l.description.toLowerCase()).join(" ");
+    // 🔥 FIXED LABEL SYSTEM
+    let text = "";
+    if(labels.length){
+      text = labels.map(l=>l.description.toLowerCase()).join(" ");
+    }
+
     let brand = logos.length ? logos[0].description : "";
 
-    // ✅ ADDED SMART FILTER
-    if(text.includes("food") || text.includes("chip") || text.includes("snack")) text="snack";
-    if(text.includes("bottle")) text="water bottle";
+    // 🔥 FORCE CATEGORY (NO MORE "item")
+    if(text.includes("shoe") || text.includes("footwear") || text.includes("sneaker")) text="shoe";
+    else if(text.includes("chip") || text.includes("snack") || text.includes("food")) text="snack";
+    else if(text.includes("bottle")) text="water bottle";
+    else if(text.includes("couch") || text.includes("sofa")) text="couch";
+    else if(text.includes("table")) text="table";
+    else if(text.includes("tv")) text="tv";
+    else if(!text) text="object";
 
     if(text.includes("nike")) brand="Nike";
     if(text.includes("jordan")) brand="Jordan";
 
-    let item="item";
-
-    if(text.includes("shoe")||text.includes("sneaker")||text.includes("footwear")) item="shoe";
-    if(text.includes("couch")||text.includes("sofa")) item="couch";
-    if(text.includes("table")) item="table";
-    if(text.includes("tv")) item="tv";
-    if(text.includes("snack")) item="snack";
-    if(text.includes("water bottle")) item="water bottle";
+    let item = text;
 
     let [low, high] = getPriceRange(item, brand);
 
@@ -264,53 +264,3 @@ async function processImage(base64Image){
     document.getElementById("scanDesc").innerText="Scan failed";
   }
 }
-
-function scanText(type){
-  let text=document.getElementById("item").value.toLowerCase();
-
-  let brand="";
-  if(text.includes("nike")) brand="Nike";
-  if(text.includes("jordan")) brand="Jordan";
-
-  let item="item";
-  if(text.includes("shoe")) item="shoe";
-  if(text.includes("tv")) item="tv";
-  if(text.includes("couch")) item="couch";
-
-  let [low, high] = getPriceRange(item, brand);
-
-  let worth = Math.floor((low+high)/2);
-
-  if(type==="used") worth*=0.8;
-  if(type==="cracked") worth*=0.5;
-
-  worth=Math.floor(worth);
-
-  let sellLow=Math.floor(high);
-  let sellHigh=Math.floor(high*1.3);
-  let profit=sellLow-worth;
-
-  document.getElementById("scanTextResult").innerText =
-    text+" ("+type+")\nWorth: $"+worth+
-    "\nSell: $"+sellLow+"-"+sellHigh+
-    "\nProfit: $"+profit;
-}
-
-function calc(){
-  let buy=parseFloat(document.getElementById("buy").value)||0;
-  let sell=parseFloat(document.getElementById("sellInput").value)||0;
-  let profit=sell-buy;
-
-  let status = profit>20 ? "🔥 GOOD FLIP" : "❌ BAD DEAL";
-
-  document.getElementById("profit").innerText="$"+profit+" | "+status;
-}
-
-function openFB(){window.open("https://www.facebook.com/marketplace","_blank");}
-function openEbay(){window.open("https://www.ebay.com","_blank");}
-function openOfferUp(){window.open("https://offerup.com","_blank");}
-
-</script>
-
-</body>
-</html>
