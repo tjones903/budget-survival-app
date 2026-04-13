@@ -7,8 +7,6 @@
 
 <link rel="icon" href="icon.png">
 
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-
 <style>
 body {
   margin: 0;
@@ -76,7 +74,6 @@ button {
 
   <button onclick="scanItem()">Scan Item</button>
 
-  <!-- DESKTOP CAMERA -->
   <button onclick="startCamera()">Use Camera (Desktop)</button>
   <video id="video" width="100%" autoplay style="display:none;"></video>
   <button onclick="takePhoto()" id="snapBtn" style="display:none;">Take Photo</button>
@@ -96,32 +93,11 @@ button {
   <h3>🧠 Smart Scanner</h3>
 
   <input id="item" placeholder="Type item">
-
-  <button onclick="scan('new')">New</button>
-  <button onclick="scan('used')">Used</button>
-  <button onclick="scan('cracked')">Cracked</button>
-
-  <div id="scanTextResult"></div>
-</div>
-
-<div class="card">
-  <h3>💰 Profit Calculator</h3>
-
-  <input id="buy" type="number" placeholder="Buy Price">
-  <input id="sellInput" type="number" placeholder="Sell Price">
-
-  <button onclick="calc()">Check Profit</button>
-
-  <div class="big" id="profit">$0</div>
 </div>
 
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
-</div>
-
-<div class="card">
-  <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
 </div>
 
 </div>
@@ -144,20 +120,14 @@ function scanItem(){
 
 function autoScan(){
   const file = cam.files[0];
-
-  if(!file){
-    document.getElementById("scanDesc").innerText = "Take a picture first";
-    return;
-  }
+  if(!file) return;
 
   const reader = new FileReader();
-  reader.onloadend = () => {
-    processImage(reader.result);
-  };
+  reader.onloadend = () => processImage(reader.result);
   reader.readAsDataURL(file);
 }
 
-// 🎥 START CAMERA
+// CAMERA
 async function startCamera(){
   const video = document.getElementById("video");
   const snapBtn = document.getElementById("snapBtn");
@@ -169,7 +139,6 @@ async function startCamera(){
   video.srcObject = stream;
 }
 
-// 📸 TAKE PHOTO (FIXED)
 function takePhoto(){
   const video = document.getElementById("video");
 
@@ -177,41 +146,38 @@ function takePhoto(){
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
 
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0);
+  canvas.getContext("2d").drawImage(video, 0, 0);
 
   const imgData = canvas.toDataURL("image/jpeg");
 
-  // 🔥 STOP CAMERA (ADDED)
-  const stream = video.srcObject;
-  if(stream){
-    stream.getTracks().forEach(track => track.stop());
-  }
-
-  // 🔥 RESET UI (ADDED)
+  // stop camera
+  video.srcObject.getTracks().forEach(track => track.stop());
   video.style.display = "none";
   document.getElementById("snapBtn").style.display = "none";
 
   processImage(imgData);
 }
 
-// 🔍 MAIN SCAN
+// 🔥 MAIN AI
 async function processImage(base64Image){
 
-  document.getElementById("scanDesc").innerText = "🔍 AI scanning...";
+  document.getElementById("scanDesc").innerText = "🔍 scanning...";
 
   const base64 = base64Image.split(',')[1];
 
-  try {
+  try{
     const res = await fetch(
       "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          requests: [{
-            image: { content: base64 },
-            features: [{ type: "LABEL_DETECTION", maxResults: 5 }]
+          requests:[{
+            image:{content:base64},
+            features:[
+              {type:"LABEL_DETECTION", maxResults:5},
+              {type:"LOGO_DETECTION", maxResults:3}
+            ]
           }]
         })
       }
@@ -219,33 +185,65 @@ async function processImage(base64Image){
 
     const data = await res.json();
 
-    let item = data.responses?.[0]?.labelAnnotations?.[0]?.description?.toLowerCase() || "unknown";
+    let labels = data.responses?.[0]?.labelAnnotations || [];
+    let logos = data.responses?.[0]?.logoAnnotations || [];
 
-    // FIX BAD DETECTIONS
-    if(item.includes("ingredient") || item.includes("orange") || item.includes("chip")){
+    // 🔥 BETTER ITEM PICKING (NOT JUST FIRST)
+    let item = labels.map(l => l.description.toLowerCase()).join(" ");
+
+    // 🔥 BRAND DETECTION
+    let brand = "";
+
+    if(logos.length){
+      brand = logos[0].description;
+    }
+
+    if(item.includes("nike")) brand = "Nike";
+    if(item.includes("adidas")) brand = "Adidas";
+    if(item.includes("jordan")) brand = "Jordan";
+    if(item.includes("apple")) brand = "Apple";
+
+    // 🔥 FIX UNKNOWN
+    if(!item || item === "unknown"){
+      item = "item";
+    }
+
+    // 🔥 SMART CATEGORY FIX
+    if(item.includes("shoe") || item.includes("footwear") || item.includes("sneaker")){
+      item = "shoe";
+    }
+
+    if(item.includes("chip") || item.includes("food") || item.includes("snack")){
       item = "snack";
     }
 
-    if(item.includes("plastic") || item.includes("rubber")){
-      item = "shoe";
+    // combine
+    if(brand){
+      item = brand + " " + item;
     }
 
     document.getElementById("scanDesc").innerText = item;
 
+    // 🔥 REALISTIC PRICING
     let worth = 0;
 
-    if(item.includes("snack")){
+    if(brand === "Nike" || brand === "Jordan"){
+      worth = 80 + Math.random()*60;
+    }
+    else if(item.includes("shoe")){
+      worth = 40 + Math.random()*40;
+    }
+    else if(item.includes("snack")){
       worth = 2 + Math.random()*5;
-    } else if(item.includes("shoe")){
-      worth = 25 + Math.random()*40;
-    } else {
+    }
+    else{
       worth = 20 + Math.random()*50;
     }
 
     worth = Math.floor(worth);
 
-    let sellLow = Math.floor(worth * 1.4);
-    let sellHigh = Math.floor(worth * 1.8);
+    let sellLow = Math.floor(worth*1.4);
+    let sellHigh = Math.floor(worth*1.8);
     let profit = sellLow - worth;
 
     let status = profit > 20 ? "🔥 GOOD FLIP" : "❌ NOT WORTH SELLING";
@@ -257,20 +255,18 @@ async function processImage(base64Image){
 
     reward(profit);
 
-  } catch(err){
+  }catch(err){
     document.getElementById("scanDesc").innerText = "Scan failed";
   }
 }
 
-// SELL LINKS
+// LINKS
 function openFB(){
   window.open("https://www.facebook.com/marketplace","_blank");
 }
-
 function openEbay(){
   window.open("https://www.ebay.com","_blank");
 }
-
 function openOfferUp(){
   window.open("https://offerup.com","_blank");
 }
