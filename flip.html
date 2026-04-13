@@ -134,7 +134,7 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
-/* 📂 FILE SCAN (FIXED) */
+/* FILE SCAN */
 function scanItem(){
   const input = document.getElementById("camera");
   input.value = "";
@@ -154,7 +154,7 @@ document.getElementById("camera").addEventListener("change", function(){
   reader.readAsDataURL(file);
 });
 
-/* 🎥 CAMERA */
+/* CAMERA */
 async function startCamera(){
   const video = document.getElementById("video");
   const snapBtn = document.getElementById("snapBtn");
@@ -174,7 +174,6 @@ function takePhoto(){
   canvas.height = video.videoHeight;
 
   canvas.getContext("2d").drawImage(video,0,0);
-
   const imgData = canvas.toDataURL("image/jpeg");
 
   video.srcObject.getTracks().forEach(t=>t.stop());
@@ -187,7 +186,7 @@ function takePhoto(){
   processImage(imgData);
 }
 
-/* 🤖 AI */
+/* AI */
 async function processImage(base64Image){
   document.getElementById("scanDesc").innerText="🔍 scanning...";
 
@@ -221,7 +220,7 @@ async function processImage(base64Image){
 
     if(!item) item="item";
 
-    if(item.includes("shoe")) item="shoe";
+    if(item.includes("shoe")||item.includes("sneaker")||item.includes("slide")) item="shoe";
     if(item.includes("food")||item.includes("chip")) item="snack";
 
     if(brand) item = brand + " " + item;
@@ -230,7 +229,8 @@ async function processImage(base64Image){
 
     let worth=0;
 
-    if(brand.toLowerCase().includes("nike")) worth=90+Math.random()*60;
+    if(brand.toLowerCase().includes("jordan")) worth=110+Math.random()*60;
+    else if(brand.toLowerCase().includes("nike")) worth=80+Math.random()*60;
     else if(item.includes("shoe")) worth=50+Math.random()*50;
     else if(item.includes("snack")) worth=2+Math.random()*5;
     else worth=20+Math.random()*40;
@@ -252,29 +252,39 @@ async function processImage(base64Image){
   }
 }
 
-/* 🧠 SMART SCANNER (WORKING) */
+/* SMART SCANNER */
 function scanText(type){
-  let item=document.getElementById("item").value;
+  let item = document.getElementById("item").value.toLowerCase();
 
-  let result = item + " (" + type + ") → ";
+  let worth = 50 + Math.random()*50;
 
-  if(type==="new") result += "Sell at full price";
-  if(type==="used") result += "Sell slightly lower";
-  if(type==="cracked") result += "Sell cheap / quick";
+  if(type==="used") worth*=0.8;
+  if(type==="cracked") worth*=0.5;
 
-  document.getElementById("scanTextResult").innerText = result;
+  worth=Math.floor(worth);
+
+  let sellLow=Math.floor(worth*1.4);
+  let sellHigh=Math.floor(worth*1.8);
+  let profit=sellLow-worth;
+
+  document.getElementById("scanTextResult").innerText =
+    item+" ("+type+")\nWorth: $"+worth+
+    "\nSell: $"+sellLow+"-"+sellHigh+
+    "\nProfit: $"+profit;
 }
 
-/* 💰 PROFIT CALCULATOR (WORKING) */
+/* PROFIT CALCULATOR */
 function calc(){
   let buy=parseFloat(document.getElementById("buy").value)||0;
   let sell=parseFloat(document.getElementById("sellInput").value)||0;
   let profit=sell-buy;
 
-  document.getElementById("profit").innerText="$"+profit;
+  let status = profit>20 ? "🔥 GOOD FLIP" : "❌ BAD DEAL";
+
+  document.getElementById("profit").innerText="$"+profit+" | "+status;
 }
 
-/* 🔗 LINKS */
+/* LINKS */
 function openFB(){window.open("https://www.facebook.com/marketplace","_blank");}
 function openEbay(){window.open("https://www.ebay.com","_blank");}
 function openOfferUp(){window.open("https://offerup.com","_blank");}
