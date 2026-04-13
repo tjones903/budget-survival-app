@@ -202,9 +202,26 @@ function autoScan(){
         item = data.responses[0].labelAnnotations[0].description.toLowerCase();
       }
 
-      // 🔥 FIX MISLABELS (slides, rubber, etc.)
+      // 🔥 FIX MISLABELS (slides etc.)
       if(item.includes("rubber") || item.includes("synthetic")){
         item = "shoe";
+      }
+
+      // 🔥 FIX BAD DETECTIONS (like your dog feeder)
+      if(item.includes("fender")){
+        item = "dog bowl";
+      }
+
+      if(item.includes("bowl") || item.includes("dish")){
+        item = "dog bowl";
+      }
+
+      if(item.includes("plastic") || item.includes("container")){
+        item = "household item";
+      }
+
+      if(item.includes("dog") || item.includes("pet")){
+        item = "pet supplies";
       }
 
       // 🔥 BRAND BOOST
