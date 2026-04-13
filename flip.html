@@ -199,24 +199,15 @@ function getPriceRange(item, brand){
   if(item==="tv") return [300,1200];
   if(item==="computer") return [300,1200];
 
-  if(item==="microwave") return [40,180];
-  if(item==="air fryer") return [40,150];
-  if(item==="refrigerator") return [300,1200];
-  if(item==="dishwasher") return [150,600];
-
   if(item==="washer") return [200,600];
   if(item==="dryer") return [200,600];
   if(item==="stove") return [300,900];
 
-  if(item==="lawn mower") return [150,500];
-  if(item==="weed eater") return [50,200];
-
-  if(item==="leash") return [5,25];
-  if(item==="tool") return [40,300];
-
-  if(item==="speaker") return [50,300];
-  if(item==="console") return [150,600];
-  if(item==="camera") return [150,1000];
+  if(item==="cable" || item==="wire") return [5,30];
+  if(item==="charger") return [10,40];
+  if(item==="extension cord") return [10,50];
+  if(item==="headphones") return [20,200];
+  if(item==="router") return [30,150];
 
   if(item==="car") return [3000,10000];
   if(item==="truck") return [5000,15000];
@@ -255,23 +246,14 @@ async function processImage(base64Image){
     let text = labels.map(l=>l.description.toLowerCase()).join(" ");
     let brand = logos.length ? logos[0].description : "";
 
-    // 🔥 ADDED DETECTION
-    if(text.includes("microwave")) text="microwave";
-    else if(text.includes("air fryer")) text="air fryer";
-    else if(text.includes("fridge") || text.includes("refrigerator")) text="refrigerator";
-    else if(text.includes("dishwasher")) text="dishwasher";
-    else if(text.includes("speaker")) text="speaker";
-    else if(text.includes("playstation") || text.includes("xbox")) text="console";
-    else if(text.includes("camera")) text="camera";
-
-    // (everything else stays same)
+    if(text.includes("wire") || text.includes("cable")) text="cable";
+    else if(text.includes("charger")) text="charger";
+    else if(text.includes("extension cord")) text="extension cord";
+    else if(text.includes("headphone")) text="headphones";
+    else if(text.includes("router") || text.includes("modem")) text="router";
 
     if(text.includes("nike")) brand="Nike";
     if(text.includes("jordan")) brand="Jordan";
-
-    if(text==="unknown item"){
-      document.getElementById("scanDesc").innerText = "⚠️ Could not detect — type manually below";
-    }
 
     let [low, high] = getPriceRange(text, brand);
 
