@@ -130,11 +130,11 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
-/* FILE SCAN */
+/* UPLOAD FIX */
 function scanItem(){
   const input = document.getElementById("camera");
   input.value = "";
-  setTimeout(()=>input.click(),50);
+  input.click();
 }
 
 document.getElementById("camera").addEventListener("change", function(){
@@ -176,13 +176,14 @@ function takePhoto(){
   video.style.display="none";
   document.getElementById("snapBtn").style.display="none";
 
-  document.getElementById("preview").src = imgData;
-  document.getElementById("preview").style.display = "block";
+  const preview = document.getElementById("preview");
+  preview.style.display="block";
+  preview.src = imgData;
 
   processImage(imgData);
 }
 
-/* AI SCAN */
+/* AI */
 async function processImage(base64Image){
   document.getElementById("scanDesc").innerText="🔍 scanning...";
 
@@ -216,10 +217,13 @@ async function processImage(base64Image){
 
     if(!item) item="item";
 
-    // 🔥 CATEGORY
-    if(item.includes("tv")) item="tv";
-    if(item.includes("shoe")||item.includes("sneaker")) item="shoe";
-    if(item.includes("bottle")) item="water bottle";
+    // 🔥 FIX DETECTION
+    if(item.includes("footwear")||item.includes("shoe")||item.includes("sneaker")||item.includes("slide")){
+      item="shoe";
+    }
+
+    if(item.includes("nike")) brand="Nike";
+    if(item.includes("jordan")) brand="Jordan";
 
     if(brand) item = brand + " " + item;
 
@@ -228,10 +232,9 @@ async function processImage(base64Image){
     let worth=0;
 
     // 🔥 REAL PRICING
-    if(item.includes("tv")) worth=300+Math.random()*600;
-    else if(brand.toLowerCase().includes("nike")) worth=80+Math.random()*60;
-    else if(item.includes("shoe")) worth=50+Math.random()*50;
-    else if(item.includes("water bottle")) worth=2+Math.random()*8;
+    if(brand==="Jordan") worth=120+Math.random()*80;
+    else if(brand==="Nike") worth=90+Math.random()*70;
+    else if(item.includes("shoe")) worth=60+Math.random()*60;
     else worth=20+Math.random()*30;
 
     worth=Math.floor(worth);
@@ -255,12 +258,15 @@ async function processImage(base64Image){
 function scanText(type){
   let item=document.getElementById("item").value.toLowerCase();
 
+  let brand="";
+  if(item.includes("nike")) brand="Nike";
+  if(item.includes("jordan")) brand="Jordan";
+
   let worth=0;
 
-  if(item.includes("tv")) worth=400+Math.random()*500;
-  else if(item.includes("nike")) worth=80+Math.random()*60;
-  else if(item.includes("shoe")) worth=50+Math.random()*50;
-  else if(item.includes("bottle")) worth=2+Math.random()*8;
+  if(brand==="Jordan") worth=120+Math.random()*80;
+  else if(brand==="Nike") worth=90+Math.random()*70;
+  else if(item.includes("shoe")) worth=60+Math.random()*60;
   else worth=20+Math.random()*30;
 
   if(type==="used") worth*=0.8;
