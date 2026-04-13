@@ -66,6 +66,7 @@ button {
 
 <div class="container">
 
+<!-- SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
@@ -88,6 +89,7 @@ button {
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
 </div>
 
+<!-- SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
@@ -100,6 +102,7 @@ button {
   <div id="scanTextResult"></div>
 </div>
 
+<!-- PROFIT CALCULATOR -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
 
@@ -111,6 +114,7 @@ button {
   <div class="big" id="profit">$0</div>
 </div>
 
+<!-- PROGRESS -->
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
@@ -130,7 +134,7 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
-/* UPLOAD FIX */
+/* FILE SCAN */
 function scanItem(){
   const input = document.getElementById("camera");
   input.value = "";
@@ -176,9 +180,8 @@ function takePhoto(){
   video.style.display="none";
   document.getElementById("snapBtn").style.display="none";
 
-  const preview = document.getElementById("preview");
-  preview.style.display="block";
-  preview.src = imgData;
+  document.getElementById("preview").src = imgData;
+  document.getElementById("preview").style.display = "block";
 
   processImage(imgData);
 }
@@ -217,7 +220,6 @@ async function processImage(base64Image){
 
     if(!item) item="item";
 
-    // 🔥 FIX DETECTION
     if(item.includes("footwear")||item.includes("shoe")||item.includes("sneaker")||item.includes("slide")){
       item="shoe";
     }
@@ -231,13 +233,15 @@ async function processImage(base64Image){
 
     let worth=0;
 
-    // 🔥 REAL PRICING
-    if(brand==="Jordan") worth=120+Math.random()*80;
-    else if(brand==="Nike") worth=90+Math.random()*70;
-    else if(item.includes("shoe")) worth=60+Math.random()*60;
-    else worth=20+Math.random()*30;
-
-    worth=Math.floor(worth);
+    // ✅ REAL FIXED PRICING
+    if(brand==="Jordan") worth=140;
+    else if(brand==="Nike") worth=110;
+    else if(item.includes("shoe")) worth=80;
+    else if(item.includes("tv")) worth=500;
+    else if(item.includes("table")||item.includes("desk")) worth=140;
+    else if(item.includes("couch")) worth=300;
+    else if(item.includes("water bottle")) worth=5;
+    else worth=25;
 
     let sellLow=Math.floor(worth*1.4);
     let sellHigh=Math.floor(worth*1.8);
@@ -264,10 +268,13 @@ function scanText(type){
 
   let worth=0;
 
-  if(brand==="Jordan") worth=120+Math.random()*80;
-  else if(brand==="Nike") worth=90+Math.random()*70;
-  else if(item.includes("shoe")) worth=60+Math.random()*60;
-  else worth=20+Math.random()*30;
+  if(brand==="Jordan") worth=140;
+  else if(brand==="Nike") worth=110;
+  else if(item.includes("shoe")) worth=80;
+  else if(item.includes("tv")) worth=500;
+  else if(item.includes("table")) worth=140;
+  else if(item.includes("water bottle")) worth=5;
+  else worth=25;
 
   if(type==="used") worth*=0.8;
   if(type==="cracked") worth*=0.5;
