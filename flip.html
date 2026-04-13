@@ -76,7 +76,7 @@ button {
 
   <button onclick="scanItem()">Scan Item</button>
 
-  <!-- 🔥 DESKTOP CAMERA (ADDED) -->
+  <!-- DESKTOP CAMERA -->
   <button onclick="startCamera()">Use Camera (Desktop)</button>
   <video id="video" width="100%" autoplay style="display:none;"></video>
   <button onclick="takePhoto()" id="snapBtn" style="display:none;">Take Photo</button>
@@ -150,20 +150,14 @@ function autoScan(){
     return;
   }
 
-  const img = document.getElementById("preview");
-  img.style.display = "block";
-  img.src = URL.createObjectURL(file);
-
   const reader = new FileReader();
-
   reader.onloadend = () => {
     processImage(reader.result);
   };
-
   reader.readAsDataURL(file);
 }
 
-// 🔥 DESKTOP CAMERA FUNCTIONS
+// 🎥 START CAMERA
 async function startCamera(){
   const video = document.getElementById("video");
   const snapBtn = document.getElementById("snapBtn");
@@ -175,6 +169,7 @@ async function startCamera(){
   video.srcObject = stream;
 }
 
+// 📸 TAKE PHOTO (FIXED)
 function takePhoto(){
   const video = document.getElementById("video");
 
@@ -187,10 +182,20 @@ function takePhoto(){
 
   const imgData = canvas.toDataURL("image/jpeg");
 
+  // 🔥 STOP CAMERA (ADDED)
+  const stream = video.srcObject;
+  if(stream){
+    stream.getTracks().forEach(track => track.stop());
+  }
+
+  // 🔥 RESET UI (ADDED)
+  video.style.display = "none";
+  document.getElementById("snapBtn").style.display = "none";
+
   processImage(imgData);
 }
 
-// 🔥 MAIN SCAN FUNCTION (USED BY BOTH PHONE + DESKTOP)
+// 🔍 MAIN SCAN
 async function processImage(base64Image){
 
   document.getElementById("scanDesc").innerText = "🔍 AI scanning...";
@@ -216,21 +221,25 @@ async function processImage(base64Image){
 
     let item = data.responses?.[0]?.labelAnnotations?.[0]?.description?.toLowerCase() || "unknown";
 
-    // 🔥 IGNORE JUNK
-    if(item.includes("ingredients") || item.includes("text")){
-      document.getElementById("scanDesc").innerText = "❌ NOT WORTH SELLING";
-      document.getElementById("worth").innerText = "$0";
-      document.getElementById("sell").innerText = "$0";
-      document.getElementById("profitScan").innerText = "";
-      return;
+    // FIX BAD DETECTIONS
+    if(item.includes("ingredient") || item.includes("orange") || item.includes("chip")){
+      item = "snack";
+    }
+
+    if(item.includes("plastic") || item.includes("rubber")){
+      item = "shoe";
     }
 
     document.getElementById("scanDesc").innerText = item;
 
-    let worth = 20 + Math.random()*50;
+    let worth = 0;
 
     if(item.includes("snack")){
       worth = 2 + Math.random()*5;
+    } else if(item.includes("shoe")){
+      worth = 25 + Math.random()*40;
+    } else {
+      worth = 20 + Math.random()*50;
     }
 
     worth = Math.floor(worth);
@@ -243,7 +252,8 @@ async function processImage(base64Image){
 
     document.getElementById("worth").innerText = "Worth: $" + worth;
     document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
-    document.getElementById("profitScan").innerText = "Profit: $" + profit + " | " + status;
+    document.getElementById("profitScan").innerText =
+      "Profit: $" + profit + " | " + status;
 
     reward(profit);
 
@@ -252,7 +262,7 @@ async function processImage(base64Image){
   }
 }
 
-// 🔥 SELL LINKS
+// SELL LINKS
 function openFB(){
   window.open("https://www.facebook.com/marketplace","_blank");
 }
