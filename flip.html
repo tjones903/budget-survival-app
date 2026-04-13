@@ -66,12 +66,11 @@ button {
 
 <div class="container">
 
+<!-- 📷 SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
-  <!-- 🔥 FIXED INPUT -->
   <input type="file" accept="image/*" id="camera" style="display:none;">
-
   <img id="preview" width="100%" style="display:none; border-radius:10px;">
 
   <button onclick="scanItem()">Scan Item</button>
@@ -90,6 +89,7 @@ button {
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
 </div>
 
+<!-- 🧠 SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
@@ -102,6 +102,7 @@ button {
   <div id="scanTextResult"></div>
 </div>
 
+<!-- 💰 PROFIT CALCULATOR -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
 
@@ -113,6 +114,7 @@ button {
   <div class="big" id="profit">$0</div>
 </div>
 
+<!-- 🏆 PROGRESS -->
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
@@ -132,18 +134,13 @@ function reward(p=0){
   document.getElementById("points").innerText = "Points: " + points;
 }
 
-// 🔥 FIXED SCAN BUTTON
+/* 📂 FILE SCAN (FIXED) */
 function scanItem(){
   const input = document.getElementById("camera");
-
-  input.value = ""; // reset so same file works again
-
-  setTimeout(() => {
-    input.click(); // force open file picker
-  }, 50);
+  input.value = "";
+  setTimeout(()=>input.click(),50);
 }
 
-// 🔥 FIXED FILE CHANGE
 document.getElementById("camera").addEventListener("change", function(){
   const file = this.files[0];
   if(!file) return;
@@ -157,7 +154,7 @@ document.getElementById("camera").addEventListener("change", function(){
   reader.readAsDataURL(file);
 });
 
-// CAMERA
+/* 🎥 CAMERA */
 async function startCamera(){
   const video = document.getElementById("video");
   const snapBtn = document.getElementById("snapBtn");
@@ -190,7 +187,7 @@ function takePhoto(){
   processImage(imgData);
 }
 
-// AI
+/* 🤖 AI */
 async function processImage(base64Image){
   document.getElementById("scanDesc").innerText="🔍 scanning...";
 
@@ -224,8 +221,8 @@ async function processImage(base64Image){
 
     if(!item) item="item";
 
-    if(item.includes("shoe")||item.includes("sneaker")) item="shoe";
-    if(item.includes("chip")||item.includes("food")) item="snack";
+    if(item.includes("shoe")) item="shoe";
+    if(item.includes("food")||item.includes("chip")) item="snack";
 
     if(brand) item = brand + " " + item;
 
@@ -244,11 +241,9 @@ async function processImage(base64Image){
     let sellHigh=Math.floor(worth*1.8);
     let profit=sellLow-worth;
 
-    let status=profit>20?"🔥 GOOD FLIP":"❌ NOT WORTH SELLING";
-
     document.getElementById("worth").innerText="Worth: $"+worth;
     document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
-    document.getElementById("profitScan").innerText="Profit: $"+profit+" | "+status;
+    document.getElementById("profitScan").innerText="Profit: $"+profit;
 
     reward(profit);
 
@@ -257,21 +252,29 @@ async function processImage(base64Image){
   }
 }
 
-// SMART SCANNER
+/* 🧠 SMART SCANNER (WORKING) */
 function scanText(type){
   let item=document.getElementById("item").value;
-  document.getElementById("scanTextResult").innerText =
-    item+" ("+type+") → flip potential";
+
+  let result = item + " (" + type + ") → ";
+
+  if(type==="new") result += "Sell at full price";
+  if(type==="used") result += "Sell slightly lower";
+  if(type==="cracked") result += "Sell cheap / quick";
+
+  document.getElementById("scanTextResult").innerText = result;
 }
 
-// PROFIT CALC
+/* 💰 PROFIT CALCULATOR (WORKING) */
 function calc(){
   let buy=parseFloat(document.getElementById("buy").value)||0;
   let sell=parseFloat(document.getElementById("sellInput").value)||0;
-  document.getElementById("profit").innerText="$"+(sell-buy);
+  let profit=sell-buy;
+
+  document.getElementById("profit").innerText="$"+profit;
 }
 
-// LINKS
+/* 🔗 LINKS */
 function openFB(){window.open("https://www.facebook.com/marketplace","_blank");}
 function openEbay(){window.open("https://www.ebay.com","_blank");}
 function openOfferUp(){window.open("https://offerup.com","_blank");}
