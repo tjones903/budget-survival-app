@@ -66,7 +66,6 @@ button {
 
 <div class="container">
 
-<!-- 📷 SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
@@ -89,7 +88,6 @@ button {
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
 </div>
 
-<!-- 🧠 SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
@@ -102,7 +100,6 @@ button {
   <div id="scanTextResult"></div>
 </div>
 
-<!-- 💰 PROFIT CALCULATOR -->
 <div class="card">
   <h3>💰 Profit Calculator</h3>
 
@@ -114,7 +111,6 @@ button {
   <div class="big" id="profit">$0</div>
 </div>
 
-<!-- 🏆 PROGRESS -->
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
@@ -186,7 +182,7 @@ function takePhoto(){
   processImage(imgData);
 }
 
-/* AI */
+/* AI SCAN */
 async function processImage(base64Image){
   document.getElementById("scanDesc").innerText="🔍 scanning...";
 
@@ -220,8 +216,10 @@ async function processImage(base64Image){
 
     if(!item) item="item";
 
-    if(item.includes("shoe")||item.includes("sneaker")||item.includes("slide")) item="shoe";
-    if(item.includes("food")||item.includes("chip")) item="snack";
+    // 🔥 CATEGORY
+    if(item.includes("tv")) item="tv";
+    if(item.includes("shoe")||item.includes("sneaker")) item="shoe";
+    if(item.includes("bottle")) item="water bottle";
 
     if(brand) item = brand + " " + item;
 
@@ -229,11 +227,12 @@ async function processImage(base64Image){
 
     let worth=0;
 
-    if(brand.toLowerCase().includes("jordan")) worth=110+Math.random()*60;
+    // 🔥 REAL PRICING
+    if(item.includes("tv")) worth=300+Math.random()*600;
     else if(brand.toLowerCase().includes("nike")) worth=80+Math.random()*60;
     else if(item.includes("shoe")) worth=50+Math.random()*50;
-    else if(item.includes("snack")) worth=2+Math.random()*5;
-    else worth=20+Math.random()*40;
+    else if(item.includes("water bottle")) worth=2+Math.random()*8;
+    else worth=20+Math.random()*30;
 
     worth=Math.floor(worth);
 
@@ -254,9 +253,15 @@ async function processImage(base64Image){
 
 /* SMART SCANNER */
 function scanText(type){
-  let item = document.getElementById("item").value.toLowerCase();
+  let item=document.getElementById("item").value.toLowerCase();
 
-  let worth = 50 + Math.random()*50;
+  let worth=0;
+
+  if(item.includes("tv")) worth=400+Math.random()*500;
+  else if(item.includes("nike")) worth=80+Math.random()*60;
+  else if(item.includes("shoe")) worth=50+Math.random()*50;
+  else if(item.includes("bottle")) worth=2+Math.random()*8;
+  else worth=20+Math.random()*30;
 
   if(type==="used") worth*=0.8;
   if(type==="cracked") worth*=0.5;
@@ -273,7 +278,7 @@ function scanText(type){
     "\nProfit: $"+profit;
 }
 
-/* PROFIT CALCULATOR */
+/* PROFIT CALC */
 function calc(){
   let buy=parseFloat(document.getElementById("buy").value)||0;
   let sell=parseFloat(document.getElementById("sellInput").value)||0;
