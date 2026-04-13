@@ -181,17 +181,26 @@ function takePhoto(){
 }
 
 function getPriceRange(item, brand){
+
   if(item.includes("snack")) return [2,6];
   if(item.includes("water bottle")) return [2,10];
 
-  if(brand==="Jordan") return [140,180];
-  if(brand==="Nike") return [100,140];
-  if(brand==="Adidas") return [90,130];
+  if(brand==="Jordan") return [140,200];
+  if(brand==="Nike") return [100,160];
+  if(brand==="Adidas") return [90,140];
 
-  if(item==="shoe") return [70,120];
-  if(item==="couch") return [250,400];
-  if(item==="table") return [120,180];
+  if(item==="shoe") return [80,150];
+  if(item==="slide") return [25,60];
+
+  if(item==="couch") return [250,500];
+  if(item==="table") return [120,220];
+  if(item==="lamp") return [30,120];
+
   if(item==="tv") return [400,700];
+  if(item==="computer") return [300,1200];
+
+  if(item==="car") return [3000,10000];
+  if(item==="truck") return [5000,15000];
 
   return [20,40];
 }
@@ -227,36 +236,32 @@ async function processImage(base64Image){
     let text = labels.map(l=>l.description.toLowerCase()).join(" ");
     let brand = logos.length ? logos[0].description : "";
 
-    // 🔥 FIXED DETECTION
-    if(text.includes("shoe") || text.includes("footwear") || text.includes("sneaker") || text.includes("slide") || text.includes("sandal")){
-      text="shoe";
-    }
-    else if(text.includes("chip") || text.includes("snack") || text.includes("food") || text.includes("ingredient")){
-      text="snack";
-    }
-    else if(text.includes("bottle") || text.includes("drink")){
-      text="water bottle";
-    }
-    else if(text.includes("couch") || text.includes("sofa")){
-      text="couch";
-    }
-    else if(text.includes("table") || text.includes("desk")){
-      text="table";
-    }
-    else if(text.includes("tv") || text.includes("screen") || text.includes("monitor")){
-      text="tv";
-    }
-    else{
-      text = text || "unknown item";
-    }
+    // 🔥 ADDED DETECTION
+    if(text.includes("slide") || text.includes("slipper")) text="slide";
+    else if(text.includes("shoe") || text.includes("sneaker") || text.includes("footwear")) text="shoe";
+    else if(text.includes("lamp")) text="lamp";
+    else if(text.includes("couch") || text.includes("sofa")) text="couch";
+    else if(text.includes("table") || text.includes("desk")) text="table";
+    else if(text.includes("laptop") || text.includes("computer") || text.includes("pc")) text="computer";
+    else if(text.includes("car") || text.includes("vehicle")) text="car";
+    else if(text.includes("truck")) text="truck";
+    else if(text.includes("tv") || text.includes("screen")) text="tv";
+    else if(text.includes("chip") || text.includes("food")) text="snack";
+    else if(text.includes("bottle")) text="water bottle";
+    else text = text || "unknown item";
 
     // 🔥 BRAND BOOST
-    let fullText = text.toLowerCase();
-    if(fullText.includes("nike") || fullText.includes("swoosh")) brand="Nike";
-    if(fullText.includes("jordan") || fullText.includes("jumpman")) brand="Jordan";
-    if(fullText.includes("adidas")) brand="Adidas";
+    if(text.includes("nike")) brand="Nike";
+    if(text.includes("jordan")) brand="Jordan";
+    if(text.includes("adidas")) brand="Adidas";
 
     let [low, high] = getPriceRange(text, brand);
+
+    // 🔥 SIZE / QUALITY BOOST
+    if(brand==="Nike" || brand==="Jordan"){
+      high += 40;
+      low += 20;
+    }
 
     let worth = Math.floor((low+high)/2);
     let sellLow = Math.floor(high);
@@ -275,7 +280,7 @@ async function processImage(base64Image){
   }
 }
 
-/* SMART SCANNER */
+/* SMART SCANNER + CALC unchanged */
 function scanText(type){
   let text=document.getElementById("item").value.toLowerCase();
 
@@ -307,7 +312,6 @@ function scanText(type){
     "\nProfit: $"+profit;
 }
 
-/* PROFIT CALC */
 function calc(){
   let buy=parseFloat(document.getElementById("buy").value)||0;
   let sell=parseFloat(document.getElementById("sellInput").value)||0;
@@ -318,7 +322,6 @@ function calc(){
   document.getElementById("profit").innerText="$"+profit+" | "+status;
 }
 
-/* LINKS */
 function openFB(){window.open("https://www.facebook.com/marketplace","_blank");}
 function openEbay(){window.open("https://www.ebay.com","_blank");}
 function openOfferUp(){window.open("https://offerup.com","_blank");}
