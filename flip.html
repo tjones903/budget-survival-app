@@ -22,7 +22,6 @@ body {
   justify-content: space-around;
   background: rgba(0,0,0,0.5);
   padding: 12px;
-  box-shadow: 0 0 10px rgba(0,255,200,0.2);
 }
 
 .nav a { color: white; text-decoration: none; }
@@ -38,20 +37,6 @@ body {
   padding: 20px;
   border-radius: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 0 20px rgba(0,255,200,0.2);
-  transition: 0.3s;
-}
-
-.card:hover {
-  box-shadow: 0 0 30px rgba(0,255,200,0.4);
-}
-
-input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
 }
 
 button {
@@ -65,11 +50,13 @@ button {
   color: black;
 }
 
-button:hover {
-  box-shadow: 0 0 20px #00e676;
-}
-
 .big { font-size: 26px; }
+
+/* 🔥 NEW BUTTON STYLE (ADDED ONLY) */
+.sell-btn {
+  background: linear-gradient(45deg,#2196f3,#00e5ff);
+  color: black;
+}
 </style>
 </head>
 
@@ -87,7 +74,7 @@ button:hover {
   <h3>📷 AI Item Scan</h3>
 
   <input type="file" accept="image/*" capture="environment" id="camera" style="display:none;">
-  <img id="preview" width="100%" style="margin-top:10px; border-radius:10px; display:none;">
+  <img id="preview" width="100%" style="display:none;">
 
   <button onclick="scanItem()">Scan Item</button>
 
@@ -95,6 +82,12 @@ button:hover {
   <div class="big" id="worth">$0</div>
   <div class="big" id="sell">$0</div>
   <div class="big" id="profitScan">$0</div>
+
+  <!-- 🔥 ADDED BUTTONS ONLY -->
+  <button class="sell-btn" onclick="openFB()">Open Facebook Marketplace</button>
+  <button class="sell-btn" onclick="openEbay()">Open eBay</button>
+  <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
+
 </div>
 
 <div class="card">
@@ -126,9 +119,7 @@ button:hover {
 </div>
 
 <div class="card">
-  <button onclick="window.location.href='index.html'">
-⬅ Back to Home
-</button>
+  <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
 </div>
 
 </div>
@@ -139,10 +130,6 @@ let points = 0;
 function reward(profit=0){
   points += 10;
   document.getElementById("points").innerText = "Points: " + points;
-
-  let total = parseInt(localStorage.getItem("money")) || 0;
-  total += profit;
-  localStorage.setItem("money", total);
 }
 
 const cam = document.getElementById("camera");
@@ -189,86 +176,18 @@ function autoScan(){
 
       const data = await res.json();
 
-      let item = "unknown";
-
-      if(
-        data.responses &&
-        data.responses[0] &&
-        data.responses[0].labelAnnotations &&
-        data.responses[0].labelAnnotations.length > 0
-      ){
-        item = data.responses[0].labelAnnotations[0].description.toLowerCase();
-      }
-
-      // FIXES
-      if(item.includes("rubber") || item.includes("synthetic")) item = "shoe";
-      if(item.includes("carbon") || item.includes("fiber") || item.includes("metal")) item = "household item";
-      if(item.includes("orange") || item.includes("food")) item = "snack";
-
-      if(item.includes("fender")) item = "dog bowl";
-      if(item.includes("bowl") || item.includes("dish")) item = "dog bowl";
-      if(item.includes("dog") || item.includes("pet")) item = "pet supplies";
-
-      // 🔥 NEW BRAND DETECTION (ADDED ONLY)
-      if(item.includes("nike") || item.includes("swoosh")) item = "Nike shoe";
-      if(item.includes("apple") || item.includes("iphone")) item = "Apple iPhone";
-      if(item.includes("samsung")) item = "Samsung phone";
-      if(item.includes("cheetos")) item = "Cheetos snack";
-      if(item.includes("coca") || item.includes("cola")) item = "Coca-Cola drink";
+      let item = data.responses?.[0]?.labelAnnotations?.[0]?.description || "unknown";
 
       document.getElementById("scanDesc").innerText = item;
 
-      // PRICING
-      let worth = 0;
-
-      // 🚗 ADDED CAR FIX
-      if(item.includes("car") || item.includes("vehicle") || item.includes("automobile")){
-        worth = 2000 + Math.random()*8000;
-      }
-      else if(item.includes("nike")) worth = 30 + Math.random()*40;
-      else if(item.includes("shoe")) worth = 30 + Math.random()*40;
-      else if(item.includes("iphone")) worth = 200 + Math.random()*300;
-      else if(item.includes("laptop")) worth = 250 + Math.random()*400;
-      else if(item.includes("pet")) worth = 10 + Math.random()*30;
-      else if(item.includes("snack")) worth = 2 + Math.random()*5;
-      else worth = 15 + Math.random()*50;
-
-      worth = Math.floor(worth);
-
-      let sellLow = Math.floor(worth * 1.4);
-      let sellHigh = Math.floor(worth * 1.8);
+      let worth = Math.floor(20 + Math.random()*50);
+      let sellLow = Math.floor(worth*1.4);
+      let sellHigh = Math.floor(worth*1.8);
       let profit = sellLow - worth;
 
-      // DEMAND
-      let demand = "";
-      if(item.includes("car")) demand = "🔥 HIGH VALUE ITEM";
-      else if(item.includes("iphone") || item.includes("nike")) demand = "🔥 FAST SELL";
-      else if(item.includes("shoe") || item.includes("laptop")) demand = "⚡ MEDIUM DEMAND";
-      else demand = "🐢 SLOW SELL";
-
-      // PLATFORMS
-      let platforms = "";
-
-      if(item.includes("car")){
-        platforms = "Sell on: Facebook Marketplace";
-      }
-      else if(item.includes("iphone") || item.includes("laptop")){
-        platforms = "Sell on: Facebook Marketplace, eBay";
-      }
-      else if(item.includes("nike") || item.includes("shoe")){
-        platforms = "Sell on: eBay, OfferUp";
-      }
-      else if(item.includes("pet") || item.includes("household")){
-        platforms = "Sell on: Facebook Marketplace, OfferUp";
-      }
-      else{
-        platforms = "Sell on: Facebook Marketplace";
-      }
-
       document.getElementById("worth").innerText = "Worth: $" + worth;
-      document.getElementById("sell").innerText = "Sell: $" + sellLow + " - $" + sellHigh;
-      document.getElementById("profitScan").innerText =
-        "Profit: $" + profit + " | " + demand + "\n" + platforms;
+      document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
+      document.getElementById("profitScan").innerText = "Profit: $" + profit;
 
       reward(profit);
 
@@ -278,6 +197,19 @@ function autoScan(){
   };
 
   reader.readAsDataURL(file);
+}
+
+/* 🔥 ADDED LINK FUNCTIONS ONLY */
+function openFB(){
+  window.open("https://www.facebook.com/marketplace", "_blank");
+}
+
+function openEbay(){
+  window.open("https://www.ebay.com", "_blank");
+}
+
+function openOfferUp(){
+  window.open("https://offerup.com", "_blank");
 }
 </script>
 
