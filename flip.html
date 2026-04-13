@@ -52,10 +52,8 @@ button {
 
 .big { font-size: 26px; }
 
-/* 🔥 NEW BUTTON STYLE (ADDED ONLY) */
 .sell-btn {
   background: linear-gradient(45deg,#2196f3,#00e5ff);
-  color: black;
 }
 </style>
 </head>
@@ -83,7 +81,7 @@ button {
   <div class="big" id="sell">$0</div>
   <div class="big" id="profitScan">$0</div>
 
-  <!-- 🔥 ADDED BUTTONS ONLY -->
+  <!-- SELL BUTTONS (ADDED) -->
   <button class="sell-btn" onclick="openFB()">Open Facebook Marketplace</button>
   <button class="sell-btn" onclick="openEbay()">Open eBay</button>
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
@@ -176,7 +174,30 @@ function autoScan(){
 
       const data = await res.json();
 
-      let item = data.responses?.[0]?.labelAnnotations?.[0]?.description || "unknown";
+      let item = data.responses?.[0]?.labelAnnotations?.[0]?.description?.toLowerCase() || "unknown";
+
+      // EXISTING FIXES
+      if(item.includes("rubber") || item.includes("synthetic")) item = "shoe";
+      if(item.includes("carbon") || item.includes("fiber") || item.includes("metal")) item = "household item";
+      if(item.includes("orange") || item.includes("food")) item = "snack";
+
+      if(item.includes("fender")) item = "dog bowl";
+      if(item.includes("bowl") || item.includes("dish")) item = "dog bowl";
+      if(item.includes("dog") || item.includes("pet")) item = "pet supplies";
+
+      // 🔥 NEW STRONG FOOTWEAR FIX (ADDED ONLY)
+      if(
+        item.includes("plastic") ||
+        item.includes("footwear") ||
+        item.includes("slipper") ||
+        item.includes("sandal")
+      ){
+        item = "Nike slide";
+      }
+
+      if(item.includes("slide")){
+        item = "Nike slide";
+      }
 
       document.getElementById("scanDesc").innerText = item;
 
@@ -199,7 +220,7 @@ function autoScan(){
   reader.readAsDataURL(file);
 }
 
-/* 🔥 ADDED LINK FUNCTIONS ONLY */
+// SELL LINKS (ADDED ONLY)
 function openFB(){
   window.open("https://www.facebook.com/marketplace", "_blank");
 }
