@@ -66,11 +66,12 @@ button {
 
 <div class="container">
 
+<!-- SCANNER -->
 <div class="card">
   <h3>📷 AI Item Scan</h3>
 
   <input type="file" accept="image/*" capture="environment" id="camera" style="display:none;">
-  <img id="preview" width="100%" style="display:none;">
+  <img id="preview" width="100%" style="display:none; border-radius:10px;">
 
   <button onclick="scanItem()">Scan Item</button>
 
@@ -86,18 +87,41 @@ button {
   <button class="sell-btn" onclick="openFB()">Open Facebook Marketplace</button>
   <button class="sell-btn" onclick="openEbay()">Open eBay</button>
   <button class="sell-btn" onclick="openOfferUp()">Open OfferUp</button>
-
 </div>
 
+<!-- SMART SCANNER -->
 <div class="card">
   <h3>🧠 Smart Scanner</h3>
 
   <input id="item" placeholder="Type item">
+
+  <button onclick="scanText('new')">New</button>
+  <button onclick="scanText('used')">Used</button>
+  <button onclick="scanText('cracked')">Cracked</button>
+
+  <div id="scanTextResult"></div>
 </div>
 
+<!-- PROFIT CALCULATOR -->
+<div class="card">
+  <h3>💰 Profit Calculator</h3>
+
+  <input id="buy" type="number" placeholder="Buy Price">
+  <input id="sellInput" type="number" placeholder="Sell Price">
+
+  <button onclick="calc()">Check Profit</button>
+
+  <div class="big" id="profit">$0</div>
+</div>
+
+<!-- PROGRESS -->
 <div class="card">
   <h3>🏆 Progress</h3>
   <div id="points">Points: 0</div>
+</div>
+
+<div class="card">
+  <button onclick="window.location.href='index.html'">⬅ Back to Home</button>
 </div>
 
 </div>
@@ -105,11 +129,12 @@ button {
 <script>
 let points = 0;
 
-function reward(profit=0){
+function reward(p=0){
   points += 10;
   document.getElementById("points").innerText = "Points: " + points;
 }
 
+// FILE SCAN
 const cam = document.getElementById("camera");
 cam.addEventListener("change", autoScan);
 
@@ -121,6 +146,10 @@ function scanItem(){
 function autoScan(){
   const file = cam.files[0];
   if(!file) return;
+
+  const img = document.getElementById("preview");
+  img.style.display = "block";
+  img.src = URL.createObjectURL(file);
 
   const reader = new FileReader();
   reader.onloadend = () => processImage(reader.result);
@@ -146,22 +175,22 @@ function takePhoto(){
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
 
-  canvas.getContext("2d").drawImage(video, 0, 0);
-
+  canvas.getContext("2d").drawImage(video,0,0);
   const imgData = canvas.toDataURL("image/jpeg");
 
-  // stop camera
-  video.srcObject.getTracks().forEach(track => track.stop());
-  video.style.display = "none";
-  document.getElementById("snapBtn").style.display = "none";
+  video.srcObject.getTracks().forEach(t=>t.stop());
+  video.style.display="none";
+  document.getElementById("snapBtn").style.display="none";
+
+  document.getElementById("preview").src = imgData;
+  document.getElementById("preview").style.display = "block";
 
   processImage(imgData);
 }
 
-// 🔥 MAIN AI
+// AI
 async function processImage(base64Image){
-
-  document.getElementById("scanDesc").innerText = "🔍 scanning...";
+  document.getElementById("scanDesc").innerText="🔍 scanning...";
 
   const base64 = base64Image.split(',')[1];
 
@@ -171,12 +200,12 @@ async function processImage(base64Image){
       {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({
+        body:JSON.stringify({
           requests:[{
             image:{content:base64},
             features:[
-              {type:"LABEL_DETECTION", maxResults:5},
-              {type:"LOGO_DETECTION", maxResults:3}
+              {type:"LABEL_DETECTION",maxResults:5},
+              {type:"LOGO_DETECTION",maxResults:3}
             ]
           }]
         })
@@ -188,88 +217,65 @@ async function processImage(base64Image){
     let labels = data.responses?.[0]?.labelAnnotations || [];
     let logos = data.responses?.[0]?.logoAnnotations || [];
 
-    // 🔥 BETTER ITEM PICKING (NOT JUST FIRST)
-    let item = labels.map(l => l.description.toLowerCase()).join(" ");
+    let item = labels.map(l=>l.description.toLowerCase()).join(" ");
+    let brand = logos.length ? logos[0].description : "";
 
-    // 🔥 BRAND DETECTION
-    let brand = "";
+    if(!item) item="item";
 
-    if(logos.length){
-      brand = logos[0].description;
-    }
+    if(item.includes("shoe")||item.includes("sneaker")) item="shoe";
+    if(item.includes("chip")||item.includes("food")) item="snack";
 
-    if(item.includes("nike")) brand = "Nike";
-    if(item.includes("adidas")) brand = "Adidas";
-    if(item.includes("jordan")) brand = "Jordan";
-    if(item.includes("apple")) brand = "Apple";
+    if(brand) item = brand + " " + item;
 
-    // 🔥 FIX UNKNOWN
-    if(!item || item === "unknown"){
-      item = "item";
-    }
+    document.getElementById("scanDesc").innerText=item;
 
-    // 🔥 SMART CATEGORY FIX
-    if(item.includes("shoe") || item.includes("footwear") || item.includes("sneaker")){
-      item = "shoe";
-    }
+    let worth=0;
 
-    if(item.includes("chip") || item.includes("food") || item.includes("snack")){
-      item = "snack";
-    }
+    if(brand.toLowerCase().includes("nike")) worth=80+Math.random()*60;
+    else if(item.includes("shoe")) worth=40+Math.random()*40;
+    else if(item.includes("snack")) worth=2+Math.random()*5;
+    else worth=20+Math.random()*50;
 
-    // combine
-    if(brand){
-      item = brand + " " + item;
-    }
+    worth=Math.floor(worth);
 
-    document.getElementById("scanDesc").innerText = item;
+    let sellLow=Math.floor(worth*1.4);
+    let sellHigh=Math.floor(worth*1.8);
+    let profit=sellLow-worth;
 
-    // 🔥 REALISTIC PRICING
-    let worth = 0;
+    let status=profit>20?"🔥 GOOD FLIP":"❌ NOT WORTH SELLING";
 
-    if(brand === "Nike" || brand === "Jordan"){
-      worth = 80 + Math.random()*60;
-    }
-    else if(item.includes("shoe")){
-      worth = 40 + Math.random()*40;
-    }
-    else if(item.includes("snack")){
-      worth = 2 + Math.random()*5;
-    }
-    else{
-      worth = 20 + Math.random()*50;
-    }
-
-    worth = Math.floor(worth);
-
-    let sellLow = Math.floor(worth*1.4);
-    let sellHigh = Math.floor(worth*1.8);
-    let profit = sellLow - worth;
-
-    let status = profit > 20 ? "🔥 GOOD FLIP" : "❌ NOT WORTH SELLING";
-
-    document.getElementById("worth").innerText = "Worth: $" + worth;
-    document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
-    document.getElementById("profitScan").innerText =
-      "Profit: $" + profit + " | " + status;
+    document.getElementById("worth").innerText="Worth: $"+worth;
+    document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
+    document.getElementById("profitScan").innerText="Profit: $"+profit+" | "+status;
 
     reward(profit);
 
-  }catch(err){
-    document.getElementById("scanDesc").innerText = "Scan failed";
+  }catch{
+    document.getElementById("scanDesc").innerText="Scan failed";
   }
 }
 
+// SMART SCANNER
+function scanText(type){
+  let item=document.getElementById("item").value;
+  document.getElementById("scanTextResult").innerText=
+    item+" ("+type+") → Sell higher";
+}
+
+// PROFIT CALC
+function calc(){
+  let buy=parseFloat(document.getElementById("buy").value)||0;
+  let sell=parseFloat(document.getElementById("sellInput").value)||0;
+  let profit=sell-buy;
+
+  document.getElementById("profit").innerText="$"+profit;
+}
+
 // LINKS
-function openFB(){
-  window.open("https://www.facebook.com/marketplace","_blank");
-}
-function openEbay(){
-  window.open("https://www.ebay.com","_blank");
-}
-function openOfferUp(){
-  window.open("https://offerup.com","_blank");
-}
+function openFB(){window.open("https://www.facebook.com/marketplace","_blank");}
+function openEbay(){window.open("https://www.ebay.com","_blank");}
+function openOfferUp(){window.open("https://offerup.com","_blank");}
+
 </script>
 
 </body>
