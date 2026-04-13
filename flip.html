@@ -182,12 +182,11 @@ function takePhoto(){
 
 function getPriceRange(item, brand){
 
-  if(item.includes("snack")) return [2,6];
-  if(item.includes("water bottle")) return [2,10];
+  if(item==="snack") return [2,6];
+  if(item==="water bottle") return [2,10];
 
   if(brand==="Jordan") return [140,200];
   if(brand==="Nike") return [100,160];
-  if(brand==="Adidas") return [90,140];
 
   if(item==="shoe") return [80,150];
   if(item==="slide") return [25,60];
@@ -203,75 +202,75 @@ function getPriceRange(item, brand){
   if(item==="dryer") return [200,600];
   if(item==="stove") return [300,900];
 
-  if(item==="cable" || item==="wire") return [5,30];
+  if(item==="cable") return [5,30];
   if(item==="charger") return [10,40];
-  if(item==="extension cord") return [10,50];
   if(item==="headphones") return [20,200];
-  if(item==="router") return [30,150];
 
   if(item==="car") return [3000,10000];
-  if(item==="truck") return [5000,15000];
 
   return [20,40];
 }
 
 async function processImage(base64Image){
-  document.getElementById("scanDesc").innerText="🔍 scanning...";
 
   const base64 = base64Image.split(',')[1];
 
-  try{
-    const res = await fetch(
-      "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",
-      {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          requests:[{
-            image:{content:base64},
-            features:[
-              {type:"LABEL_DETECTION",maxResults:5},
-              {type:"LOGO_DETECTION",maxResults:3}
-            ]
-          }]
-        })
-      }
-    );
+  const res = await fetch(
+    "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        requests:[{
+          image:{content:base64},
+          features:[
+            {type:"LABEL_DETECTION",maxResults:5},
+            {type:"LOGO_DETECTION",maxResults:3}
+          ]
+        }]
+      })
+    }
+  );
 
-    const data = await res.json();
+  const data = await res.json();
 
-    let labels = data.responses?.[0]?.labelAnnotations || [];
-    let logos = data.responses?.[0]?.logoAnnotations || [];
+  let labels = data.responses?.[0]?.labelAnnotations || [];
+  let logos = data.responses?.[0]?.logoAnnotations || [];
 
-    let text = labels.map(l=>l.description.toLowerCase()).join(" ");
-    let brand = logos.length ? logos[0].description : "";
+  let text = labels.map(l=>l.description.toLowerCase()).join(" ");
+  let brand = logos.length ? logos[0].description : "";
 
-    if(text.includes("wire") || text.includes("cable")) text="cable";
-    else if(text.includes("charger")) text="charger";
-    else if(text.includes("extension cord")) text="extension cord";
-    else if(text.includes("headphone")) text="headphones";
-    else if(text.includes("router") || text.includes("modem")) text="router";
+  let displayText = text;
+  let itemType = "unknown";
 
-    if(text.includes("nike")) brand="Nike";
-    if(text.includes("jordan")) brand="Jordan";
+  if(text.includes("computer") || text.includes("monitor") || text.includes("display")) itemType="computer";
+  else if(text.includes("tv")) itemType="tv";
+  else if(text.includes("stove") || text.includes("oven")) itemType="stove";
+  else if(text.includes("washer")) itemType="washer";
+  else if(text.includes("dryer")) itemType="dryer";
+  else if(text.includes("couch") || text.includes("sofa")) itemType="couch";
+  else if(text.includes("table") || text.includes("desk")) itemType="table";
+  else if(text.includes("lamp")) itemType="lamp";
+  else if(text.includes("slide")) itemType="slide";
+  else if(text.includes("shoe") || text.includes("sneaker")) itemType="shoe";
+  else if(text.includes("cable") || text.includes("wire")) itemType="cable";
+  else if(text.includes("charger")) itemType="charger";
+  else if(text.includes("headphone")) itemType="headphones";
+  else if(text.includes("car")) itemType="car";
 
-    let [low, high] = getPriceRange(text, brand);
+  let [low, high] = getPriceRange(itemType, brand);
 
-    let worth = Math.floor((low+high)/2);
-    let sellLow = Math.floor(high);
-    let sellHigh = Math.floor(high*1.3);
-    let profit = sellLow - worth;
+  let worth = Math.floor((low+high)/2);
+  let sellLow = Math.floor(high);
+  let sellHigh = Math.floor(high*1.3);
+  let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = brand ? brand+" "+text : text;
-    document.getElementById("worth").innerText="Worth: $"+worth;
-    document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
-    document.getElementById("profitScan").innerText="Profit: $"+profit;
+  document.getElementById("scanDesc").innerText = brand ? brand+" "+displayText : displayText;
+  document.getElementById("worth").innerText="Worth: $"+worth;
+  document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
+  document.getElementById("profitScan").innerText="Profit: $"+profit;
 
-    reward(profit);
-
-  }catch{
-    document.getElementById("scanDesc").innerText="Scan failed";
-  }
+  reward(profit);
 }
 </script>
 
