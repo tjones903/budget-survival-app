@@ -216,7 +216,7 @@ function getPriceRange(item, brand){
   return [20,40];
 }
 
-// 🔥 AI SCANNER
+// 🔥 AI SCANNER (FULL DETECTION)
 async function processImage(base64Image){
 
   const base64 = base64Image.split(',')[1];
@@ -230,7 +230,8 @@ async function processImage(base64Image){
         requests:[{
           image:{content:base64},
           features:[
-            {type:"LABEL_DETECTION",maxResults:5}
+            {type:"LABEL_DETECTION",maxResults:8},
+            {type:"LOGO_DETECTION",maxResults:3}
           ]
         }]
       })
@@ -239,28 +240,36 @@ async function processImage(base64Image){
     const data = await res.json();
 
     let labels = data.responses?.[0]?.labelAnnotations || [];
-    let text = labels.map(l=>l.description.toLowerCase()).join(" ");
+    let logos = data.responses?.[0]?.logoAnnotations || [];
 
-    if(!text){
+    let text = labels.map(l=>l.description.toLowerCase()).join(" ");
+    let brand = logos.length ? logos[0].description : "";
+
+    let itemType = "unknown";
+
+    if(text.includes("computer") || text.includes("monitor") || text.includes("display")) itemType="computer";
+    else if(text.includes("tv")) itemType="tv";
+    else if(text.includes("couch")) itemType="couch";
+    else if(text.includes("shoe") || text.includes("sneaker")) itemType="shoe";
+    else if(text.includes("fridge")) itemType="fridge";
+    else if(text.includes("table")) itemType="table";
+
+    if(itemType==="unknown"){
       document.getElementById("scanDesc").innerText =
         "Could not detect — type in Smart Scanner";
       return;
     }
 
-    let itemType = "unknown";
-
-    if(text.includes("shoe")) itemType="shoe";
-    else if(text.includes("tv")) itemType="tv";
-    else if(text.includes("couch")) itemType="couch";
-
-    let [low, high] = getPriceRange(itemType);
+    let [low, high] = getPriceRange(itemType, brand);
 
     let worth = Math.floor((low+high)/2);
     let sellLow = high;
     let sellHigh = Math.floor(high*1.3);
     let profit = sellLow - worth;
 
-    document.getElementById("scanDesc").innerText = text;
+    document.getElementById("scanDesc").innerText =
+      (brand ? brand + " " : "") + text;
+
     document.getElementById("worth").innerText = "Worth: $" + worth;
     document.getElementById("sell").innerText = "Sell: $" + sellLow + "-" + sellHigh;
     document.getElementById("profitScan").innerText = "Profit: $" + profit;
@@ -271,7 +280,7 @@ async function processImage(base64Image){
   }
 }
 
-// 🔥 SMART SCANNER (FULL PRICE SYSTEM RESTORED)
+// 🔥 SMART SCANNER (FULL SYSTEM)
 function scanText(type){
 
   let text = document.getElementById("item").value.toLowerCase();
@@ -280,7 +289,12 @@ function scanText(type){
   if(text.includes("nike")) brand="Nike";
   if(text.includes("jordan")) brand="Jordan";
 
-  let itemType = "shoe"; // ensures jordans work
+  let itemType = "unknown";
+
+  if(text.includes("computer")) itemType="computer";
+  else if(text.includes("tv")) itemType="tv";
+  else if(text.includes("couch")) itemType="couch";
+  else if(text.includes("shoe") || text.includes("jordan")) itemType="shoe";
 
   let [low, high] = getPriceRange(itemType, brand);
 
@@ -300,12 +314,11 @@ function scanText(type){
 
 // 🔥 PROFIT CALCULATOR
 function calc(){
-
   let buy = parseFloat(document.getElementById("buy").value);
   let sell = parseFloat(document.getElementById("sellInput").value);
 
   if(isNaN(buy)||isNaN(sell)){
-    document.getElementById("profit").innerText = "Enter values";
+    document.getElementById("profit").innerText="Enter values";
     return;
   }
 
@@ -313,7 +326,7 @@ function calc(){
 
   let status = "GOOD";
   if(profit < 0) status = "BAD DEAL";
-  if(profit > 50) status = "GREAT FLIP";
+  else if(profit > 50) status = "GREAT FLIP";
 
   document.getElementById("profit").innerText =
     "$"+profit+" | "+status;
