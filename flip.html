@@ -124,7 +124,7 @@ processImage(reader.result);
 reader.readAsDataURL(file);
 });
 
-// PRICE SYSTEM
+// PRICE SYSTEM (UNCHANGED)
 function getPriceRange(item,brand){
 
 if(item==="house") return [80000,400000];
@@ -157,44 +157,62 @@ if(item==="headphones") return [20,200];
 
 if(item==="car") return [3000,10000];
 
-return [20,40];
+return null; // 🔥 STOP $30 FALLBACK
 }
 
-// SMART SCANNER (FULL)
+// 🔥 MASTER DETECTION (USED EVERYWHERE)
+function detectItem(text){
+
+if(text.includes("house")) return "house";
+if(text.includes("fridge")) return "fridge";
+if(text.includes("air fryer")) return "air fryer";
+if(text.includes("clock")) return "clock";
+if(text.includes("perfume")||text.includes("cologne")) return "perfume";
+if(text.includes("shirt")||text.includes("hoodie")||text.includes("jacket")) return "clothes";
+
+if(text.includes("computer")||text.includes("monitor")||text.includes("laptop")) return "computer";
+if(text.includes("tv")) return "tv";
+
+if(text.includes("stove")||text.includes("oven")) return "stove";
+if(text.includes("washer")) return "washer";
+if(text.includes("dryer")) return "dryer";
+
+if(text.includes("couch")||text.includes("sofa")) return "couch";
+if(text.includes("table")||text.includes("desk")||text.includes("chair")) return "table";
+if(text.includes("lamp")) return "lamp";
+
+if(text.includes("shoe")||text.includes("sneaker")||text.includes("jordan")) return "shoe";
+if(text.includes("slide")) return "slide";
+
+if(text.includes("cable")||text.includes("wire")) return "cable";
+if(text.includes("charger")) return "charger";
+if(text.includes("headphone")) return "headphones";
+
+if(text.includes("car")) return "car";
+if(text.includes("kennel")||text.includes("cage")) return "couch";
+
+return "unknown";
+}
+
+// SMART SCANNER (UNCHANGED STRUCTURE)
 function scanText(type){
 
 let text=document.getElementById("item").value.toLowerCase();
-if(!text){
-document.getElementById("scanTextResult").innerText="Type item";
-return;
-}
 
 let brand="";
 if(text.includes("nike")) brand="Nike";
 if(text.includes("jordan")) brand="Jordan";
 
-let item="unknown";
+let item=detectItem(text);
 
-if(text.includes("house")) item="house";
-else if(text.includes("fridge")) item="fridge";
-else if(text.includes("air fryer")) item="air fryer";
-else if(text.includes("clock")) item="clock";
-else if(text.includes("perfume")) item="perfume";
+let range=getPriceRange(item,brand);
 
-else if(text.includes("computer")||text.includes("monitor")) item="computer";
-else if(text.includes("tv")) item="tv";
-else if(text.includes("stove")) item="stove";
-else if(text.includes("washer")) item="washer";
-else if(text.includes("dryer")) item="dryer";
+if(!range){
+document.getElementById("scanTextResult").innerText="Item not detected — use AI scanner";
+return;
+}
 
-else if(text.includes("couch")) item="couch";
-else if(text.includes("table")) item="table";
-else if(text.includes("lamp")) item="lamp";
-
-else if(text.includes("shoe")||text.includes("jordan")) item="shoe";
-else if(text.includes("car")) item="car";
-
-let [low,high]=getPriceRange(item,brand);
+let [low,high]=range;
 
 if(type==="used"){low*=0.8;high*=0.8;}
 if(type==="cracked"){low*=0.5;high*=0.5;}
@@ -214,7 +232,7 @@ text+" ("+type+")\nWorth: $"+worth+
 "\nProfit: $"+profit+" | "+status;
 }
 
-// CALCULATOR
+// CALCULATOR (UNCHANGED)
 function calc(){
 
 let buy=parseFloat(document.getElementById("buy").value);
@@ -235,7 +253,7 @@ else if(profit>50) status="🔥 GREAT FLIP";
 document.getElementById("profit").innerText="$"+profit+" | "+status;
 }
 
-// AI SCANNER (FIXED DETECTION)
+// AI SCANNER (NOW MATCHES SMART)
 async function processImage(base64Image){
 
 const base64=base64Image.split(',')[1];
@@ -251,18 +269,16 @@ requests:[{image:{content:base64},features:[{type:"LABEL_DETECTION"}]}]
 const data=await res.json();
 let text=data.responses[0].labelAnnotations.map(l=>l.description.toLowerCase()).join(" ");
 
-let item="unknown";
+let item=detectItem(text);
 
-if(text.includes("chair")) item="table";
-else if(text.includes("cage")||text.includes("kennel")) item="couch";
-else if(text.includes("computer")) item="computer";
-else if(text.includes("tv")) item="tv";
-else if(text.includes("washer")) item="washer";
-else if(text.includes("dryer")) item="dryer";
-else if(text.includes("stove")) item="stove";
-else if(text.includes("car")) item="car";
+let range=getPriceRange(item);
 
-let [low,high]=getPriceRange(item);
+if(!range){
+document.getElementById("scanDesc").innerText="Could not detect — type in Smart Scanner";
+return;
+}
+
+let [low,high]=range;
 
 let worth=Math.floor((low+high)/2);
 let sellLow=high;
@@ -273,7 +289,6 @@ document.getElementById("scanDesc").innerText=text;
 document.getElementById("worth").innerText="Worth: $"+worth;
 document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
 document.getElementById("profitScan").innerText="Profit: $"+profit;
-
 }
 
 </script>
