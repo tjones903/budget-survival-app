@@ -3,273 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Flip It</title>
-
-<link rel="icon" href="icon.png">
+<title>Budget Survival</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: system-ui;
-  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
-  color: white;
+body{
+margin:0;
+font-family:system-ui;
+background:radial-gradient(circle at top,#0f2027,#0f0f0f);
+color:white;
+text-align:center;
 }
 
-.nav {
-  display: flex;
-  justify-content: space-around;
-  background: rgba(0,0,0,0.5);
-  padding: 12px;
+.header{
+padding:20px;
+font-size:26px;
+text-shadow:0 0 12px #00e676;
 }
 
-.nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
+.nav{
+display:flex;
+justify-content:space-around;
+background:rgba(0,0,0,0.6);
+padding:12px;
 }
 
-.container {
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
+.nav a{
+color:white;
+text-decoration:none;
+font-weight:bold;
 }
 
-.card {
-  background: rgba(30,30,30,0.6);
-  padding: 20px;
-  border-radius: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 0 15px rgba(0,255,200,0.25);
+.card{
+background:rgba(30,30,30,0.7);
+padding:20px;
+border-radius:15px;
+margin:15px auto;
+max-width:400px;
+box-shadow:0 0 15px rgba(0,255,200,0.2);
 }
 
-button {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  margin-top: 10px;
-  font-weight: bold;
-  background: linear-gradient(45deg,#00e676,#00c853);
-  color: black;
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:none;
 }
 
-.sell-btn {
-  background: linear-gradient(45deg,#2196f3,#00e5ff);
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border-radius:10px;
+border:none;
+font-weight:bold;
+background:linear-gradient(45deg,#00e676,#00c853);
 }
 
-.big { font-size: 24px; }
+.result{
+margin-top:10px;
+white-space:pre-line;
+}
+
+.history{
+text-align:left;
+font-size:14px;
+}
+
 </style>
 </head>
 
 <body>
 
+<div class="header">💰 Budget Survival</div>
+
 <div class="nav">
-  <a href="index.html">Home</a>
-  <a href="tips.html">Tips</a>
-  <a href="about.html">About</a>
+<a href="index.html">Home</a>
+<a href="tips.html">Tips</a>
+<a href="about.html">About</a>
 </div>
 
-<div class="container">
-
-<!-- AI SCANNER -->
+<!-- CALCULATOR -->
 <div class="card">
-<h3>📷 AI Item Scan</h3>
 
-<input type="file" id="camera" accept="image/*">
-<img id="preview" width="100%" style="display:none">
+<input id="income" placeholder="Income">
+<input id="expenses" placeholder="Expenses">
+<input id="days" placeholder="Days Left">
 
-<button onclick="scanItem()">Scan Item</button>
+<button onclick="calcBudget()">Calculate</button>
 
-<div id="scanDesc"></div>
-<div class="big" id="worth">$0</div>
-<div class="big" id="sell">$0</div>
-<div class="big" id="profitScan">$0</div>
+<div id="output" class="result"></div>
 
-<!-- 🔥 RESTORED SELL BUTTONS -->
-<button class="sell-btn" onclick="window.open('https://www.facebook.com/marketplace')">
-Facebook Marketplace
-</button>
-
-<button class="sell-btn" onclick="window.open('https://www.ebay.com')">
-eBay
-</button>
-
-<button class="sell-btn" onclick="window.open('https://offerup.com')">
-OfferUp
-</button>
+<button onclick="location.href='flip.html'">💸 Make Money</button>
+<button onclick="location.href='lifemode.html'">🧠 Life Mode</button>
+<button onclick="share()">📤 Share App</button>
 
 </div>
 
-<!-- SMART SCANNER -->
+<!-- HISTORY -->
+<div class="card history">
+<h3>📊 Budget History</h3>
+<ul id="history"></ul>
+</div>
+
+<!-- TOTAL -->
 <div class="card">
-<h3>🧠 Smart Scanner</h3>
-
-<input id="item" placeholder="Type item">
-
-<button onclick="scanText('new')">New</button>
-<button onclick="scanText('used')">Used</button>
-<button onclick="scanText('cracked')">Cracked</button>
-
-<div id="scanTextResult"></div>
-</div>
-
-<!-- PROFIT -->
-<div class="card">
-<h3>💰 Profit Calculator</h3>
-
-<input id="buy" type="number" placeholder="Buy Price">
-<input id="sellInput" type="number" placeholder="Sell Price">
-
-<button onclick="calc()">Check Profit</button>
-
-<div class="big" id="profit">$0</div>
-</div>
-
+<h3>💰 Total Money Made</h3>
+<div id="total">$0</div>
 </div>
 
 <script>
 
-// FILE
-function scanItem(){
-document.getElementById("camera").click();
+let historyList = JSON.parse(localStorage.getItem("history")) || [];
+let total = parseInt(localStorage.getItem("total")) || 0;
+
+function calcBudget(){
+
+let income=parseFloat(document.getElementById("income").value);
+let expenses=parseFloat(document.getElementById("expenses").value);
+let days=parseFloat(document.getElementById("days").value);
+
+let left=income-expenses;
+let daily=left/days;
+
+let status="🟢 Good";
+let msg="You are in control.";
+
+if(left<0){
+status="🔴 Risk";
+msg="You are at risk.\nMake money ASAP";
+}
+else if(daily<20){
+status="🟡 Careful";
+msg="Be careful.\nEarn extra income";
 }
 
-document.getElementById("camera").addEventListener("change",function(){
-const file=this.files[0];
-if(!file)return;
+document.getElementById("output").innerText=
+"Money Left: $"+left+
+"\nDaily Budget: $"+daily.toFixed(2)+
+"\n"+status+
+"\n"+msg+
+"\nDays Left: "+days;
 
-const reader=new FileReader();
-reader.onload=()=>{
-document.getElementById("preview").style.display="block";
-document.getElementById("preview").src=reader.result;
-processImage(reader.result);
-};
-reader.readAsDataURL(file);
+historyList.push("Left $"+left+" Daily $"+daily.toFixed(2));
+localStorage.setItem("history",JSON.stringify(historyList));
+
+render();
+}
+
+function render(){
+
+let list=document.getElementById("history");
+list.innerHTML="";
+historyList.slice(-5).forEach(h=>{
+let li=document.createElement("li");
+li.innerText=h;
+list.appendChild(li);
 });
 
-// PRICE SYSTEM (UNCHANGED)
-function getPriceRange(item,brand){
-
-if(item==="house") return [80000,400000];
-if(item==="fridge") return [300,1500];
-if(item==="air fryer") return [40,150];
-if(item==="clock") return [15,150];
-if(item==="perfume"||item==="cologne") return [40,200];
-if(item==="clothes") return [10,150];
-
-if(brand==="Jordan") return [140,200];
-if(brand==="Nike") return [100,160];
-
-if(item==="shoe") return [80,150];
-if(item==="slide") return [25,60];
-
-if(item==="couch") return [250,500];
-if(item==="table") return [120,220];
-if(item==="lamp") return [30,120];
-
-if(item==="tv") return [300,1200];
-if(item==="computer") return [300,1200];
-
-if(item==="washer") return [200,600];
-if(item==="dryer") return [200,600];
-if(item==="stove") return [300,900];
-
-if(item==="cable") return [5,30];
-if(item==="charger") return [10,40];
-if(item==="headphones") return [20,200];
-
-if(item==="car") return [3000,10000];
-
-return [20,40];
+document.getElementById("total").innerText="$"+total;
 }
 
-// DETECTION
-function detectItem(text){
-
-if(text.includes("fridge")) return "fridge";
-if(text.includes("tv")) return "tv";
-if(text.includes("computer")) return "computer";
-if(text.includes("shoe")) return "shoe";
-if(text.includes("couch")) return "couch";
-if(text.includes("table")||text.includes("chair")) return "table";
-if(text.includes("washer")) return "washer";
-if(text.includes("dryer")) return "dryer";
-if(text.includes("stove")) return "stove";
-if(text.includes("car")) return "car";
-if(text.includes("cable")) return "cable";
-if(text.includes("charger")) return "charger";
-if(text.includes("headphone")) return "headphones";
-
-return "unknown";
+function share(){
+alert("Share your app link!");
 }
 
-// SMART
-function scanText(type){
-
-let text=document.getElementById("item").value.toLowerCase();
-
-let brand="";
-if(text.includes("nike")) brand="Nike";
-if(text.includes("jordan")) brand="Jordan";
-
-let item=detectItem(text);
-
-let [low,high]=getPriceRange(item,brand);
-
-if(type==="used"){low*=0.8;high*=0.8;}
-if(type==="cracked"){low*=0.5;high*=0.5;}
-
-let worth=Math.floor((low+high)/2);
-let sellLow=high;
-let sellHigh=Math.floor(high*1.3);
-let profit=sellLow-worth;
-
-document.getElementById("scanTextResult").innerText=
-text+"\nWorth: $"+worth+
-"\nSell: $"+sellLow+"-"+sellHigh+
-"\nProfit: $"+profit;
-}
-
-// CALC
-function calc(){
-let buy=parseFloat(document.getElementById("buy").value);
-let sell=parseFloat(document.getElementById("sellInput").value);
-
-let profit=sell-buy;
-
-document.getElementById("profit").innerText="$"+profit;
-}
-
-// AI
-async function processImage(base64Image){
-
-const base64=base64Image.split(',')[1];
-
-const res=await fetch("https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-requests:[{image:{content:base64},features:[{type:"LABEL_DETECTION"}]}]
-})
-});
-
-const data=await res.json();
-let text=data.responses[0].labelAnnotations.map(l=>l.description.toLowerCase()).join(" ");
-
-let item=detectItem(text);
-
-let [low,high]=getPriceRange(item);
-
-let worth=Math.floor((low+high)/2);
-let sellLow=high;
-let sellHigh=Math.floor(high*1.3);
-let profit=sellLow-worth;
-
-document.getElementById("scanDesc").innerText=text;
-document.getElementById("worth").innerText="Worth: $"+worth;
-document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
-document.getElementById("profitScan").innerText="Profit: $"+profit;
-}
+render();
 
 </script>
 
