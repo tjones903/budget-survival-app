@@ -16,14 +16,12 @@ color:white;
 text-align:center;
 }
 
-/* HEADER */
 .header{
 padding:20px;
 font-size:26px;
 text-shadow:0 0 12px #00e676;
 }
 
-/* NAV */
 .nav{
 display:flex;
 justify-content:space-around;
@@ -37,7 +35,6 @@ text-decoration:none;
 font-weight:bold;
 }
 
-/* CARD */
 .card{
 background:rgba(30,30,30,0.7);
 padding:20px;
@@ -52,7 +49,6 @@ transition:0.3s;
 box-shadow:0 0 25px rgba(0,255,200,0.4);
 }
 
-/* INPUT */
 input{
 width:100%;
 padding:12px;
@@ -61,7 +57,6 @@ border-radius:10px;
 border:none;
 }
 
-/* BUTTON */
 button{
 width:100%;
 padding:12px;
@@ -72,19 +67,16 @@ font-weight:bold;
 background:linear-gradient(45deg,#00e676,#00c853);
 }
 
-/* OUTPUT */
 .result{
 margin-top:10px;
 white-space:pre-line;
 font-weight:bold;
 }
 
-/* HISTORY */
 .history{
 text-align:left;
 font-size:14px;
 }
-
 </style>
 </head>
 
@@ -98,7 +90,6 @@ font-size:14px;
 <a href="about.html">About</a>
 </div>
 
-<!-- CALCULATOR -->
 <div class="card">
 
 <input id="income" placeholder="Income">
@@ -115,13 +106,11 @@ font-size:14px;
 
 </div>
 
-<!-- HISTORY -->
 <div class="card history">
 <h3>📊 Budget History</h3>
 <ul id="history"></ul>
 </div>
 
-<!-- TOTAL -->
 <div class="card">
 <h3>💰 Total Money Made</h3>
 <div id="total">$0</div>
@@ -132,7 +121,6 @@ font-size:14px;
 let historyList = JSON.parse(localStorage.getItem("history")) || [];
 let total = parseInt(localStorage.getItem("total")) || 0;
 
-// 🔥 FIXED COLOR SYSTEM
 function calcBudget(){
 
 let income=parseFloat(document.getElementById("income").value);
@@ -147,32 +135,30 @@ return;
 let left=income-expenses;
 let daily=left/days;
 
-let color="lime";
-let status="🟢 Good";
+let statusHTML="";
 let msg="You are in control.";
 
+// 🔥 COLOR WORDS ONLY
 if(left < 0){
-color="red";
-status="🔴 Risk";
+statusHTML = "<span style='color:red;'>🔴 Risk</span>";
 msg="You are at risk.\nMake money ASAP";
 }
 else if(daily < 20){
-color="yellow";
-status="🟡 Careful";
+statusHTML = "<span style='color:yellow;'>🟡 Careful</span>";
 msg="Be careful.\nEarn extra income";
+}
+else{
+statusHTML = "<span style='color:lime;'>🟢 Good</span>";
 }
 
 let output=document.getElementById("output");
 
-output.innerText=
+output.innerHTML =
 "Money Left: $"+left+
-"\nDaily Budget: $"+daily.toFixed(2)+
-"\n"+status+
-"\n"+msg+
-"\nDays Left: "+days;
-
-// 🔥 COLOR APPLY
-output.style.color=color;
+"<br>Daily Budget: $"+daily.toFixed(2)+
+"<br>"+statusHTML+
+"<br>"+msg+
+"<br>Days Left: "+days;
 
 // SAVE HISTORY
 historyList.push("Left $"+left+" Daily $"+daily.toFixed(2));
