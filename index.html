@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Budget Survival</title>
 
+<link rel="icon" href="icon.png">
+
 <style>
 body{
 margin:0;
@@ -14,12 +16,14 @@ color:white;
 text-align:center;
 }
 
+/* HEADER */
 .header{
 padding:20px;
 font-size:26px;
 text-shadow:0 0 12px #00e676;
 }
 
+/* NAV */
 .nav{
 display:flex;
 justify-content:space-around;
@@ -33,6 +37,7 @@ text-decoration:none;
 font-weight:bold;
 }
 
+/* CARD */
 .card{
 background:rgba(30,30,30,0.7);
 padding:20px;
@@ -40,8 +45,14 @@ border-radius:15px;
 margin:15px auto;
 max-width:400px;
 box-shadow:0 0 15px rgba(0,255,200,0.2);
+transition:0.3s;
 }
 
+.card:hover{
+box-shadow:0 0 25px rgba(0,255,200,0.4);
+}
+
+/* INPUT */
 input{
 width:100%;
 padding:12px;
@@ -50,6 +61,7 @@ border-radius:10px;
 border:none;
 }
 
+/* BUTTON */
 button{
 width:100%;
 padding:12px;
@@ -60,11 +72,14 @@ font-weight:bold;
 background:linear-gradient(45deg,#00e676,#00c853);
 }
 
+/* OUTPUT */
 .result{
 margin-top:10px;
 white-space:pre-line;
+font-weight:bold;
 }
 
+/* HISTORY */
 .history{
 text-align:left;
 font-size:14px;
@@ -117,34 +132,49 @@ font-size:14px;
 let historyList = JSON.parse(localStorage.getItem("history")) || [];
 let total = parseInt(localStorage.getItem("total")) || 0;
 
+// 🔥 FIXED COLOR SYSTEM
 function calcBudget(){
 
 let income=parseFloat(document.getElementById("income").value);
 let expenses=parseFloat(document.getElementById("expenses").value);
 let days=parseFloat(document.getElementById("days").value);
 
+if(isNaN(income)||isNaN(expenses)||isNaN(days)){
+document.getElementById("output").innerText="Enter all values";
+return;
+}
+
 let left=income-expenses;
 let daily=left/days;
 
+let color="lime";
 let status="🟢 Good";
 let msg="You are in control.";
 
-if(left<0){
+if(left < 0){
+color="red";
 status="🔴 Risk";
 msg="You are at risk.\nMake money ASAP";
 }
-else if(daily<20){
+else if(daily < 20){
+color="yellow";
 status="🟡 Careful";
 msg="Be careful.\nEarn extra income";
 }
 
-document.getElementById("output").innerText=
+let output=document.getElementById("output");
+
+output.innerText=
 "Money Left: $"+left+
 "\nDaily Budget: $"+daily.toFixed(2)+
 "\n"+status+
 "\n"+msg+
 "\nDays Left: "+days;
 
+// 🔥 COLOR APPLY
+output.style.color=color;
+
+// SAVE HISTORY
 historyList.push("Left $"+left+" Daily $"+daily.toFixed(2));
 localStorage.setItem("history",JSON.stringify(historyList));
 
@@ -155,6 +185,7 @@ function render(){
 
 let list=document.getElementById("history");
 list.innerHTML="";
+
 historyList.slice(-5).forEach(h=>{
 let li=document.createElement("li");
 li.innerText=h;
