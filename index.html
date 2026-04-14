@@ -64,7 +64,6 @@ font-weight:bold;
 
 <div class="container">
 
-<!-- AI -->
 <div class="card">
 <h3>📷 AI Item Scan</h3>
 
@@ -79,7 +78,6 @@ font-weight:bold;
 <div class="big" id="profitScan">$0</div>
 </div>
 
-<!-- SMART -->
 <div class="card">
 <h3>🧠 Smart Scanner</h3>
 
@@ -92,7 +90,6 @@ font-weight:bold;
 <div id="scanTextResult"></div>
 </div>
 
-<!-- PROFIT -->
 <div class="card">
 <h3>💰 Profit Calculator</h3>
 
@@ -112,7 +109,6 @@ font-weight:bold;
 
 <script>
 
-// FILE
 function scanItem(){
 document.getElementById("camera").click();
 }
@@ -130,7 +126,6 @@ processImage(reader.result);
 reader.readAsDataURL(file);
 });
 
-// PRICE SYSTEM (UNCHANGED)
 function getPriceRange(item,brand){
 
 if(item==="house") return [80000,400000];
@@ -166,7 +161,7 @@ if(item==="car") return [3000,10000];
 return [20,40];
 }
 
-// 🔥 ONE DETECTION SYSTEM (NEW — USED EVERYWHERE)
+/* 🔥 FINAL DETECTION FIX */
 function detectItem(text){
 
 if(text.includes("house")) return "house";
@@ -200,7 +195,6 @@ if(text.includes("kennel")||text.includes("cage")) return "couch";
 return "unknown";
 }
 
-// SMART SCANNER (ONLY DETECTION FIXED — NOTHING ELSE TOUCHED)
 function scanText(type){
 
 let text=document.getElementById("item").value.toLowerCase();
@@ -240,7 +234,6 @@ text+" ("+type+")\nWorth: $"+worth+
 "\nProfit: $"+profit+" | "+status;
 }
 
-// PROFIT CALCULATOR (UNCHANGED)
 function calc(){
 
 let buy=parseFloat(document.getElementById("buy").value);
@@ -261,7 +254,6 @@ else if(profit>50) status="🔥 GREAT FLIP";
 document.getElementById("profit").innerText="$"+profit+" | "+status;
 }
 
-// AI SCANNER (NOW USES SAME DETECTION)
 async function processImage(base64Image){
 
 const base64=base64Image.split(',')[1];
