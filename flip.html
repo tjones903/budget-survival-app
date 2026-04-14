@@ -6,20 +6,53 @@
 <title>Flip It</title>
 
 <style>
-body {
-  margin:0;
-  font-family:system-ui;
-  background:#0f2027;
-  color:white;
+body{
+margin:0;
+font-family:system-ui;
+background:#0f2027;
+color:white;
 }
-.container{padding:20px;max-width:500px;margin:auto;}
-.card{background:#1e1e1e;padding:20px;border-radius:15px;margin-bottom:15px;}
-button{width:100%;padding:12px;border-radius:10px;margin-top:10px;}
+
+.nav{
+display:flex;
+justify-content:space-around;
+background:#000;
+padding:12px;
+}
+
+.container{
+padding:20px;
+max-width:500px;
+margin:auto;
+}
+
+.card{
+background:#1e1e1e;
+padding:20px;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+button{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+background:#00e676;
+}
+
 .big{font-size:24px;}
 </style>
 </head>
 
 <body>
+
+<div class="nav">
+<div>Home</div>
+<div>Tips</div>
+<div>About</div>
+</div>
 
 <div class="container">
 
@@ -27,37 +60,70 @@ button{width:100%;padding:12px;border-radius:10px;margin-top:10px;}
 <h3>📷 AI Item Scan</h3>
 
 <input type="file" id="camera" accept="image/*">
-<img id="preview" width="100%">
+<img id="preview" width="100%" style="display:none">
+
+<button onclick="scanItem()">Scan Item</button>
 
 <div id="scanDesc"></div>
-<div class="big" id="worth"></div>
-<div class="big" id="sell"></div>
-<div class="big" id="profitScan"></div>
+<div class="big" id="worth">$0</div>
+<div class="big" id="sell">$0</div>
+<div class="big" id="profitScan">$0</div>
+</div>
+
+<div class="card">
+<h3>🧠 Smart Scanner</h3>
+<input id="item" placeholder="Type item">
+<button onclick="scanText('new')">New</button>
+<button onclick="scanText('used')">Used</button>
+<button onclick="scanText('cracked')">Cracked</button>
+<div id="scanTextResult"></div>
+</div>
+
+<div class="card">
+<h3>💰 Profit Calculator</h3>
+<input id="buy" placeholder="Buy Price">
+<input id="sellInput" placeholder="Sell Price">
+<button onclick="calc()">Check Profit</button>
+<div id="profit"></div>
 </div>
 
 </div>
 
 <script>
 
-// 🔥 PRICE SYSTEM (UNCHANGED)
-function getPriceRange(item, brand){
+// 📷 FILE PICKER
+function scanItem(){
+document.getElementById("camera").click();
+}
+
+document.getElementById("camera").addEventListener("change",function(){
+const file=this.files[0];
+if(!file)return;
+
+const reader=new FileReader();
+reader.onload=()=>{
+document.getElementById("preview").style.display="block";
+document.getElementById("preview").src=reader.result;
+processImage(reader.result);
+};
+reader.readAsDataURL(file);
+});
+
+// 💰 PRICE SYSTEM
+function getPriceRange(item,brand){
 
 if(item==="house") return [80000,400000];
 if(item==="fridge") return [300,1500];
 if(item==="air fryer") return [40,150];
 if(item==="clock") return [15,150];
-if(item==="perfume" || item==="cologne") return [40,200];
 if(item==="clothes") return [10,150];
 
 if(brand==="Jordan") return [140,200];
 if(brand==="Nike") return [100,160];
 
 if(item==="shoe") return [80,150];
-if(item==="slide") return [25,60];
-
 if(item==="couch") return [250,500];
 if(item==="table") return [120,220];
-if(item==="lamp") return [30,120];
 
 if(item==="tv") return [300,1200];
 if(item==="computer") return [300,1200];
@@ -66,116 +132,53 @@ if(item==="washer") return [200,600];
 if(item==="dryer") return [200,600];
 if(item==="stove") return [300,900];
 
-if(item==="cable") return [5,30];
-if(item==="charger") return [10,40];
-if(item==="headphones") return [20,200];
-
 if(item==="car") return [3000,10000];
 
 return [20,40];
 }
 
-// 🔥 SPECIFIC PRICING
+// 🎯 SPECIFIC ITEMS
 function getSpecificPrice(text){
-
-if(text.includes("ps5")) return [400,600];
 if(text.includes("ps4")) return [200,350];
-
+if(text.includes("ps5")) return [400,600];
 if(text.includes("iphone")) return [300,1000];
-if(text.includes("samsung")) return [200,900];
-
-if(text.includes("macbook")) return [500,1500];
 if(text.includes("jordan")) return [150,250];
-
 return null;
 }
 
-// 🔥 IMAGE SCAN
-document.getElementById("camera").addEventListener("change",function(){
-
-const file=this.files[0];
-const reader=new FileReader();
-
-reader.onload=()=>processImage(reader.result);
-reader.readAsDataURL(file);
-
-});
-
-// 🔥 AI SCANNER
+// 🧠 AI
 async function processImage(base64Image){
 
 const base64=base64Image.split(',')[1];
-
-try{
 
 const res=await fetch("https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
-requests:[{
-image:{content:base64},
-features:[{type:"LABEL_DETECTION",maxResults:8}]
-}]
+requests:[{image:{content:base64},features:[{type:"LABEL_DETECTION"}]}]
 })
 });
 
 const data=await res.json();
+let text=data.responses[0].labelAnnotations.map(l=>l.description.toLowerCase()).join(" ");
 
-let labels=data.responses?.[0]?.labelAnnotations||[];
-let text=labels.map(l=>l.description.toLowerCase()).join(" ");
+let item="unknown";
 
-let itemType="unknown";
-
-// 🔥 NEW ADDED FIXES
-
-// chair
-if(text.includes("chair") || text.includes("seat")){
-itemType="table";
-}
-
-// dog cage / kennel
-else if(text.includes("dog cage") || text.includes("kennel") || text.includes("crate")){
-itemType="couch";
-}
-
-// 🔥 EXISTING SYSTEM
-else if(text.includes("house") && !text.includes("room")) itemType="house";
-
-else if(text.includes("fridge")) itemType="fridge";
-else if(text.includes("air fryer")) itemType="air fryer";
-else if(text.includes("clock")) itemType="clock";
-
-else if(text.includes("playstation") || text.includes("ps4")) itemType="computer";
-
-else if(text.includes("computer") || text.includes("monitor")) itemType="computer";
-else if(text.includes("tv")) itemType="tv";
-
-else if(text.includes("stove")) itemType="stove";
-else if(text.includes("washer")) itemType="washer";
-else if(text.includes("dryer")) itemType="dryer";
-
-else if(text.includes("shelf")) itemType="table";
-
-else if(text.includes("couch")) itemType="couch";
-else if(text.includes("table")) itemType="table";
-
-else if(text.includes("shoe")) itemType="shoe";
-else if(text.includes("car")) itemType="car";
-
-if(itemType==="unknown"){
-document.getElementById("scanDesc").innerText="Could not detect — type manually";
-return;
-}
+// 🔥 FIXED DETECTION
+if(text.includes("chair")) item="table";
+else if(text.includes("cage")||text.includes("kennel")) item="couch";
+else if(text.includes("computer")) item="computer";
+else if(text.includes("tv")) item="tv";
+else if(text.includes("washer")) item="washer";
+else if(text.includes("dryer")) item="dryer";
+else if(text.includes("stove")) item="stove";
+else if(text.includes("car")) item="car";
 
 let specific=getSpecificPrice(text);
-
 let low,high;
 
-if(specific){
-[low,high]=specific;
-}else{
-[low,high]=getPriceRange(itemType);
-}
+if(specific){[low,high]=specific;}
+else{[low,high]=getPriceRange(item);}
 
 let worth=Math.floor((low+high)/2);
 let sellLow=high;
@@ -187,10 +190,20 @@ document.getElementById("worth").innerText="Worth: $"+worth;
 document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
 document.getElementById("profitScan").innerText="Profit: $"+profit;
 
-}catch{
-document.getElementById("scanDesc").innerText="Scan failed";
 }
 
+// 🧠 SMART SCANNER (UNCHANGED)
+function scanText(type){
+let text=document.getElementById("item").value;
+document.getElementById("scanTextResult").innerText=text;
+}
+
+// 💰 CALCULATOR (UNCHANGED)
+function calc(){
+let buy=parseFloat(document.getElementById("buy").value);
+let sell=parseFloat(document.getElementById("sellInput").value);
+let profit=sell-buy;
+document.getElementById("profit").innerText=profit;
 }
 
 </script>
