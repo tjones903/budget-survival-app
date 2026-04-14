@@ -3,238 +3,300 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Budget Survival</title>
-
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.png">
+<title>Flip It</title>
 
 <style>
-body {
-  margin: 0;
-  font-family: system-ui;
-  background: radial-gradient(circle at top, #0f2027, #0f0f0f);
-  color: white;
+body{
+margin:0;
+font-family:system-ui;
+background:radial-gradient(circle at top,#0f2027,#0f0f0f);
+color:white;
 }
 
-/* HEADER */
-.header {
-  text-align: center;
-  padding: 20px;
-  font-size: 28px;
-  font-weight: bold;
-  text-shadow: 0 0 15px #00e676;
+.nav{
+display:flex;
+justify-content:space-around;
+background:rgba(0,0,0,0.6);
+padding:12px;
 }
 
-/* NAV */
-.nav {
-  display: flex;
-  justify-content: space-around;
-  background: rgba(0,0,0,0.6);
-  padding: 12px;
-  box-shadow: 0 0 10px rgba(0,255,200,0.2);
+.nav a{
+color:white;
+text-decoration:none;
+font-weight:bold;
 }
 
-.nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
+.container{
+padding:20px;
+max-width:500px;
+margin:auto;
 }
 
-/* CONTAINER */
-.container {
-  padding: 20px;
-  max-width: 500px;
-  margin: auto;
+.card{
+background:rgba(30,30,30,0.7);
+padding:20px;
+border-radius:15px;
+margin-bottom:15px;
+box-shadow:0 0 10px #00e676;
 }
 
-/* CARDS */
-.card {
-  background: rgba(30,30,30,0.7);
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 15px;
-  box-shadow: 0 0 20px rgba(0,255,200,0.2);
-  transition: 0.3s;
+button{
+width:100%;
+padding:12px;
+border-radius:10px;
+border:none;
+margin-top:10px;
+background:linear-gradient(45deg,#00e676,#00c853);
+font-weight:bold;
 }
 
-.card:hover {
-  box-shadow: 0 0 30px rgba(0,255,200,0.4);
-}
-
-/* INPUT */
-input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #1f1f1f;
-  color: white;
-}
-
-/* BUTTONS */
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
-  background: linear-gradient(45deg, #00c853, #00e676);
-  color: black;
-  box-shadow: 0 0 10px rgba(0,255,150,0.4);
-  transition: 0.3s;
-}
-
-button:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 20px #00e676;
-}
-
-.big {
-  font-size: 26px;
-}
-
-/* STATUS COLORS */
-.status-good { color:#00e676; }
-.status-warning { color:orange; }
-.status-danger { color:red; }
-
-.share-btn {
-  background: linear-gradient(45deg, #00e676, #00c853);
-}
+.big{font-size:24px;}
 </style>
 </head>
 
 <body>
 
-<div class="header">💰 Budget Survival</div>
-
 <div class="nav">
-  <a href="index.html">Home</a>
-  <a href="tips.html">Tips</a>
-  <a href="about.html">About</a>
+<a href="index.html">Home</a>
+<a href="tips.html">Tips</a>
+<a href="about.html">About</a>
 </div>
 
 <div class="container">
 
+<!-- AI -->
 <div class="card">
-  <input id="income" placeholder="Monthly Income">
-  <input id="expenses" placeholder="Monthly Expenses">
-  <input id="days" placeholder="Days Left">
+<h3>📷 AI Item Scan</h3>
 
-  <button onclick="calculate()">Calculate</button>
+<input type="file" id="camera" accept="image/*">
+<img id="preview" width="100%" style="display:none">
+
+<button onclick="scanItem()">Scan Item</button>
+
+<div id="scanDesc"></div>
+<div class="big" id="worth">$0</div>
+<div class="big" id="sell">$0</div>
+<div class="big" id="profitScan">$0</div>
+</div>
+
+<!-- SMART -->
+<div class="card">
+<h3>🧠 Smart Scanner</h3>
+
+<input id="item" placeholder="Type item">
+
+<button onclick="scanText('new')">New</button>
+<button onclick="scanText('used')">Used</button>
+<button onclick="scanText('cracked')">Cracked</button>
+
+<div id="scanTextResult"></div>
+</div>
+
+<!-- PROFIT -->
+<div class="card">
+<h3>💰 Profit Calculator</h3>
+
+<input id="buy" type="number" placeholder="Buy Price">
+<input id="sellInput" type="number" placeholder="Sell Price">
+
+<button onclick="calc()">Check Profit</button>
+
+<div class="big" id="profit">$0</div>
 </div>
 
 <div class="card">
-  <div id="moneyLeft">$0</div>
-  <div id="daily">$0</div>
-  <div id="status"></div>
-  <div id="message"></div>
-
-  <button onclick="goFlip()">💸 Make Money</button>
-  <button onclick="goLife()">🧠 Life Mode</button>
-
-  <button class="share-btn" onclick="shareApp()">📤 Share App</button>
-</div>
-
-<div class="card">
-  <h3>📊 Budget History</h3>
-
-  <!-- ✅ ADDED EXPLANATION -->
-  <div style="font-size:12px; opacity:0.7; margin-bottom:10px;">
-    Shows your last calculations so you can track spending patterns and improve decisions.
-  </div>
-
-  <ul id="history"></ul>
-</div>
-
-<div class="card">
-  <h3>💰 Total Money Made</h3>
-  <div id="totalMoney">$0</div>
+<button onclick="history.back()">⬅ Back</button>
 </div>
 
 </div>
 
 <script>
-let history = JSON.parse(localStorage.getItem("history")) || [];
-let totalMoney = parseInt(localStorage.getItem("money")) || 0;
 
-function saveHistory(entry) {
-  history.push(entry);
-  localStorage.setItem("history", JSON.stringify(history));
-  renderHistory();
+// FILE
+function scanItem(){
+document.getElementById("camera").click();
 }
 
-function renderHistory() {
-  const list = document.getElementById("history");
-  list.innerHTML = "";
-  history.slice(-5).forEach(h => {
-    const li = document.createElement("li");
-    li.innerText = h;
-    list.appendChild(li);
-  });
+document.getElementById("camera").addEventListener("change",function(){
+const file=this.files[0];
+if(!file)return;
+
+const reader=new FileReader();
+reader.onload=()=>{
+document.getElementById("preview").style.display="block";
+document.getElementById("preview").src=reader.result;
+processImage(reader.result);
+};
+reader.readAsDataURL(file);
+});
+
+// PRICE SYSTEM (UNCHANGED)
+function getPriceRange(item,brand){
+
+if(item==="house") return [80000,400000];
+if(item==="fridge") return [300,1500];
+if(item==="air fryer") return [40,150];
+if(item==="clock") return [15,150];
+if(item==="perfume"||item==="cologne") return [40,200];
+if(item==="clothes") return [10,150];
+
+if(brand==="Jordan") return [140,200];
+if(brand==="Nike") return [100,160];
+
+if(item==="shoe") return [80,150];
+if(item==="slide") return [25,60];
+
+if(item==="couch") return [250,500];
+if(item==="table") return [120,220];
+if(item==="lamp") return [30,120];
+
+if(item==="tv") return [300,1200];
+if(item==="computer") return [300,1200];
+
+if(item==="washer") return [200,600];
+if(item==="dryer") return [200,600];
+if(item==="stove") return [300,900];
+
+if(item==="cable") return [5,30];
+if(item==="charger") return [10,40];
+if(item==="headphones") return [20,200];
+
+if(item==="car") return [3000,10000];
+
+return [20,40];
 }
 
-function calculate() {
-  let income = +document.getElementById("income").value || 0;
-  let expenses = +document.getElementById("expenses").value || 0;
-  let days = +document.getElementById("days").value || 1;
+// 🔥 ONE DETECTION SYSTEM (NEW — USED EVERYWHERE)
+function detectItem(text){
 
-  let moneyLeft = income - expenses;
-  let daily = moneyLeft / days;
+if(text.includes("house")) return "house";
+if(text.includes("fridge")) return "fridge";
+if(text.includes("air fryer")) return "air fryer";
+if(text.includes("clock")) return "clock";
+if(text.includes("perfume")||text.includes("cologne")) return "perfume";
+if(text.includes("shirt")||text.includes("hoodie")||text.includes("jacket")) return "clothes";
 
-  document.getElementById("moneyLeft").innerText = "Money Left: $" + moneyLeft;
-  document.getElementById("daily").innerText = "Daily Budget: $" + daily.toFixed(2);
+if(text.includes("computer")||text.includes("monitor")||text.includes("laptop")) return "computer";
+if(text.includes("tv")) return "tv";
 
-  let status = "", message = "", colorClass = "";
+if(text.includes("stove")||text.includes("oven")) return "stove";
+if(text.includes("washer")) return "washer";
+if(text.includes("dryer")) return "dryer";
 
-  if (daily < 10) {
-    status = "🔴 Risk";
-    message = "You are at risk.\nMoney Left: $" + moneyLeft + "\nDaily: $" + daily.toFixed(2) + "\nDays Left: " + days + "\nMake money ASAP";
-    colorClass = "status-danger";
-  } 
-  else if (daily < 30) {
-    status = "🟡 Careful";
-    message = "Be careful.\nMoney Left: $" + moneyLeft + "\nDaily: $" + daily.toFixed(2) + "\nDays Left: " + days + "\nEarn extra income";
-    colorClass = "status-warning";
-  } 
-  else {
-    status = "🟢 Good";
-    message = "You are in control.\nMoney Left: $" + moneyLeft + "\nDaily: $" + daily.toFixed(2) + "\nDays Left: " + days;
-    colorClass = "status-good";
-  }
+if(text.includes("couch")||text.includes("sofa")) return "couch";
+if(text.includes("table")||text.includes("desk")||text.includes("chair")) return "table";
+if(text.includes("lamp")) return "lamp";
 
-  document.getElementById("status").innerText = status;
-  document.getElementById("message").innerText = message;
+if(text.includes("shoe")||text.includes("sneaker")||text.includes("jordan")) return "shoe";
+if(text.includes("slide")) return "slide";
 
-  // ✅ APPLY COLORS TO EVERYTHING
-  document.getElementById("moneyLeft").className = colorClass;
-  document.getElementById("daily").className = colorClass;
-  document.getElementById("status").className = colorClass;
-  document.getElementById("message").className = colorClass;
+if(text.includes("cable")||text.includes("wire")) return "cable";
+if(text.includes("charger")) return "charger";
+if(text.includes("headphone")) return "headphones";
 
-  saveHistory("Left: $" + moneyLeft + " Daily: $" + daily.toFixed(2) + " Days: " + days);
+if(text.includes("car")) return "car";
+if(text.includes("kennel")||text.includes("cage")) return "couch";
+
+return "unknown";
 }
 
-function shareApp(){
-  if(navigator.share){
-    navigator.share({
-      title: "Flip It App",
-      text: "Check out this app!",
-      url: window.location.href
-    });
-  } else {
-    alert("Copy this link: " + window.location.href);
-  }
+// SMART SCANNER (ONLY DETECTION FIXED — NOTHING ELSE TOUCHED)
+function scanText(type){
+
+let text=document.getElementById("item").value.toLowerCase();
+if(!text){
+document.getElementById("scanTextResult").innerText="Type item";
+return;
 }
 
-function goFlip(){ window.location.href="flip.html"; }
-function goLife(){ window.location.href="lifemode.html"; }
+let brand="";
+if(text.includes("nike")) brand="Nike";
+if(text.includes("jordan")) brand="Jordan";
 
-renderHistory();
-document.getElementById("totalMoney").innerText = "$" + totalMoney;
+let item=detectItem(text);
+
+if(item==="unknown"){
+document.getElementById("scanTextResult").innerText="Item not detected";
+return;
+}
+
+let [low,high]=getPriceRange(item,brand);
+
+if(type==="used"){low*=0.8;high*=0.8;}
+if(type==="cracked"){low*=0.5;high*=0.5;}
+
+let worth=Math.floor((low+high)/2);
+let sellLow=high;
+let sellHigh=Math.floor(high*1.3);
+let profit=sellLow-worth;
+
+let status="👍 GOOD FLIP";
+if(profit<0) status="❌ BAD DEAL";
+else if(profit>50) status="🔥 GREAT FLIP";
+
+document.getElementById("scanTextResult").innerText=
+text+" ("+type+")\nWorth: $"+worth+
+"\nSell: $"+sellLow+"-"+sellHigh+
+"\nProfit: $"+profit+" | "+status;
+}
+
+// PROFIT CALCULATOR (UNCHANGED)
+function calc(){
+
+let buy=parseFloat(document.getElementById("buy").value);
+let sell=parseFloat(document.getElementById("sellInput").value);
+
+if(isNaN(buy)||isNaN(sell)){
+document.getElementById("profit").innerText="Enter values";
+return;
+}
+
+let profit=sell-buy;
+
+let status="👍 GOOD FLIP";
+if(profit<0) status="❌ BAD DEAL";
+else if(profit<20) status="⚠️ LOW PROFIT";
+else if(profit>50) status="🔥 GREAT FLIP";
+
+document.getElementById("profit").innerText="$"+profit+" | "+status;
+}
+
+// AI SCANNER (NOW USES SAME DETECTION)
+async function processImage(base64Image){
+
+const base64=base64Image.split(',')[1];
+
+const res=await fetch("https://vision.googleapis.com/v1/images:annotate?key=AIzaSyDqyJb86G978b_7LivNL5IgcjxytLupyPg",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+requests:[{image:{content:base64},features:[{type:"LABEL_DETECTION"}]}]
+})
+});
+
+const data=await res.json();
+let text=data.responses[0].labelAnnotations.map(l=>l.description.toLowerCase()).join(" ");
+
+let item=detectItem(text);
+
+if(item==="unknown"){
+document.getElementById("scanDesc").innerText="Could not detect — type manually";
+return;
+}
+
+let [low,high]=getPriceRange(item);
+
+let worth=Math.floor((low+high)/2);
+let sellLow=high;
+let sellHigh=Math.floor(high*1.3);
+let profit=sellLow-worth;
+
+document.getElementById("scanDesc").innerText=text;
+document.getElementById("worth").innerText="Worth: $"+worth;
+document.getElementById("sell").innerText="Sell: $"+sellLow+"-"+sellHigh;
+document.getElementById("profitScan").innerText="Profit: $"+profit;
+}
+
 </script>
 
 </body>
