@@ -461,8 +461,8 @@ label {
 <body>
 
 <header class="header">
-  <div class="logo">💸 FLIP IT</div>
-  <div class="tagline">Scan it. Price it. Profit.</div>
+  <<div class="logo">💸 SELL IT</div>
+<div class="tagline">Scan it. Price it. Sell it.</div>
   <div class="subtag">Budget Survival Toolkit</div>
 </header>
 
@@ -481,10 +481,9 @@ label {
   <section class="card scanner-card">
 
     <h2 class="section-title">📷 Scan an Item</h2>
-
-    <div class="section-subtitle">
-      Take a clear picture of something you may want to flip.
-    </div>
+<div class="section-subtitle">
+  Take a clear picture of an item you want to sell. AI will identify it, or you can enter it manually.
+</div>
 
     <div class="camera-box" id="cameraBox">
 
@@ -529,11 +528,11 @@ label {
 
   <section class="card">
 
-    <h3 class="section-title">⌨️ Item Analyzer</h3>
+ <h3 class="section-title">⌨️ Item Details</h3>
 
-    <div class="section-subtitle">
-      Type the item if the scanner cannot identify it.
-    </div>
+<div class="section-subtitle">
+  AI will fill this in after a scan. You can also type the item yourself or correct anything AI gets wrong.
+</div>
 
     <label for="item">What is the item?</label>
 
@@ -571,46 +570,79 @@ label {
       </button>
 
     </div>
+<label for="buyPrice">How much did this item cost you?</label>
 
-    <label for="buyPrice">How much can you buy it for?</label>
+<input
+  id="buyPrice"
+  type="number"
+  min="0"
+  step="0.01"
+  value="0"
+  placeholder="$0 if you already own it or got it free"
+>
+   
+ <label for="marketValue">
+  💰 What price do you want to sell it for?
+</label>
 
-    <input
-      id="buyPrice"
-      type="number"
-      min="0"
-      step="0.01"
-      placeholder="$ Purchase price"
-    >
+<input
+  id="marketValue"
+  type="number"
+  min="0"
+  step="0.01"
+  placeholder="$ Your selling/listing price"
+>  
 
-    <label for="marketValue">
-      Estimated resale value
-    </label>
+ <label for="fees">
+  📦 Selling costs / fees / shipping
+</label>
 
-    <input
-      id="marketValue"
-      type="number"
-      min="0"
-      step="0.01"
-      placeholder="$ Expected selling price"
-    >
+<input
+  id="fees"
+  type="number"
+  min="0"
+  step="0.01"
+  value="0"
+  placeholder="$0 if selling locally with no fees"
+> 
+<button class="blue-button" onclick="analyzeFlip()">
+  💰 PREPARE ITEM TO SELL
+</button>
+    
+<button class="primary" onclick="createSellingListing()">
+  🏷️ CREATE SELLING LISTING
+</button>
 
-    <label for="fees">
-      Estimated fees / repairs / shipping
-    </label>
+<button class="secondary" onclick="researchSellingPrice()">
+  🔎 CHECK SELLING PRICES
+</button>
 
-    <input
-      id="fees"
-      type="number"
-      min="0"
-      step="0.01"
-      value="0"
-    >
+<div id="listingOutput" style="display:none; margin-top:15px; padding:15px; background:rgba(0,230,118,0.06); border:1px solid rgba(0,230,118,0.20); border-radius:13px;">
 
-    <button class="blue-button" onclick="analyzeFlip()">
-      🧠 ANALYZE FLIP
-    </button>
+  <div style="font-weight:900; color:#00e676; margin-bottom:8px;">
+    🏷️ SELLING TITLE
+  </div>
 
-  </section>
+  <div id="listingTitle" style="margin-bottom:16px; line-height:1.5;"></div>
+
+  <div style="font-weight:900; color:#00e676; margin-bottom:8px;">
+    📝 DESCRIPTION
+  </div>
+
+  <div id="listingDescription" style="white-space:pre-line; line-height:1.6;"></div>
+
+  <button class="secondary" onclick="copyListingTitle()">
+    📋 COPY TITLE
+  </button>
+
+  <button class="secondary" onclick="copyListingDescription()">
+    📋 COPY DESCRIPTION
+  </button>
+
+</div>
+
+</section>
+
 
 
   <!-- RESULT -->
@@ -630,22 +662,22 @@ label {
     <div class="result-grid">
 
       <div class="result-box">
-        <div class="result-label">BUY PRICE</div>
+<div class="result-label">YOUR COST</div>
         <div class="result-value" id="resultBuy">$0</div>
       </div>
 
       <div class="result-box">
-        <div class="result-label">EXPECTED SALE</div>
+        <div class="result-label">SELLING PRICE</div>
         <div class="result-value" id="resultSale">$0</div>
       </div>
 
       <div class="result-box">
-        <div class="result-label">COSTS / FEES</div>
+        <div class="result-label">SELLING COSTS</div>
         <div class="result-value" id="resultFees">$0</div>
       </div>
 
       <div class="result-box">
-        <div class="result-label">TOTAL INVESTMENT</div>
+        <div class="result-label">TOTAL COST TO YOU</div>
         <div class="result-value" id="resultInvestment">$0</div>
       </div>
 
@@ -653,29 +685,28 @@ label {
 
     <div class="profit-box">
 
-      <div class="profit-label">
-        ESTIMATED PROFIT
-      </div>
+     <div class="profit-label">
+  💰 ESTIMATED MONEY YOU'LL MAKE
+</div>
 
       <div class="profit-number" id="resultProfit">
         +$0
       </div>
 
-      <div class="roi" id="resultROI">
-        ROI: 0%
-      </div>
+    <div class="roi" id="resultROI">
+  After your costs
+</div> 
 
     </div>
 
-    <button class="save-button" onclick="saveFlip()">
-      💾 SAVE THIS FLIP
-    </button>
+   <button class="save-button" onclick="saveFlip()">
+  📦 SAVE ITEM FOR SALE
+</button>
 
-    <div class="disclaimer">
-      Estimates are for decision support only. Actual selling prices,
-      marketplace fees, shipping, taxes, repairs, and demand may change
-      your final profit.
-    </div>
+ <div class="disclaimer">
+  Your actual sale amount may be different from your listing price.
+  When the item sells, mark it SOLD and enter the amount you actually received.
+</div>  
 
   </section>
 
@@ -684,18 +715,18 @@ label {
 
   <section class="card">
 
-    <h3 class="section-title">💰 Quick Profit Calculator</h3>
+  <h3 class="section-title">💰 Quick Sale Calculator</h3>
 
-    <div class="section-subtitle">
-      Already know your numbers? Check the deal quickly.
-    </div>
+<div class="section-subtitle">
+  See how much money you'll keep after your item cost and selling expenses.
+</div>
 
     <input
       id="quickBuy"
       type="number"
       min="0"
       step="0.01"
-      placeholder="Buy price"
+      placeholder="What the item cost you"
     >
 
     <input
@@ -703,7 +734,7 @@ label {
       type="number"
       min="0"
       step="0.01"
-      placeholder="Sell price"
+      placeholder="What you're selling it for"
     >
 
     <input
@@ -711,7 +742,7 @@ label {
       type="number"
       min="0"
       step="0.01"
-      placeholder="Fees / other costs"
+     placeholder="Selling fees / shipping / other costs"
       value="0"
     >
 
@@ -730,12 +761,11 @@ label {
 
   <section class="card">
 
-    <h3 class="section-title">📦 Saved Flips</h3>
+   <h3 class="section-title">🏷️ Items for Sale</h3>
 
-    <div class="section-subtitle">
-      Deals you have analyzed and saved.
-    </div>
-
+<div class="section-subtitle">
+  Items you're selling. When one sells, mark it SOLD and enter what you actually received.
+</div>
     <div id="savedFlips"></div>
 
   </section>
@@ -756,8 +786,11 @@ label {
 
 let selectedCondition = "used";
 let currentFlip = null;
+let currentDetectedItem = null;
 
-
+document.getElementById("item").addEventListener("input", function() {
+  currentDetectedItem = null;
+});
 /* ---------------------------
    CAMERA / PHOTO
 ---------------------------- */
@@ -775,159 +808,238 @@ document.getElementById("camera").addEventListener("change", function() {
 
   const reader = new FileReader();
 
-  reader.onload = async function(event) {
+  reader.onload = function(event) {
 
-    const imageData = event.target.result;
+    const originalImage = event.target.result;
 
-    const preview = document.getElementById("preview");
+    const img = new Image();
 
-    preview.src = imageData;
-    preview.style.display = "block";
+    img.onload = async function() {
 
-    document.getElementById("cameraPlaceholder").style.display = "none";
-    document.getElementById("changePhoto").style.display = "block";
+      try {
 
-    const status = document.getElementById("scanStatus");
+        /* Resize large phone photos before sending to AI */
 
-    status.style.display = "block";
+        const maxSize = 1024;
 
-    status.innerHTML =
-      "🧠 <strong>AI is looking at your item...</strong><br>" +
-      "Trying to identify the product, brand and condition.";
+        let width = img.width;
+        let height = img.height;
 
-    try {
-
-      const response = await fetch(
-        "https://budget-survival-scanner.tjones36.workers.dev",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            image: imageData
-          })
+        if (width > height && width > maxSize) {
+          height = Math.round(height * (maxSize / width));
+          width = maxSize;
         }
-      );
 
-      const data = await response.json();
+        if (height >= width && height > maxSize) {
+          width = Math.round(width * (maxSize / height));
+          height = maxSize;
+        }
 
-      if (!response.ok || !data.success) {
+        const canvas = document.createElement("canvas");
 
-        throw new Error(
-          data.details ||
-          data.error ||
-          "Scanner could not identify the item."
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const imageData =
+          canvas.toDataURL("image/jpeg", 0.78);
+
+
+        /* Show resized photo */
+
+        const preview =
+          document.getElementById("preview");
+
+        preview.src = imageData;
+        preview.style.display = "block";
+
+        document.getElementById("cameraPlaceholder").style.display =
+          "none";
+
+        document.getElementById("changePhoto").style.display =
+          "block";
+
+
+        /* Scanner message */
+
+        const status =
+          document.getElementById("scanStatus");
+
+        status.style.display = "block";
+
+        status.innerHTML =
+          "🧠 <strong>AI is looking at your item...</strong><br>" +
+          "Trying to identify the product, brand and condition.";
+
+
+        /* Send smaller image to Cloudflare */
+
+        const response = await fetch(
+          "https://budget-survival-scanner.tjones36.workers.dev",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              image: imageData
+            })
+          }
         );
 
-      }
 
-      const detected = data.detected || {};
+        const data = await response.json();
 
-      const itemName =
-        detected.searchTerm ||
-        detected.item ||
-        "";
 
-      document.getElementById("item").value =
-        itemName;
+        if (!response.ok || !data.success) {
 
-      /*
-        Match AI condition to our buttons
-      */
+          throw new Error(
+            data.details ||
+            data.error ||
+            "Scanner could not identify the item."
+          );
 
-      const aiCondition =
-        String(detected.condition || "").toLowerCase();
-
-      let condition = "used";
-
-      if (
-        aiCondition.includes("new") &&
-        !aiCondition.includes("like")
-      ) {
-        condition = "new";
-      }
-
-      if (
-        aiCondition.includes("poor") ||
-        aiCondition.includes("damage")
-      ) {
-        condition = "damaged";
-      }
-
-      selectedCondition = condition;
-
-      document.querySelectorAll(".condition").forEach(btn => {
-
-        btn.classList.remove("selected");
-
-        if (btn.dataset.condition === condition) {
-          btn.classList.add("selected");
         }
 
-      });
+
+    const detected = data.detected || {};
+
+currentDetectedItem = detected;
 
 
-      /*
-        Show what AI found
-      */
+        const itemName =
+          detected.searchTerm ||
+          detected.item ||
+          "";
+
+
+        document.getElementById("item").value =
+          itemName;
+
+
+        /* Match AI condition */
+
+        const aiCondition =
+          String(detected.condition || "").toLowerCase();
+
+        let condition = "used";
+
+
+        if (
+          aiCondition.includes("new") &&
+          !aiCondition.includes("like")
+        ) {
+          condition = "new";
+        }
+
+
+        if (
+          aiCondition.includes("poor") ||
+          aiCondition.includes("damage")
+        ) {
+          condition = "damaged";
+        }
+
+
+        selectedCondition = condition;
+
+
+        document.querySelectorAll(".condition").forEach(btn => {
+
+          btn.classList.remove("selected");
+
+          if (btn.dataset.condition === condition) {
+            btn.classList.add("selected");
+          }
+
+        });
+
+
+        /* Show AI results */
+
+        status.innerHTML =
+          "✅ <strong>ITEM DETECTED</strong><br><br>" +
+
+          "<strong>Item:</strong> " +
+          safeText(detected.item || "Unknown") +
+          "<br>" +
+
+          "<strong>Brand:</strong> " +
+          safeText(detected.brand || "Unknown") +
+          "<br>" +
+
+          "<strong>Model:</strong> " +
+          safeText(detected.model || "Unknown") +
+          "<br>" +
+
+          "<strong>Category:</strong> " +
+          safeText(detected.category || "Unknown") +
+          "<br>" +
+
+          "<strong>Condition:</strong> " +
+          safeText(detected.condition || "Unknown") +
+          "<br>" +
+
+          "<strong>Visible damage:</strong> " +
+          safeText(detected.damage || "None visible") +
+          "<br>" +
+
+          "<strong>AI confidence:</strong> " +
+          safeText(detected.confidence || "Unknown") +
+          "<br><br>" +
+
+         "💰 <strong>Next:</strong> Check the item information above, correct it manually if needed, then enter your selling price below.";
+
+
+      document.getElementById("marketValue").focus();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        const status =
+          document.getElementById("scanStatus");
+
+        status.style.display = "block";
+
+        status.innerHTML =
+          "❌ <strong>Scanner couldn't identify this photo.</strong><br>" +
+          safeText(error.message) +
+          "<br><br>You can still type the item manually below.";
+
+      }
+
+    };
+
+
+    img.onerror = function() {
+
+      const status =
+        document.getElementById("scanStatus");
+
+      status.style.display = "block";
 
       status.innerHTML =
-        "✅ <strong>ITEM DETECTED</strong><br><br>" +
+        "❌ <strong>Could not load this photo.</strong><br>" +
+        "Please try another photo.";
 
-        "<strong>Item:</strong> " +
-        safeText(detected.item || "Unknown") +
-        "<br>" +
+    };
 
-        "<strong>Brand:</strong> " +
-        safeText(detected.brand || "Unknown") +
-        "<br>" +
 
-        "<strong>Model:</strong> " +
-        safeText(detected.model || "Unknown") +
-        "<br>" +
-
-        "<strong>Category:</strong> " +
-        safeText(detected.category || "Unknown") +
-        "<br>" +
-
-        "<strong>Condition:</strong> " +
-        safeText(detected.condition || "Unknown") +
-        "<br>" +
-
-        "<strong>Visible damage:</strong> " +
-        safeText(detected.damage || "None visible") +
-        "<br>" +
-
-        "<strong>AI confidence:</strong> " +
-        safeText(detected.confidence || "Unknown") +
-        "<br><br>" +
-
-        "💰 <strong>Next:</strong> Enter what you can buy it for and its expected resale value.";
-
-      document.getElementById("buyPrice").focus();
-
-    }
-
-    catch (error) {
-
-      console.error(error);
-
-      status.innerHTML =
-        "❌ <strong>Scanner couldn't identify this photo.</strong><br>" +
-        safeText(error.message) +
-        "<br><br>You can still type the item manually below.";
-
-    }
+    img.src = originalImage;
 
   };
+
 
   reader.readAsDataURL(file);
 
 });
-
 /* ---------------------------
    CONDITION
 ---------------------------- */
@@ -965,19 +1077,19 @@ function analyzeFlip() {
 
 
   if (!item) {
-    alert("Enter the item you want to analyze.");
+ alert("Enter the item you want to sell.");
     return;
   }
 
 
   if (isNaN(buy) || buy < 0) {
-    alert("Enter the price you can buy the item for.");
+    alert("Enter what the item cost you. Use 0 if you already own it or got it free.");
     return;
   }
 
 
   if (isNaN(sale) || sale <= 0) {
-    alert("Enter the estimated resale value.");
+   alert("Enter the price you want to sell the item for.");
     return;
   }
 
@@ -1002,34 +1114,21 @@ function analyzeFlip() {
   let statusClass = "";
 
 
-  if (profit <= 0) {
+if (profit <= 0) {
+  message = " ⚠️ NO MONEY AFTER COSTS";
+}
 
-    statusText = "❌ PASS — BAD DEAL";
-    statusClass = "bad";
+else if (profit < 25) {
+  message = " 💵 SMALL SALE";
+}
 
-  }
+else if (profit >= 100) {
+  message = " 🔥 BIG MONEY SALE";
+}
 
-  else if (profit < 20 || roi < 25) {
-
-    statusText = "⚠️ LOW PROFIT";
-    statusClass = "low";
-
-  }
-
-  else if (profit >= 50 && roi >= 50) {
-
-    statusText = "🔥 GREAT FLIP";
-    statusClass = "great";
-
-  }
-
-  else {
-
-    statusText = "👍 GOOD FLIP";
-    statusClass = "good";
-
-  }
-
+else {
+  message = " 💰 GOOD SALE";
+}
 
   currentFlip = {
     item: item,
@@ -1073,9 +1172,10 @@ function analyzeFlip() {
 
   document.getElementById("resultProfit").innerText =
     (profit >= 0 ? "+" : "-") + money(Math.abs(profit));
+  
+document.getElementById("resultROI").innerText =
+  "After your costs: " + money(investment);
 
-  document.getElementById("resultROI").innerText =
-    "ROI: " + roi.toFixed(0) + "%";
 
 
   const resultCard =
@@ -1113,7 +1213,7 @@ function saveFlip() {
 
   renderSavedFlips();
 
-  alert("Flip saved!");
+alert("Item saved for sale!");
 
 }
 
@@ -1132,8 +1232,8 @@ function renderSavedFlips() {
 
   if (flips.length === 0) {
 
-    container.innerHTML =
-      '<div class="saved-empty">No flips saved yet.</div>';
+  container.innerHTML =
+  '<div class="saved-empty">No items for sale yet.</div>';  
 
     return;
 
@@ -1147,7 +1247,7 @@ function renderSavedFlips() {
     .slice()
     .reverse()
     .slice(0, 5)
-    .forEach(flip => {
+.forEach((flip, index) => {
 
       const div =
         document.createElement("div");
@@ -1163,25 +1263,204 @@ function renderSavedFlips() {
 
         '<div style="font-size:12px;color:#8d999d;margin-top:3px;">' +
         capitalize(flip.condition) +
-        ' • Buy ' +
-        money(flip.buy) +
-        ' • Sell ' +
-        money(flip.sale) +
+      ' • Cost ' +
+money(flip.buy) +
+' • Listed ' +
+money(flip.sale) +
         '</div>' +
+'<div class="saved-profit">' +
+'Estimated Money: ' +
+(flip.profit >= 0 ? "+" : "-") +
+money(Math.abs(flip.profit)) +
+'</div>' +
 
-        '<div class="saved-profit">' +
-        'Estimated Profit: ' +
-        (flip.profit >= 0 ? "+" : "-") +
-        money(Math.abs(flip.profit)) +
-        '</div>';
-
+'<button class="primary" onclick="markSold(' + index + ')">' +
+'✅ MARK SOLD' +
+'</button>';
+        
       container.appendChild(div);
 
     });
 
 }
 
+  /* ---------------------------
+   CREATE SELLING LISTING
+---------------------------- */
 
+
+
+  async function copyListingTitle() {
+
+  const text =
+    document.getElementById("listingTitle").innerText;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("Title copied!");
+  } catch {
+    alert("Could not copy automatically. Press and hold the title to copy it.");
+  }
+}
+
+
+async function copyListingDescription() {
+
+  const text =
+    document.getElementById("listingDescription").innerText;
+
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("Description copied!");
+  } catch {
+    alert("Could not copy automatically. Press and hold the description to copy it.");
+  }
+}
+
+
+function researchSellingPrice() {
+
+  const manualItem =
+    document.getElementById("item").value.trim();
+
+  if (!manualItem) {
+    alert("Scan an item or type the item you want to sell first.");
+    return;
+  }
+
+  const detected = currentDetectedItem || {};
+
+  const searchTerm =
+    detected.searchTerm || manualItem;
+
+  const url =
+    "https://www.google.com/search?q=" +
+    encodeURIComponent(searchTerm + " used for sale");
+
+  window.open(url, "_blank");
+}
+function createSellingListing() {
+  const detected = currentDetectedItem || {};
+
+  const brand =
+    detected.brand && detected.brand !== "Unknown"
+      ? detected.brand
+      : "";
+
+  const model =
+    detected.model && detected.model !== "Unknown"
+      ? detected.model
+      : "";
+
+  const damage =
+    detected.damage && detected.damage !== "None visible"
+      ? detected.damage
+      : "";
+
+  const condition =
+    capitalize(selectedCondition);
+
+ let title = manualItem;
+
+title = title.trim();
+
+  let description =
+    title + "\n\n" +
+    "Condition: " + condition + "\n";
+
+  if (damage) {
+    description +=
+      "Visible condition notes: " + damage + "\n";
+  }
+
+  description +=
+    "\nItem is being sold as pictured. " +
+    "Please review the photos and ask any questions before purchasing.";
+document.getElementById("listingTitle").innerText =
+  title;
+
+document.getElementById("listingDescription").innerText =
+  description;
+
+document.getElementById("listingOutput").style.display =
+  "block";
+
+document.getElementById("listingOutput").scrollIntoView({
+  behavior: "smooth",
+  block: "center"
+});
+  
+}
+/* ---------------------------
+   MARK ITEM SOLD
+---------------------------- */
+
+function markSold(displayIndex) {
+
+  let flips =
+    JSON.parse(localStorage.getItem("savedFlips")) || [];
+
+  const reversed = flips
+    .map((flip, originalIndex) => ({
+      flip,
+      originalIndex
+    }))
+    .reverse()
+    .slice(0, 5);
+
+  const selected = reversed[displayIndex];
+
+  if (!selected) {
+    alert("Could not find this item.");
+    return;
+  }
+
+  const soldFor = parseFloat(
+    prompt(
+      "How much did you actually sell " +
+      selected.flip.item +
+      " for?"
+    )
+  );
+
+  if (isNaN(soldFor) || soldFor < 0) {
+    alert("Enter a valid sale amount.");
+    return;
+  }
+
+  const costs =
+    Number(selected.flip.buy || 0) +
+    Number(selected.flip.fees || 0);
+
+  const moneyMade = soldFor - costs;
+
+  let total =
+    parseFloat(localStorage.getItem("total")) || 0;
+
+  total += moneyMade;
+
+  localStorage.setItem(
+    "total",
+    total.toFixed(2)
+  );
+
+  flips.splice(selected.originalIndex, 1);
+
+  localStorage.setItem(
+    "savedFlips",
+    JSON.stringify(flips)
+  );
+
+  renderSavedFlips();
+
+  alert(
+    "🎉 SOLD!\n\n" +
+    "Sold for: " + money(soldFor) + "\n" +
+    "Your costs: " + money(costs) + "\n" +
+    "Money made: " + money(moneyMade) + "\n\n" +
+    "Added to Total Money Made!"
+  );
+}
 /* ---------------------------
    QUICK PROFIT
 ---------------------------- */
@@ -1219,29 +1498,17 @@ function quickProfit() {
 
   let message = "";
 
-
-  if (profit <= 0) {
-    message = " ❌ PASS";
-  }
-
-  else if (profit < 20) {
-    message = " ⚠️ LOW PROFIT";
-  }
-
-  else if (profit >= 50) {
-    message = " 🔥 GREAT FLIP";
-  }
-
-  else {
-    message = " 👍 GOOD FLIP";
-  }
-
-
-  document.getElementById("quickOutput").innerText =
-    (profit >= 0 ? "+" : "-") +
-    money(Math.abs(profit)) +
-    message;
-
+if (profit <= 0) {
+  message = " ⚠️ NO MONEY AFTER COSTS";
+}
+else if (profit < 25) {
+  message = " 💵 SMALL SALE";
+}
+else if (profit >= 100) {
+  message = " 🔥 BIG MONEY SALE";
+}
+else {
+  message = " 💰 GOOD SALE";
 }
 
 
