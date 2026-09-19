@@ -119,7 +119,7 @@ font-size:14px;
 <script>
 
 let historyList = JSON.parse(localStorage.getItem("history")) || [];
-let total = parseInt(localStorage.getItem("total")) || 0;
+let total = parseFloat(localStorage.getItem("total")) || 0;
 
 function calcBudget(){
 
